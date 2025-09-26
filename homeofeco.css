@@ -1,0 +1,617 @@
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Color variables */
+:root {
+  --primary: #4CAF50;
+  --primary-dark: #388E3C;
+  --background: #f5f5f5;
+  --text-secondary: #333333;
+  --navbar-bg: rgba(255, 255, 255, 0.9);
+  --navbar-text: #333;
+  --footer-bg: rgba(0, 0, 0, 0.8);
+  --footer-text: #fff;
+  --sidenav-bg: rgba(0, 0, 0, 0.7);
+  --sidenav-width: 70px;
+  --sidenav-expanded-width: 200px;
+}
+
+/* Global styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Background styling */
+.hero-background {
+  background-image: url('valentin-petrov-m-mal-01.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -2;
+  opacity: 0.9;
+  animation: bgZoomIn 4s ease-in-out 1 forwards;
+}
+
+.overlay-background {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("after.png");
+  background-size: cover;
+  background-position: top;
+  transform: scale(2);
+  animation: bgZoomOut 4s ease-in-out 1 forwards;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Background animations */
+@keyframes bgZoomIn {
+  from {
+    transform: scale(1.2);
+  } 
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  } 
+  to {
+    opacity: 0.7;
+  }
+}
+
+@keyframes bgZoomOut {
+  from {
+    transform: scale(1);
+  } to {
+    transform: scale(2);
+  }
+}
+
+/* Top Navbar styling */
+.top-navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: transparent;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  backdrop-filter: none;
+}
+
+.nav-container {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+}
+
+.nav-logo {
+  font-size: 1.8rem;
+  color: var(--primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  margin: 0 10px;
+}
+
+.nav-link {
+  color: var(--navbar-text);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1.1rem;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  background-color: var(--primary);
+  color: white;
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.bar {
+  width: 25px;
+  height: 3px;
+  background-color: var(--primary);
+  margin: 3px 0;
+  transition: 0.3s;
+  border-radius: 2px;
+}
+
+/* Side Navbar styling - Updated for all devices */
+.side-navbar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  background-color: transparent;
+  width: var(--sidenav-width);
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: none;
+  transition: all 0.3s ease;
+  padding: 15px 10px;
+  transform: translateX(0);
+}
+
+.side-navbar.expanded {
+  width: var(--sidenav-expanded-width);
+}
+
+.side-navbar.hidden {
+  transform: translateX(-100%);
+}
+
+.side-navbar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.side-nav-item {
+  margin: 10px 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.side-nav-link {
+  color: white;
+  text-decoration: none;
+  font-size: 1.5rem;
+  padding: 10px;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.side-nav-link:hover,
+.side-nav-link.active {
+  background-color: var(--primary);
+  color: white;
+}
+
+.side-nav-tooltip {
+  position: absolute;
+  left: 70px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+}
+
+.side-nav-item:hover .side-nav-tooltip {
+  opacity: 1;
+}
+
+/* Side navbar toggle button */
+.side-nav-toggle {
+  position: fixed;
+  left: 20px;
+  top: 80px;
+  z-index: 101;
+  background-color: var(--sidenav-bg);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.side-nav-toggle:hover {
+  background-color: var(--primary);
+}
+
+.side-nav-toggle i {
+  font-size: 1.2rem;
+}
+
+/* Main content styling - adjusted for side navbar */
+.main-content {
+  margin-top: 70px;
+  margin-left: var(--sidenav-width);
+  padding-bottom: 60px; /* Space for footer */
+  transition: margin-left 0.3s ease;
+}
+
+.main-content.full-width {
+  margin-left: 0;
+}
+
+/* Content sections styling */
+.content-section {
+  display: none;
+  min-height: calc(100vh - 130px); /* Account for navbar and footer */
+  padding: 40px 20px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.content-section.active {
+  display: flex;
+}
+
+/* Homepage container styling */
+.homepage-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  color: white;
+  width: 100%;
+}
+
+/* Logo styling */
+.homepage-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--primary);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.homepage-logo:hover {
+  color: var(--primary-dark);
+}
+
+/* Hero content styling */
+.hero-content {
+  margin-top: 2rem;
+  font-size: 1.5rem;
+  color: white;
+  max-width: 600px;
+}
+
+/* Call to action button styling */
+.cta-button {
+  margin-top: 2rem;
+  padding: 15px 30px;
+  background-color: var(--primary);
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: background-color 0.3s;
+  display: inline-block;
+}
+
+.cta-button:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Mission and Vision sections styling */
+.mission-vision {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 800px;
+  margin: 20px auto;
+  animation: fadeInUp 1s ease-out;
+}
+
+.mission-vision h1, .mission-vision h2 {
+  color: var(--primary);
+  margin-top: 0;
+}
+
+.mission-vision p {
+  color: white;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  text-align: left;
+}
+
+/* Awareness content styling */
+.awareness-content {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 800px;
+  margin: 20px auto;
+  margin-bottom: 40px;
+  animation: fadeInUp 1s ease-out;
+}
+
+.awareness-content h2 {
+  color: var(--primary);
+  margin-top: 0;
+}
+
+.awareness-content p {
+  color: white;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  text-align: left;
+}
+
+/* Footer styling */
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: transparent;
+  color: var(--footer-text);
+  padding: 10px 0;
+  text-align: center;
+  z-index: 90;
+  backdrop-filter: blur(10px);
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.footer-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.social-icons {
+  display: flex;
+  gap: 15px;
+}
+
+.social-icon {
+  color: white;
+  font-size: 1.5rem;
+  transition: color 0.3s;
+}
+
+.social-icon:hover {
+  color: var(--primary);
+}
+
+/* Smooth entrance animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 992px) {
+  .footer-content {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .footer-links {
+    margin: 10px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-menu {
+    position: fixed;
+    left: -100%;
+    top: 70px;
+    flex-direction: column;
+    background-color: var(--navbar-bg);
+    width: 100%;
+    text-align: center;
+    transition: 0.3s;
+    box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+  }
+
+  .nav-menu.active {
+    left: 0;
+  }
+
+  .nav-item {
+    margin: 10px 0;
+  }
+
+  .nav-link {
+    font-size: 1.2rem;
+    display: block;
+    padding: 15px;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .hamburger.active .bar:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger.active .bar:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+
+  .hamburger.active .bar:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  .homepage-container {
+    padding: 10px;
+  }
+  
+  .homepage-logo {
+    font-size: 2rem;
+  }
+  
+  .hero-content {
+    font-size: 1.2rem;
+  }
+  
+  .mission-vision, .awareness-content {
+    padding: 20px;
+    margin: 10px auto;
+  }
+  
+  .mission-vision h1, .mission-vision h2, .awareness-content h2 {
+    font-size: 1.5rem;
+  }
+  
+  .mission-vision p, .awareness-content p {
+    font-size: 1rem;
+  }
+  
+  .cta-button {
+    padding: 12px 25px;
+    font-size: 1rem;
+  }
+  
+  .content-section {
+    padding: 20px 10px;
+  }
+  
+  /* Side navbar remains on the side in mobile */
+  .side-navbar {
+    width: 0;
+    overflow: hidden;
+  }
+  
+  .side-navbar.expanded {
+    width: var(--sidenav-width);
+  }
+  
+  /* Adjust main content for collapsed side navbar */
+  .main-content {
+    margin-left: 0;
+  }
+  
+  .main-content.with-sidenav {
+    margin-left: var(--sidenav-width);
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-container {
+    padding: 10px 15px;
+  }
+  
+  .homepage-container {
+    padding: 5px;
+  }
+  
+  .homepage-logo {
+    font-size: 1.5rem;
+  }
+  
+  .hero-content {
+    font-size: 1rem;
+  }
+  
+  .mission-vision, .awareness-content {
+    padding: 15px;
+    margin: 10px auto;
+  }
+  
+  .mission-vision h1, .mission-vision h2, .awareness-content h2 {
+    font-size: 1.2rem;
+  }
+  
+  .mission-vision p, .awareness-content p {
+    font-size: 0.9rem;
+  }
+  
+  .cta-button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .social-icons {
+    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 0;
+  }
+}
+
+/* Fix for overlay image on different screen sizes */
+@media (max-width: 1200px) {
+  .overlay-background {
+    background-size: contain;
+    transform: none;
+  }
+}
