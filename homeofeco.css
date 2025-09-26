@@ -47,10 +47,11 @@ body {
 
 .overlay-background {
   content: '';
-  position: absolute;
+  position: fixed;
   inset: 0;
   background-image: url("after.png");
   background-size: cover;
+  background-repeat: no-repeat;
   background-position: top;
   transform: scale(2);
   animation: bgZoomOut 4s ease-in-out 1 forwards;
