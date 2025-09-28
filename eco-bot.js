@@ -239,6 +239,73 @@ class HamburgerMenu {
     }
 }
 
+// Waste Disposal Calculator Functionality
+class WasteCalculator {
+    constructor() {
+        this.calculateBtn = document.getElementById('calculate-btn');
+        this.wasteFrequency = document.getElementById('waste-frequency');
+        this.wasteAmount = document.getElementById('waste-amount');
+        this.wasteType = document.getElementById('waste-type');
+        this.dailyResult = document.getElementById('daily-waste-result');
+        this.weeklyResult = document.getElementById('weekly-waste-result');
+        this.monthlyResult = document.getElementById('monthly-waste-result');
+        this.yearlyResult = document.getElementById('yearly-waste-result');
+        this.init();
+    }
+
+    init() {
+        if (this.calculateBtn) {
+            this.setupEventListeners();
+        }
+    }
+
+    setupEventListeners() {
+        this.calculateBtn.addEventListener('click', () => {
+            this.calculateWaste();
+        });
+
+        // Also calculate when inputs change
+        this.wasteFrequency.addEventListener('input', () => {
+            this.calculateWaste();
+        });
+
+        this.wasteAmount.addEventListener('input', () => {
+            this.calculateWaste();
+        });
+
+        this.wasteType.addEventListener('change', () => {
+            this.calculateWaste();
+        });
+    }
+
+    calculateWaste() {
+        const frequency = parseFloat(this.wasteFrequency.value) || 0;
+        const amount = parseFloat(this.wasteAmount.value) || 0;
+        const type = this.wasteType.value;
+
+        // Daily calculation
+        const daily = amount * frequency / 7;
+        this.dailyResult.textContent = daily.toFixed(2) + ' kg';
+
+        // Weekly calculation
+        const weekly = amount * frequency;
+        this.weeklyResult.textContent = weekly.toFixed(2) + ' kg';
+
+        // Monthly calculation (approximate)
+        const monthly = weekly * 4.33;
+        this.monthlyResult.textContent = monthly.toFixed(2) + ' kg';
+
+        // Yearly calculation
+        const yearly = weekly * 52;
+        this.yearlyResult.textContent = yearly.toFixed(2) + ' kg';
+
+        // Show notification
+        if (typeof window.showNotification !== 'undefined') {
+            window.showNotification(`Waste calculation updated for ${type} waste!`);
+        }
+    }
+}
+
 // Enhanced notification system to fix spam issue
 function enhanceNotificationSystem() {
     const originalShowNotification = window.showNotification;
@@ -293,6 +360,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Hamburger Menu
     const hamburgerMenu = new HamburgerMenu();
     
+    // Initialize Waste Calculator
+    const wasteCalculator = new WasteCalculator();
+    
     // Enhance notification system
     enhanceNotificationSystem();
     
@@ -328,3 +398,4 @@ function getRandomWasteTip() {
 // Export for use in other scripts if needed
 window.EcoBot = EcoBot;
 window.HamburgerMenu = HamburgerMenu;
+window.WasteCalculator = WasteCalculator;

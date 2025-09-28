@@ -118,8 +118,8 @@ const translations = {
         'games.subtitle': 'Learn while you play',
         
         // Tracker section
-        'tracker.title': 'Waste Tracker Dashboard',
-        'tracker.subtitle': 'Monitor your environmental impact',
+        'tracker.title': 'Waste Disposal Calculator',
+        'tracker.subtitle': 'Calculate your waste disposal needs',
         'tracker.metrics.wasteReduced': 'Pounds Reduced',
         'tracker.metrics.recyclingRate': 'Recycling Rate %',
         'tracker.metrics.carbonSaved': 'Tons CO2 Saved',
@@ -168,98 +168,98 @@ const translations = {
         'settings.privacy.description': 'Control your data sharing preferences and privacy settings for a personalized experience.',
         'settings.privacy.button': 'Privacy Settings'
     },
-    es: {
+    fil: {
         // Navigation
-        'nav.home': 'Inicio',
-        'nav.info': 'Info',
-        'nav.games': 'Juegos',
-        'nav.tracker': 'Monitor',
-        'nav.about': 'Acerca',
-        'nav.settings': 'Configuración',
+        'nav.home': 'Home',
+        'nav.info': 'Impormasyon',
+        'nav.games': 'Mga Laro',
+        'nav.tracker': 'Tracker',
+        'nav.about': 'Tungkol',
+        'nav.settings': 'Mga Setting',
         
         // Hero section
-        'hero.title': 'Transforma Residuos en Valor',
-        'hero.description': 'Únete a la revolución verde con nuestra plataforma integral de gestión de residuos. Rastrea, reduce y recicla hacia un futuro sostenible.',
-        'hero.cta': 'Comenzar Seguimiento',
+        'hero.title': 'I-Transform ang Basura sa Kabuluhan',
+        'hero.description': 'Sumali sa green revolution gamit ang aming comprehensive waste management platform. I-track, bawasan, at i-recycle ang iyong daan patungo sa isang sustainable na hinaharap.',
+        'hero.cta': 'Simulan ang Pag-track',
         
         // Features
-        'features.recycling.title': 'Reciclaje Inteligente',
-        'features.recycling.description': 'Aprende cómo clasificar y reciclar diferentes materiales correctamente con nuestro sistema de guía inteligente.',
-        'features.analytics.title': 'Análisis de Residuos',
-        'features.analytics.description': 'Rastrea tu progreso de reducción de residuos con análisis detallados y métricas de impacto ambiental.',
-        'features.rewards.title': 'Recompensas Eco',
-        'features.rewards.description': 'Gana puntos por prácticas sostenibles y cámbialos por productos ecológicos.',
+        'features.recycling.title': 'Smart na Pag-recycle',
+        'features.recycling.description': 'Alamin kung paano ng wasto i-sort at i-recycle ang iba\'t ibang materyales gamit ang aming intelligent guidance system.',
+        'features.analytics.title': 'Waste Analytics',
+        'features.analytics.description': 'I-track ang iyong pag-unlad sa pagbawas ng basura gamit ang detalyadong analytics at environmental impact metrics.',
+        'features.rewards.title': 'Eco Rewards',
+        'features.rewards.description': 'Kumita ng puntos para sa sustainable practices at i-redeem ang mga ito para sa eco-friendly merchandise.',
         
         // Info section
-        'info.title': 'Información de Gestión de Residuos',
-        'info.subtitle': 'Aprende sobre prácticas sostenibles de eliminación de residuos',
-        'info.categories.title': 'Categorías de Residuos',
-        'info.categories.description': 'Los residuos orgánicos deben compostarse para crear suelo rico en nutrientes. Mantén los restos de comida, recortes de jardín y materiales biodegradables separados de otros flujos de residuos.',
-        'info.recycling.title': 'Guías de Reciclaje',
-        'info.recycling.description': 'Limpia los contenedores antes de reciclar. Retira tapas y tapones de las botellas. Consulta los programas de reciclaje locales para políticas específicas de aceptación de materiales.',
-        'info.hazardous.title': 'Residuos Peligrosos',
-        'info.hazardous.description': 'Electrónicos, baterías, químicos y residuos médicos requieren métodos especiales de eliminación. Nunca pongas estos artículos en contenedores regulares de basura o reciclaje.',
-        'info.reduction.title': 'Consejos de Reducción',
-        'info.reduction.description': 'Compra solo lo que necesite, elige productos reutilizables, repara en lugar de reemplazar, y dona artículos en buenas condiciones para reducir la generación total de residuos.',
-        'info.composting.title': 'Guía de Compostaje',
-        'info.composting.description': 'Crea una mezcla equilibrada de materiales verdes (restos de comida) y materiales marrones (hojas secas, papel) para condiciones óptimas de compostaje.',
-        'info.industrial.title': 'Residuos Industriales',
-        'info.industrial.description': 'Las empresas deben seguir regulaciones específicas para la eliminación de residuos. Asíóciate con empresas certificadas de gestión de residuos para el manejo y documentación adecuados.',
+        'info.title': 'Impormasyon sa Waste Management',
+        'info.subtitle': 'Alamin ang tungkol sa sustainable waste disposal practices',
+        'info.categories.title': 'Mga Kategorya ng Basura',
+        'info.categories.description': 'Ang organic waste ay dapat i-compost para makagawa ng nutrient-rich soil. Panatilihin ang food scraps, yard trimmings, at biodegradable materials na hiwalay sa iba pang waste streams.',
+        'info.recycling.title': 'Mga Alituntunin sa Pag-recycle',
+        'info.recycling.description': 'Linisin ang mga lalagyan bago i-recycle. Alisin ang mga cap at lid mula sa mga bote. Tingnan ang mga lokal na recycling programs para sa mga patakaran sa pagtanggap ng materyales.',
+        'info.hazardous.title': 'Hazardous Waste',
+        'info.hazardous.description': 'Ang mga electronics, bateriya, kemikal, at medikal na basura ay nangangailangan ng espesyal na disposal methods. Huwag ilagay ang mga ite, sa regular trash o recycling bins.',
+        'info.reduction.title': 'Mga Tip sa Pagbawas',
+        'info.reduction.description': 'Bumili lamang ng kung ano ang kailangan, pumili ng mga reusable product, kumpihin sa halip na palitan, at i-donate ang mga gamit na nasa mabuting kondisyon para bawasan ang kabuuang waste generation.',
+        'info.composting.title': 'Gabay sa Composting',
+        'info.composting.description': 'Gumawa ng balanseng halo ng green materials (tira ng pagkain) at brown materials (tuyot na dahon, papel) para sa pinakamainam na composting conditions.',
+        'info.industrial.title': 'Pang-industriyang Basura',
+        'info.industrial.description': 'Ang mga negosyo ay dapat sumunod sa mga partikular na regulasyon para sa waste disposal. Makipagtulungan sa mga sertipikadong waste management companies para sa tamang paghahawak at dokumentasyon.',
         
         // Games section
-        'games.title': 'Juegos Ecológicos',
-        'games.subtitle': 'Aprende mientras juegas',
+        'games.title': 'Eco-Friendly na Mga Laro',
+        'games.subtitle': 'Matuto habang naglalaro',
         
         // Tracker section
-        'tracker.title': 'Panel de Control de Seguimiento de Residuos',
-        'tracker.subtitle': 'Monitorea tu impacto ambiental',
-        'tracker.metrics.wasteReduced': 'Libras Reducidas',
-        'tracker.metrics.recyclingRate': 'Tasa de Reciclaje %',
-        'tracker.metrics.carbonSaved': 'Toneladas CO2 Ahorradas',
-        'tracker.metrics.ecoPoints': 'Puntos Eco',
-        'tracker.report.title': 'Informe Anual',
-        'tracker.report.description': 'Esta semana has mejorado tu tasa de reciclaje en 12% y reducido los residuos totales en 8 libras. ¡Sigue con el excelente trabajo!',
-        'tracker.report.button': 'Ver Informe Completo',
-        'tracker.goals.title': 'Metas y Logros',
-        'tracker.goals.description': 'Estás al 78% hacia tu meta mensual de reducir residuos en 50 libras. ¡Completa 3 actividades más de reciclaje para desbloquear la insignia "Campeón Verde"!',
-        'tracker.goals.button': 'Establecer Nuevas Metas',
-        'tracker.comparison.title': 'Comparación de Impacto',
-        'tracker.comparison.description': 'Comparado con el hogar promedio, estás produciendo 32% menos residuos y reciclando 28% más materiales. ¡Estás haciendo una diferencia real!',
-        'tracker.comparison.button': 'Comparar con Otros',
+        'tracker.title': 'Kalkulator ng Waste Disposal',
+        'tracker.subtitle': 'Kalkulahin ang iyong pangangailangan sa waste disposal',
+        'tracker.metrics.wasteReduced': 'Pounds na Nabawasan',
+        'tracker.metrics.recyclingRate': 'Rate ng Pag-recycle %',
+        'tracker.metrics.carbonSaved': 'Tons CO2 na Na-save',
+        'tracker.metrics.ecoPoints': 'Eco Points',
+        'tracker.report.title': 'Taunang Ulat',
+        'tracker.report.description': 'Ngayong linggo ay pinaigi mo ang iyong recycling rate ng 12% at nabawasan ang kabuuang basura ng 8 pounds. Patuloy na gawin ang mahusay na trabaho!',
+        'tracker.report.button': 'Tingnan ang Buong Ulat',
+        'tracker.goals.title': 'Mga Layunin at Nakamit',
+        'tracker.goals.description': 'Ikaw ay 78% na natapos sa iyong buwanang layunin na bawasan ang basura ng 50 pounds. Kumpletuhin ang 3 pang recycling activities para i-unlock ang "Green Champion" badge!',
+        'tracker.goals.button': 'Magtakda ng Bagong Mga Layunin',
+        'tracker.comparison.title': 'Paghahambing ng Epekto',
+        'tracker.comparison.description': 'Ikukumpara sa isang average household, ikaw ay gumagawa ng 32% na mas kaunting basura at nagre-recycle ng 28% na mas maraming materyales. Ikaw ay gumagawa ng tunay na pagbabago!',
+        'tracker.comparison.button': 'Ikumpara sa Iba',
         
         // About section
-        'about.title': 'Acerca de ECOTrack',
-        'about.subtitle': 'Nuestra misión para un futuro sostenible',
-        'about.mission.title': 'Nuestra Misión',
-        'about.mission.description': 'Crear un mundo donde los residuos se minimicen, los recursos se conserven, y cada individuo contribuya a la sostenibilidad ambiental a través de acciones informadas y tecnología inteligente.',
-        'about.team.title': 'Nuestro Equipo',
-        'about.team.description': 'Un grupo dedicado de científicos ambientales, ingenieros de software y expertos en sostenibilidad trabajando juntos para desarrollar soluciones innovadoras para los desafíos de gestión de residuos.',
-        'about.impact.title': 'Impacto Global',
-        'about.impact.description': 'Desde nuestro lanzamiento, los usuarios de ECOTrack han desviado más de 2 millones de libras de residuos de vertederos y reducido las emisiones de carbono en 15,000 toneladas a través de mejores prácticas de reciclaje.',
-        'about.technology.title': 'Tecnología',
-        'about.technology.description': 'Nuestra plataforma utiliza análisis avanzados y aprendizaje automático para proporcionar recomendaciones personalizadas de reducción de residuos y rastrear el impacto ambiental en tiempo real.',
-        'about.partnerships.title': 'Alianzas',
-        'about.partnerships.description': 'Colaboramos con empresas locales de gestión de residuos, organizaciones ambientales y municipalidades para crear programas integrales de sostenibilidad.',
-        'about.education.title': 'Educación',
-        'about.education.description': 'A través de talleres, recursos en línea y programas comunitarios, educamos a individuos y empresas sobre prácticas sostenibles de gestión de residuos.',
+        'about.title': 'Tungkol sa ECOTrack',
+        'about.subtitle': 'Ang aming misyon para sa isang sustainable na hinaharap',
+        'about.mission.title': 'Ang Aming Misyon',
+        'about.mission.description': 'Para lumikha ng isang mundo kung saan ang basura ay nababawasan, ang mga mapagkukunan ay nakakatipid, at bawat indibidwal ay nakakatulong sa environmental sustainability sa pamamagitan ng impormadong aksyon at smart technology.',
+        'about.team.title': 'Ang Aming Koponan',
+        'about.team.description': 'Isang dedikadong grupo ng environmental scientists, software engineers, at sustainability experts na nagtutulungan para bumuo ng makabagong solusyon sa mga hamon ng waste management.',
+        'about.impact.title': 'Global na Epekto',
+        'about.impact.description': 'Mula nang aming ilunsad, ang mga gumagamit ng ECOTrack ay nakaiwas ng higit sa 2 milyong pounds ng basura mula sa mga landfill at nabawasan ang carbon emissions ng 15,000 tons sa pamamagitan ng pagpapahusay ng recycling practices.',
+        'about.technology.title': 'Teknolohiya',
+        'about.technology.description': 'Ang aming platform ay gumagamit ng advanced analytics at machine learning para magbigay ng personalized waste reduction recommendations at i-track ang environmental impact sa real-time.',
+        'about.partnerships.title': 'Mga Partership',
+        'about.partnerships.description': 'Kami ay nakikipagtulungan sa mga lokal na waste management companies, environmental organizations, at mga munisipalidad para lumikha ng komprehensibong sustainability programs.',
+        'about.education.title': 'Edukasyon',
+        'about.education.description': 'Sa pamamagitan ng mga workshop, online resources, at komunidad na mga programa, kami ay nagpapalaganap ng kaalaman sa mga indibidwal at negosyo tungkol sa sustainable na waste management practices.',
         
         // Settings section
-        'settings.title': 'Configuración',
-        'settings.subtitle': 'Personaliza tu experiencia ECOTrack',
-        'settings.theme.title': 'Elegir Tema',
-        'settings.theme.light': 'Claro',
-        'settings.theme.dark': 'Oscuro',
-        'settings.theme.forest': 'Bosque',
-        'settings.theme.ocean': 'Océano',
-        'settings.theme.sunset': 'Atardecer',
-        'settings.theme.description': 'Elige de nuestra colección de hermosos temas para personalizar tu experiencia ECOTrack.',
-        'settings.language.title': 'Idioma / Language',
-        'settings.notifications.title': 'Notificaciones',
-        'settings.notifications.description': 'Gestiona tus preferencias de notificación para recordatorios, logros e informes semanales.',
-        'settings.notifications.button': 'Configurar Notificaciones',
-        'settings.privacy.title': 'Datos y Privacidad',
-        'settings.privacy.description': 'Controla tus preferencias de compartir datos y configuraciones de privacidad para una experiencia personalizada.',
-        'settings.privacy.button': 'Configuración de Privacidad'
+        'settings.title': 'Mga Setting',
+        'settings.subtitle': 'I-customize ang iyong ECOTrack experience',
+        'settings.theme.title': 'Pumili ng Tema',
+        'settings.theme.light': 'Liwanag',
+        'settings.theme.dark': 'Madilim',
+        'settings.theme.forest': 'Kagubatan',
+        'settings.theme.ocean': 'Karagatan',
+        'settings.theme.sunset': 'Takipsilim',
+        'settings.theme.description': 'Pumili mula sa aming koleksyon ng magagandang tema para i-personalize ang iyong ECOTrack experience.',
+        'settings.language.title': 'Wika / Language',
+        'settings.notifications.title': 'Mga Abiso',
+        'settings.notifications.description': 'Pamahalaan ang iyong mga kagustuhan sa abiso para sa mga paalala, nakamit, at lingguhang mga ulat.',
+        'settings.notifications.button': 'I-configure ang Mga Abiso',
+        'settings.privacy.title': 'Datos at Privacy',
+        'settings.privacy.description': 'Kontrolin ang iyong mga kagustuhan sa pagbabahagi ng datos at mga setting ng privacy para sa isang personalized na karanasan.',
+        'settings.privacy.button': 'Mga Setting ng Privacy'
     }
 };
 
@@ -285,7 +285,7 @@ let wasteData = {
 // Waste items for games
 const wasteItems = {
     recyclable: [
-        { name: "Plastic Bottle", icon: "🧃" },
+        { name: "Plastic Bottle", icon: "🥤" },
         { name: "Glass Jar", icon: "🍯" },
         { name: "Aluminum Can", icon: "🥫" },
         { name: "Newspaper", icon: "🗞️" },
@@ -313,7 +313,7 @@ const wasteItems = {
         { name: "Ceramic Bowl", icon: "🥣" },
         { name: "Styrofoam", icon: "🍱" },
         { name: "Used Tissue", icon: "🧻" },
-        { name: "Broken Glass", icon: "🥃" },
+        { name: "Broken Glass", icon: "🍷" },
         { name: "Food Wrapper", icon: "🥡" }
     ]
 };
@@ -457,7 +457,7 @@ function setupEventListeners() {
         'Comparison feature coming soon!',
         'view-comparison-btn'
     );
-
+    
     // Settings buttons
     createSafeClickHandler(
         document.querySelector('[data-testid="button-configure-notifications"]'),
@@ -687,10 +687,15 @@ function applyTheme() {
 }
 
 function setLanguage(language) {
+    // Only allow English and Filipino
+    if (language !== 'en' && language !== 'fil') {
+        return;
+    }
+    
     currentLanguage = language;
     updateLanguage();
     saveSettings();
-    showNotification(`Language changed to ${language === 'en' ? 'English' : 'Español'}`);
+    showNotification(`Language changed to ${language === 'en' ? 'English' : 'Filipino'}`);
 }
 
 function translate(key) {
@@ -1069,7 +1074,7 @@ function generateMemoryCards(pairCount) {
 }
 
 function getMemoryCardIcon(value) {
-    const icons = ['♻️', '🌱', '⚠️', '🗑️', '🍎', '🥤', '📦', '🔋', '📱', '🧴'];
+    const icons = ['♻️', '🌱', '⚠️', '🗑️', '🍎', '🥥', '📦', '🔋', '📱', '🧴'];
     return icons[value - 1] || '❓';
 }
 

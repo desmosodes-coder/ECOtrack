@@ -310,82 +310,87 @@
         <!-- Tracker Section -->
         <section class="section" id="tracker-section" data-testid="tracker-section">
             <div class="section-header">
-                <h2 data-key="tracker.title">Waste Tracker Dashboard</h2>
-                <p data-key="tracker.subtitle">Monitor your environmental impact</p>
+                <h2 data-key="tracker.title">Waste Disposal Calculator</h2>
+                <p data-key="tracker.subtitle">Calculate your waste disposal needs</p>
             </div>
 
-            <div class="metrics-grid" data-testid="tracker-dashboard">
-                <div class="metric-card">
-                    <div class="metric-value" data-testid="metric-waste-reduced">0</div>
-                    <div class="metric-label" data-key="tracker.metrics.wasteReduced">Total Waste Disposal (lbs)</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value" data-testid="metric-recycling-rate">0</div>
-                    <div class="metric-label" data-key="tracker.metrics.recyclingRate">Recycling Rate %</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value" data-testid="metric-carbon-saved">0.0</div>
-                    <div class="metric-label" data-key="tracker.metrics.carbonSaved">Tons CO2 Saved</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value" data-testid="metric-eco-points">0</div>
-                    <div class="metric-label" data-key="tracker.metrics.ecoPoints">Eco Points</div>
-                </div>
-            </div>
-
-            <div class="waste-categories">
-                <h3>Live Waste Disposal by Category</h3>
-                <div class="category-grid">
-                    <div class="category-card">
-                        <span class="category-icon">🥬</span>
-                        <span class="category-name">Organic</span>
-                        <span class="category-value" data-category="organic">0 lbs</span>
+            <div class="calculator-container">
+                <div class="calculator-card">
+                    <h3>Waste Disposal Estimator</h3>
+                    <div class="calculator-inputs">
+                        <div class="input-group">
+                            <label for="waste-frequency">How many times per week do you dispose of waste?</label>
+                            <input type="number" id="waste-frequency" min="1" max="7" value="3">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="waste-amount">Average amount of waste per disposal (in kg):</label>
+                            <input type="number" id="waste-amount" min="1" value="10">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="waste-type">Type of waste:</label>
+                            <select id="waste-type">
+                                <option value="general">General Waste</option>
+                                <option value="recyclable">Recyclable Waste</option>
+                                <option value="organic">Organic Waste</option>
+                                <option value="hazardous">Hazardous Waste</option>
+                                <option value="electronic">Electronic Waste</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="category-card">
-                        <span class="category-icon">♻️</span>
-                        <span class="category-name">Recyclable</span>
-                        <span class="category-value" data-category="recyclable">0 lbs</span>
+                    
+                    <div class="calculator-results">
+                        <h4>Estimation Results</h4>
+                        <div class="result-item">
+                            <span>Daily Waste:</span>
+                            <span id="daily-waste-result">0 kg</span>
+                        </div>
+                        <div class="result-item">
+                            <span>Weekly Waste:</span>
+                            <span id="weekly-waste-result">0 kg</span>
+                        </div>
+                        <div class="result-item">
+                            <span>Monthly Waste:</span>
+                            <span id="monthly-waste-result">0 kg</span>
+                        </div>
+                        <div class="result-item">
+                            <span>Yearly Waste:</span>
+                            <span id="yearly-waste-result">0 kg</span>
+                        </div>
                     </div>
-                    <div class="category-card">
-                        <span class="category-icon">💻</span>
-                        <span class="category-name">Electronic</span>
-                        <span class="category-value" data-category="electronic">0 lbs</span>
+                    
+                    <button id="calculate-btn" class="calculate-button">Calculate</button>
+                </div>
+                
+                <div class="tracker-cards">
+                    <div class="tracker-card">
+                        <span class="tracker-icon">🎯</span>
+                        <h3 data-key="tracker.goals.title">Goals & Achievements</h3>
+                        <p data-key="tracker.goals.description">Track your waste disposal activities and set goals for reduction. Complete tasks to earn eco-points and badges!</p>
+                        <div class="task-tracker">
+                            <h4>Tasks to Complete</h4>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <input type="checkbox" id="task1">
+                                    <label for="task1">Dispose of waste properly 5 times this week</label>
+                                </li>
+                                <li class="task-item">
+                                    <input type="checkbox" id="task2">
+                                    <label for="task2">Sort recyclable waste from general waste</label>
+                                </li>
+                                <li class="task-item">
+                                    <input type="checkbox" id="task3">
+                                    <label for="task3">Compost organic waste at least once</label>
+                                </li>
+                                <li class="task-item">
+                                    <input type="checkbox" id="task4">
+                                    <label for="task4">Reduce overall waste by 10% this month</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <button class="tracker-button" data-testid="button-set-goals" data-key="tracker.goals.button">Set New Goals</button>
                     </div>
-                    <div class="category-card">
-                        <span class="category-icon">⚠️</span>
-                        <span class="category-name">Hazardous</span>
-                        <span class="category-value" data-category="hazardous">0 lbs</span>
-                    </div>
-                    <div class="category-card">
-                        <span class="category-icon">🗑️</span>
-                        <span class="category-name">General</span>
-                        <span class="category-value" data-category="general">0 lbs</span>
-                    </div>
-                </div>
-                <div class="live-indicator">
-                    <span class="pulse-dot"></span>
-                    <span>Live Data - Updates every 30 seconds</span>
-                </div>
-            </div>
-
-            <div class="tracker-cards">
-                <div class="tracker-card">
-                    <span class="tracker-icon">📋</span>
-                    <h3 data-key="tracker.report.title">Yearly Report</h3>
-                    <p data-key="tracker.report.description">This week you've improved your recycling rate by 12% and reduced overall waste by 8 pounds. Keep up the excellent work!</p>
-                    <button class="tracker-button" data-testid="button-view-report" data-key="tracker.report.button">View Full Report</button>
-                </div>
-                <div class="tracker-card">
-                    <span class="tracker-icon">🎯</span>
-                    <h3 data-key="tracker.goals.title">Goals & Achievements</h3>
-                    <p data-key="tracker.goals.description">You're 78% towards your monthly goal of reducing waste by 50 pounds. Complete 3 more recycling activities to unlock the "Green Champion" badge!</p>
-                    <button class="tracker-button" data-testid="button-set-goals" data-key="tracker.goals.button">Set New Goals</button>
-                </div>
-                <div class="tracker-card">
-                    <span class="tracker-icon">📊</span>
-                    <h3 data-key="tracker.comparison.title">Impact Comparison</h3>
-                    <p data-key="tracker.comparison.description">Compared to the average household, you're producing 32% less waste and recycling 28% more materials. You're making a real difference!</p>
-                    <button class="tracker-button" data-testid="button-view-comparison" data-key="tracker.comparison.button">Compare with Others</button>
                 </div>
             </div>
         </section>
@@ -475,11 +480,11 @@
                                 <div class="language-region">United States</div>
                             </div>
                         </button>
-                        <button class="language-option" data-testid="language-es" data-language="es">
-                            <span class="flag">🇪🇸</span>
+                        <button class="language-option" data-testid="language-fil" data-language="fil">
+                            <span class="flag">🇵🇭</span>
                             <div class="language-info">
-                                <div class="language-name">Español</div>
-                                <div class="language-region">España</div>
+                                <div class="language-name">Filipino</div>
+                                <div class="language-region">Pilipinas</div>
                             </div>
                         </button>
                     </div>
