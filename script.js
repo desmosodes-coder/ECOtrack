@@ -10,14 +10,18 @@ let gameState = {
         points: 0,
         difficulty: 'easy',
         items: [],
-        bins: []
+        bins: [],
+        timer: null,
+        timeLeft: 600 // 10 minutes in seconds
     },
     matching: {
         points: 0,
         difficulty: 'easy',
         cards: [],
         flippedCards: [],
-        matchedPairs: 0
+        matchedPairs: 0,
+        timer: null,
+        timeLeft: 600 // 10 minutes in seconds
     },
     memory: {
         points: 0,
@@ -25,7 +29,9 @@ let gameState = {
         cards: [],
         flippedCards: [],
         matchedPairs: 0,
-        moves: 0
+        moves: 0,
+        timer: null,
+        timeLeft: 600 // 10 minutes in seconds
     }
 };
 
@@ -438,38 +444,6 @@ function setupEventListeners() {
     document.getElementById('reset-sorting').addEventListener('click', resetSortingGame);
     document.getElementById('reset-matching').addEventListener('click', resetMatchingGame);
     document.getElementById('reset-memory').addEventListener('click', resetMemoryGame);
-
-    // Tracker buttons
-    createSafeClickHandler(
-        document.querySelector('[data-testid="button-view-report"]'),
-        'Full report coming soon!',
-        'view-report-btn'
-    );
-    
-    createSafeClickHandler(
-        document.querySelector('[data-testid="button-set-goals"]'),
-        'Goal setting feature coming soon!',
-        'set-goals-btn'
-    );
-    
-    createSafeClickHandler(
-        document.querySelector('[data-testid="button-view-comparison"]'),
-        'Comparison feature coming soon!',
-        'view-comparison-btn'
-    );
-    
-    // Settings buttons
-    createSafeClickHandler(
-        document.querySelector('[data-testid="button-configure-notifications"]'),
-        'Notification settings coming soon!',
-        'configure-notifications-btn'
-    );
-    
-    createSafeClickHandler(
-        document.querySelector('[data-testid="button-privacy-settings"]'),
-        'Privacy settings coming soon!',
-        'privacy-settings-btn'
-    );
 }
 
 function showSection(sectionName) {
@@ -776,10 +750,85 @@ function showGame(gameType) {
     }
 }
 
+// Timer functions
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function startGameTimer(gameType) {
+    // Clear existing timer if any
+    if (gameState[gameType].timer) {
+        clearInterval(gameState[gameType].timer);
+    }
+    
+    // Get time based on difficulty
+    const timeLimit = getDifficultyTimeLimit(gameState[gameType].difficulty);
+    gameState[gameType].timeLeft = timeLimit;
+    
+    // Update timer display
+    const timerElement = document.getElementById(`${gameType}-timer`);
+    if (timerElement) {
+        timerElement.textContent = formatTime(gameState[gameType].timeLeft);
+    }
+    
+    // Start new timer
+    gameState[gameType].timer = setInterval(() => {
+        gameState[gameType].timeLeft--;
+        
+        // Update timer display
+        if (timerElement) {
+            timerElement.textContent = formatTime(gameState[gameType].timeLeft);
+        }
+        
+        // Check if time is up
+        if (gameState[gameType].timeLeft <= 0) {
+            clearInterval(gameState[gameType].timer);
+            showNotification(`Time's up! Game over for ${gameType} game.`);
+            // Disable game interaction
+            disableGameInteraction(gameType);
+        }
+    }, 1000);
+}
+
+function disableGameInteraction(gameType) {
+    // Disable game elements when timer runs out
+    const gameElement = document.getElementById(`${gameType}-game`);
+    if (gameElement) {
+        gameElement.classList.add('disabled');
+    }
+}
+
+function enableGameInteraction(gameType) {
+    // Enable game elements when starting/resetting game
+    const gameElement = document.getElementById(`${gameType}-game`);
+    if (gameElement) {
+        gameElement.classList.remove('disabled');
+    }
+}
+
+function getDifficultyTimeLimit(difficulty) {
+    switch(difficulty) {
+        case 'easy': return 600; // 10 minutes
+        case 'normal': return 480; // 8 minutes
+        case 'hard': return 240; // 4 minutes
+        case 'nightmare': return 60; // 1 minute
+        case 'impossible': return 50; // 50 seconds
+        default: return 600; // 10 minutes
+    }
+}
+
 // Sorting Game Implementation
 function resetSortingGame() {
     gameState.sorting.points = 0;
     document.getElementById('sorting-points').textContent = '0';
+    
+    // Enable game interaction
+    enableGameInteraction('sorting');
+    
+    // Start timer
+    startGameTimer('sorting');
     
     const itemsContainer = document.getElementById('sorting-items');
     itemsContainer.innerHTML = '';
@@ -820,6 +869,7 @@ function resetSortingGame() {
 function getDifficultyItemCount(difficulty) {
     switch(difficulty) {
         case 'easy': return 4;
+        case 'normal': return 6;
         case 'hard': return 8;
         case 'nightmare': return 12;
         case 'impossible': return 16;
@@ -895,6 +945,7 @@ function handleDrop(e) {
         
         // Check if game is complete
         if (document.querySelectorAll('.waste-item').length === 0) {
+            clearInterval(gameState.sorting.timer);
             showNotification(`Game complete! Total points: ${gameState.sorting.points}`);
         }
     } else {
@@ -909,6 +960,12 @@ function resetMatchingGame() {
     gameState.matching.flippedCards = [];
     gameState.matching.matchedPairs = 0;
     document.getElementById('matching-points').textContent = '0';
+    
+    // Enable game interaction
+    enableGameInteraction('matching');
+    
+    // Start timer
+    startGameTimer('matching');
     
     const board = document.getElementById('matching-board');
     board.innerHTML = '';
@@ -937,6 +994,7 @@ function resetMatchingGame() {
 function getDifficultyPairCount(difficulty) {
     switch(difficulty) {
         case 'easy': return 4;
+        case 'normal': return 5;
         case 'hard': return 6;
         case 'nightmare': return 8;
         case 'impossible': return 10;
@@ -1005,6 +1063,7 @@ function flipMatchingCard(cardElement) {
                 // Check if game is complete
                 const totalPairs = getDifficultyPairCount(gameState.matching.difficulty);
                 if (gameState.matching.matchedPairs === totalPairs) {
+                    clearInterval(gameState.matching.timer);
                     showNotification(`Game complete! Total points: ${gameState.matching.points}`);
                 }
             }, 1000);
@@ -1027,6 +1086,12 @@ function resetMemoryGame() {
     gameState.memory.matchedPairs = 0;
     gameState.memory.moves = 0;
     document.getElementById('memory-points').textContent = '0';
+    
+    // Enable game interaction
+    enableGameInteraction('memory');
+    
+    // Start timer
+    startGameTimer('memory');
     
     const board = document.getElementById('memory-board');
     board.innerHTML = '';
@@ -1121,6 +1186,7 @@ function flipMemoryCard(cardElement) {
                 // Check if game is complete
                 const totalPairs = getDifficultyPairCount(gameState.memory.difficulty);
                 if (gameState.memory.matchedPairs === totalPairs) {
+                    clearInterval(gameState.memory.timer);
                     showNotification(`Game complete! Total points: ${gameState.memory.points}`);
                 }
             }, 1000);
@@ -1140,6 +1206,7 @@ function flipMemoryCard(cardElement) {
 function getDifficultyPoints(difficulty) {
     switch(difficulty) {
         case 'easy': return 10;
+        case 'normal': return 15;
         case 'hard': return 20;
         case 'nightmare': return 30;
         case 'impossible': return 50;
