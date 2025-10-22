@@ -13,17 +13,38 @@
       justify-content: center;
       align-items: center;
       overflow: hidden;
+      position: relative;
     }
+
+    /* Animated leaves */
+    .leaf {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: url('https://cdn-icons-png.flaticon.com/512/765/765590.png') no-repeat center/contain;
+      opacity: 0.8;
+      animation: floatLeaf 10s linear infinite;
+    }
+    @keyframes floatLeaf {
+      0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
+      20% { opacity: 1; }
+      50% { transform: translateY(300px) rotate(180deg); opacity: 0.8; }
+      80% { opacity: 1; }
+      100% { transform: translateY(700px) rotate(360deg); opacity: 0; }
+    }
+
     .container {
       width: 380px;
-      background: #fff;
+      background: rgba(255, 255, 255, 0.95);
       border-radius: 25px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
       padding: 30px;
       text-align: center;
+      transition: 0.3s ease;
       animation: fadeIn 0.5s ease;
+      z-index: 10;
     }
-    h2 { color: #56ab2f; margin-bottom: 15px; }
+    h2 { color: #56ab2f; margin-bottom: 15px; font-weight: 700; }
     input, select {
       width: 100%;
       padding: 10px;
@@ -31,6 +52,12 @@
       border-radius: 10px;
       border: 1px solid #ccc;
       font-size: 15px;
+      transition: 0.3s;
+    }
+    input:focus, select:focus {
+      border-color: #56ab2f;
+      outline: none;
+      box-shadow: 0 0 5px #a8e063;
     }
     button {
       width: 100%;
@@ -43,7 +70,7 @@
       cursor: pointer;
       transition: 0.3s;
     }
-    button:hover { background: #3e8e41; }
+    button:hover { background: #3e8e41; transform: scale(1.05); }
     .switch { margin-top: 12px; color: #333; cursor: pointer; text-decoration: underline; }
     .role-switch {
       display: flex; justify-content: space-between; margin-bottom: 20px;
@@ -57,26 +84,28 @@
       font-weight: 600;
       color: #333;
       cursor: pointer;
+      transition: 0.3s;
     }
+    .role-switch button:hover { transform: scale(1.05); }
     .active-role { background: #56ab2f !important; color: #fff !important; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .leaf {
-      position: absolute;
-      background: rgba(255,255,255,0.2);
-      border-radius: 50%;
-      animation: float 10s infinite ease-in-out;
-    }
-    @keyframes float {
-      0% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-20px) rotate(180deg); }
-      100% { transform: translateY(0) rotate(360deg); }
+
+    /* Responsive */
+    @media(max-width: 450px) {
+      .container { width: 90%; padding: 25px; }
     }
   </style>
 </head>
 <body>
+  <!-- Floating leaves -->
+  <div class="leaf" style="left: 10%; animation-delay: 0s;"></div>
+  <div class="leaf" style="left: 40%; animation-delay: 3s;"></div>
+  <div class="leaf" style="left: 70%; animation-delay: 6s;"></div>
+  <div class="leaf" style="left: 85%; animation-delay: 1s;"></div>
+
   <div class="container" id="container">
     <div class="role-switch">
       <button id="studentBtn" class="active-role">Student</button>
@@ -84,8 +113,8 @@
     </div>
     <h2 id="formTitle">Student Sign Up</h2>
 
-    <div id="nameField"><input type="text" id="name" placeholder="Full Name" /></div>
-    <div id="gradeField">
+    <div id="studentFields">
+      <input type="text" id="name" placeholder="Full Name" />
       <select id="gradeLevel">
         <option value="">Select Grade Level</option>
         <option value="1">Grade 1</option>
@@ -95,8 +124,9 @@
         <option value="5">Grade 5</option>
         <option value="6">Grade 6</option>
       </select>
+      <input type="number" id="age" placeholder="Age" min="5" max="12" />
     </div>
-    <div id="ageField"><input type="number" id="age" placeholder="Age" min="5" max="12" /></div>
+
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
     <div id="confirmField"><input type="password" id="confirmPassword" placeholder="Confirm Password" /></div>
@@ -126,127 +156,120 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    const formTitle = document.getElementById('formTitle');
-    const authBtn = document.getElementById('authBtn');
-    const switchLink = document.getElementById('switchLink');
-    const studentBtn = document.getElementById('studentBtn');
-    const teacherBtn = document.getElementById('teacherBtn');
-    const nameField = document.getElementById('nameField');
-    const gradeField = document.getElementById('gradeField');
-    const ageField = document.getElementById('ageField');
-    const confirmField = document.getElementById('confirmField');
+    const studentBtn = document.getElementById("studentBtn");
+    const teacherBtn = document.getElementById("teacherBtn");
+    const switchLink = document.getElementById("switchLink");
+    const formTitle = document.getElementById("formTitle");
+    const authBtn = document.getElementById("authBtn");
+    const studentFields = document.getElementById("studentFields");
+    const confirmField = document.getElementById("confirmField");
 
     let isSignUp = true;
     let isTeacher = false;
 
-    // Role switching
-    studentBtn.addEventListener('click', () => {
+    studentBtn.addEventListener("click", () => {
       isTeacher = false;
-      studentBtn.classList.add('active-role');
-      teacherBtn.classList.remove('active-role');
+      studentBtn.classList.add("active-role");
+      teacherBtn.classList.remove("active-role");
+      isSignUp = true;
       updateForm();
     });
 
-    teacherBtn.addEventListener('click', () => {
+    teacherBtn.addEventListener("click", () => {
       isTeacher = true;
-      teacherBtn.classList.add('active-role');
-      studentBtn.classList.remove('active-role');
+      teacherBtn.classList.add("active-role");
+      studentBtn.classList.remove("active-role");
+      isSignUp = false;
       updateForm();
     });
 
-    // Sign up / Sign in switching
-    switchLink.addEventListener('click', () => {
+    switchLink.addEventListener("click", () => {
       isSignUp = !isSignUp;
       updateForm();
     });
 
     function updateForm() {
       if (isTeacher) {
-        // Teacher Mode
-        nameField.style.display = 'none';
-        gradeField.style.display = 'none';
-        ageField.style.display = 'none';
-        confirmField.style.display = 'none';
-        switchLink.style.display = 'none';
-        formTitle.textContent = 'Teacher Sign In';
-        authBtn.textContent = 'Sign In';
+        formTitle.textContent = "Teacher Sign In";
+        studentFields.style.display = "none";
+        confirmField.style.display = "none";
+        switchLink.style.display = "none";
+        authBtn.textContent = "Sign In";
       } else {
-        // Student Mode
-        nameField.style.display = isSignUp ? 'block' : 'none';
-        gradeField.style.display = isSignUp ? 'block' : 'none';
-        ageField.style.display = isSignUp ? 'block' : 'none';
-        confirmField.style.display = isSignUp ? 'block' : 'none';
-        switchLink.style.display = 'block';
-        formTitle.textContent = isSignUp ? 'Student Sign Up' : 'Student Sign In';
-        authBtn.textContent = isSignUp ? 'Sign Up' : 'Sign In';
+        studentFields.style.display = isSignUp ? "block" : "none";
+        confirmField.style.display = isSignUp ? "block" : "none";
+        formTitle.textContent = isSignUp ? "Student Sign Up" : "Student Sign In";
+        authBtn.textContent = isSignUp ? "Sign Up" : "Sign In";
+        switchLink.style.display = "block";
         switchLink.textContent = isSignUp
-          ? 'Already have an account? Sign In'
-          : 'Don’t have an account? Sign Up';
+          ? "Already have an account? Sign In"
+          : "Don’t have an account? Sign Up";
       }
     }
 
-    // Auth function
-    authBtn.addEventListener('click', async () => {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const confirmPassword = document.getElementById('confirmPassword').value.trim();
-      const name = document.getElementById('name')?.value.trim();
-      const grade = document.getElementById('gradeLevel')?.value;
-      const age = document.getElementById('age')?.value.trim();
+    authBtn.addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const confirmPassword = document.getElementById("confirmPassword")?.value.trim();
+      const name = document.getElementById("name")?.value.trim();
+      const grade = document.getElementById("gradeLevel")?.value;
+      const age = document.getElementById("age")?.value.trim();
 
       if (!email || !password) {
-        alert('Please fill in all required fields');
+        alert("Please fill in all required fields.");
         return;
       }
 
       if (isTeacher) {
         try {
           await signInWithEmailAndPassword(auth, email, password);
-          window.location.href = 'verify.html';
-        } catch (error) {
-          alert('Teacher login failed: ' + error.message);
+          window.location.href = "verify.html";
+        } catch (err) {
+          alert("Teacher sign-in failed: " + err.message);
         }
       } else {
         if (isSignUp) {
           if (!name || !grade || !age || !confirmPassword) {
-            alert('Please fill in all fields for sign up');
+            alert("Please fill all sign-up fields.");
             return;
           }
           if (password !== confirmPassword) {
-            alert('Passwords do not match');
+            alert("Passwords do not match!");
             return;
           }
           try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            await set(ref(db, 'students/' + userCredential.user.uid), {
+            const user = await createUserWithEmailAndPassword(auth, email, password);
+            await set(ref(db, "students/" + user.user.uid), {
               name: name,
               gradeLevel: grade,
               age: age,
               email: email,
               verified: false
             });
-            alert('Sign up successful! Please wait for teacher verification.');
+            alert("Sign-up successful! Wait for teacher verification.");
             isSignUp = false;
             updateForm();
-          } catch (error) {
-            alert('Sign up failed: ' + error.message);
+          } catch (err) {
+            alert("Sign-up failed: " + err.message);
           }
         } else {
           try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = await signInWithEmailAndPassword(auth, email, password);
             const dbRef = ref(db);
-            const snapshot = await get(child(dbRef, 'students/' + userCredential.user.uid));
+            const snapshot = await get(child(dbRef, "students/" + user.user.uid));
             if (snapshot.exists() && snapshot.val().verified) {
-              alert('Welcome back, ' + snapshot.val().name + '!');
+              alert("Welcome, " + snapshot.val().name + "!");
             } else {
-              alert('Your account has not been verified yet by the teacher.');
+              alert("Account not yet verified by the teacher.");
             }
-          } catch (error) {
-            alert('Sign in failed: ' + error.message);
+          } catch (err) {
+            alert("Sign-in failed: " + err.message);
           }
         }
       }
     });
+
+    updateForm();
   </script>
 </body>
 </html>
