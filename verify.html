@@ -1,55 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>ECOTrack | Verify Students</title>
-<style>
-body{
-  font-family:Poppins,sans-serif;
-  background:linear-gradient(135deg,#b2fefa,#0ed2f7);
-  min-height:100vh;margin:0;padding:30px;text-align:center;
-  overflow:hidden;
-}
-h1{color:#2e7d32;margin-bottom:20px;}
-.card{
-  background:#fff;border-radius:14px;box-shadow:0 5px 15px rgba(0,0,0,.2);
-  padding:15px;margin:10px auto;max-width:600px;
-  display:flex;justify-content:space-between;align-items:center;
-  transition:.3s;
-}
-.card:hover{transform:translateY(-3px);}
-button{
-  border:none;border-radius:10px;padding:8px 14px;background:#43a047;
-  color:#fff;cursor:pointer;transition:.3s;
-}
-button:hover{background:#2e7d32;}
-.verified{background:#81c784!important;color:#fff;}
-#logout{
-  margin-top:20px;background:#f44336;
-  padding:10px 20px;border:none;border-radius:10px;color:#fff;cursor:pointer;
-}
-#logout:hover{background:#c62828;}
-.leaf{position:absolute;width:40px;height:40px;background:radial-gradient(circle,#a5d6a7 40%,transparent 41%);
-border-radius:50%;opacity:.7;animation:float 6s infinite ease-in-out;}
-@keyframes float{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-25px) rotate(15deg);}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECOTrack - Teacher Verification</title>
+  <style>
+    body { font-family: 'Poppins', sans-serif; background: #d4fc79; background: linear-gradient(to right, #96e6a1, #d4fc79); text-align: center; margin: 0; padding: 20px; }
+    h2 { color: #388e3c; }
+    .student {
+      background: white;
+      border-radius: 15px;
+      padding: 15px;
+      margin: 10px auto;
+      width: 300px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      transition: 0.3s;
+    }
+    .student:hover { transform: scale(1.02); }
+    button { background: #4CAF50; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+  </style>
 </head>
 <body>
-<div class="leaf" style="left:10%;animation-delay:.4s;"></div>
-<div class="leaf" style="left:40%;animation-delay:1.2s;"></div>
-<div class="leaf" style="left:70%;animation-delay:2s;"></div>
-<h1>Teacher Verification 🌿</h1>
-<div id="list">Loading students...</div>
-<button id="logout">Logout</button>
+  <h2>👩‍🏫 Teacher Verification Panel</h2>
+  <div id="studentList"></div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, onSnapshot, updateDoc, doc } 
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-const firebaseConfig = {
+    const firebaseConfig = {
   apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
   authDomain: "registar-5f3fb.firebaseapp.com",
   projectId: "registar-5f3fb",
@@ -58,39 +38,34 @@ const firebaseConfig = {
   appId: "1:856198150739:web:801000f564b47f6333e4a6"
 };
 
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
-const list=document.getElementById("list");
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
 
-function renderStudent(id,data){
-  const div=document.createElement("div");
-  div.className="card"+(data.verified?" verified":"");
-  div.innerHTML=`
-    <div><strong>${data.name}</strong><br>
-    Grade ${data.grade} | Age ${data.age}<br>${data.email}</div>
-    <button data-id=\"${id}\" ${data.verified?"disabled":""}>
-      ${data.verified?"Verified":"Verify"}
-    </button>
-  `;
-  list.appendChild(div);
-}
+    const studentList = document.getElementById("studentList");
 
-onSnapshot(collection(db,"students"),(snapshot)=>{
-  list.innerHTML="\"";
-  snapshot.forEach(docSnap=>{
-    renderStudent(docSnap.id,docSnap.data());
-  });
-  document.querySelectorAll('button[data-id]').forEach(btn=>{
-    btn.onclick=async()=>{
-      const id=btn.getAttribute('data-id');
-      await updateDoc(doc(db,'students',id),{verified:true});
-      alert('✅ Student verified successfully!');
+    const studentsRef = ref(db, "students/");
+    onValue(studentsRef, (snapshot) => {
+      studentList.innerHTML = "";
+      snapshot.forEach((child) => {
+        const student = child.val();
+        if (!student.verified) {
+          const div = document.createElement("div");
+          div.classList.add("student");
+          div.innerHTML = `
+            <p><b>${student.name}</b> (Grade ${student.grade}, Age ${student.age})</p>
+            <p>${student.email}</p>
+            <button onclick="verifyStudent('${child.key}')">✅ Verify</button>
+          `;
+          studentList.appendChild(div);
+        }
+      });
+    });
+
+    window.verifyStudent = async (uid) => {
+      await update(ref(db, "students/" + uid), { verified: true });
+      alert("Student verified!");
     };
-  });
-});
-
-document.getElementById('logout').onclick=()=>{signOut(auth).then(()=>location='index.html');};
-</script>
+  </script>
 </body>
 </html>
