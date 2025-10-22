@@ -1,119 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ECOTrack - Sign In / Sign Up</title>
-  <style>
-    body {
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(to bottom right, #a8e6cf, #dcedc1);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-      flex-direction: column;
-      transition: 0.5s;
-    }
-
-    .container {
-      background: #fff;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-      width: 350px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      transition: 0.3s ease-in-out;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-8px); }
-      100% { transform: translateY(0px); }
-    }
-
-    h2 {
-      color: #388e3c;
-    }
-
-    input, select {
-      width: 90%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      background: #66bb6a;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background: #43a047;
-      transform: scale(1.05);
-    }
-
-    .switch {
-      margin-top: 15px;
-      cursor: pointer;
-      color: #2e7d32;
-    }
-
-    .hidden { display: none; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ECOTrack | Sign In / Sign Up</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+body{
+  font-family:Poppins,sans-serif;
+  background:linear-gradient(135deg,#b7f8db,#50a7c2);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  margin:0;
+}
+.container{
+  background:#fff;
+  border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+  width:90%;max-width:400px;
+  text-align:center;
+  padding:40px 30px;
+  animation:fadeIn .6s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+h2{color:#2e7d32;margin-bottom:10px;}
+select,input{width:100%;padding:10px;margin:6px 0;border:1px solid #ccc;border-radius:10px;outline:none;transition:.3s;}
+input:focus,select:focus{border-color:#2e7d32;box-shadow:0 0 5px #81c784;}
+button{
+  width:100%;padding:12px;border:none;border-radius:12px;
+  background:#43a047;color:#fff;font-weight:600;
+  cursor:pointer;transition:.3s;position:relative;overflow:hidden;
+}
+button:hover{background:#2e7d32;}
+button::after{
+  content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);
+  width:200%;height:200%;background:rgba(255,255,255,.3);border-radius:50%;
+  transition:transform .4s ease;
+}
+button:active::after{transform:translate(-50%,-50%) scale(1);}
+.toggle{color:#009688;cursor:pointer;margin-top:10px;}
+.hidden{display:none;}
+.leaf{position:absolute;width:30px;height:30px;background:radial-gradient(circle,#81c784 40%,transparent 41%);
+border-radius:50%;opacity:.8;animation:floatLeaf 6s infinite ease-in-out;}
+@keyframes floatLeaf{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-25px) rotate(15deg);}}
+</style>
 </head>
 <body>
-  <div class="container" id="authContainer">
-    <h2 id="title">Student Sign Up</h2>
-    
-    <div id="roleSwitch">
-      <button id="studentBtn">Student</button>
-      <button id="teacherBtn">Teacher</button>
-    </div>
+<div class="leaf" style="left:10%;animation-delay:.3s;"></div>
+<div class="leaf" style="left:30%;animation-delay:1s;"></div>
+<div class="leaf" style="left:60%;animation-delay:2s;"></div>
+<div class="leaf" style="left:80%;animation-delay:.8s;"></div>
 
-    <div id="signupFields">
-      <input type="text" id="name" placeholder="Full Name" required />
-      <select id="grade">
-        <option value="">Select Grade</option>
-        <option value="1">Grade 1</option>
-        <option value="2">Grade 2</option>
-        <option value="3">Grade 3</option>
-        <option value="4">Grade 4</option>
-        <option value="5">Grade 5</option>
-        <option value="6">Grade 6</option>
-      </select>
-      <input type="number" id="age" placeholder="Age" required />
-      <input type="email" id="email" placeholder="Email" required />
-      <input type="password" id="password" placeholder="Password" required />
-      <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
-      <button id="signupBtn">Sign Up</button>
-    </div>
+<div class="container">
+  <h2 id="formTitle">Student Sign Up 🌿</h2>
+  <select id="roleSelect">
+    <option value="student">Student</option>
+    <option value="teacher">Teacher</option>
+  </select>
 
-    <div id="signinFields" class="hidden">
-      <input type="email" id="signinEmail" placeholder="Email" required />
-      <input type="password" id="signinPassword" placeholder="Password" required />
-      <button id="signinBtn">Sign In</button>
-    </div>
-
-    <p class="switch" id="toggleForm">Already have an account? Sign In</p>
+  <div id="studentFields">
+    <input id="name" placeholder="Name">
+    <select id="grade">
+      <option value="">Select Grade</option>
+      <option>1</option><option>2</option><option>3</option>
+      <option>4</option><option>5</option><option>6</option>
+    </select>
+    <input id="age" type="number" placeholder="Age">
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
 
-    const firebaseConfig = {
+  <button id="actionBtn">Sign Up</button>
+  <p class="toggle" id="switchForm">Already have an account? Sign In</p>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } 
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } 
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
   apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
   authDomain: "registar-5f3fb.firebaseapp.com",
   projectId: "registar-5f3fb",
@@ -122,109 +94,63 @@
   appId: "1:856198150739:web:801000f564b47f6333e4a6"
 };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
 
-    const toggleForm = document.getElementById("toggleForm");
-    const signupFields = document.getElementById("signupFields");
-    const signinFields = document.getElementById("signinFields");
-    const title = document.getElementById("title");
-    const signupBtn = document.getElementById("signupBtn");
-    const signinBtn = document.getElementById("signinBtn");
-    const studentBtn = document.getElementById("studentBtn");
-    const teacherBtn = document.getElementById("teacherBtn");
+let isSignUp=true;
+const title=document.getElementById("formTitle");
+const switcher=document.getElementById("switchForm");
+const btn=document.getElementById("actionBtn");
+const studentFields=document.getElementById("studentFields");
+const roleSelect=document.getElementById("roleSelect");
 
-    let isSignUp = true;
-    let role = "student";
+switcher.onclick=()=>{
+  isSignUp=!isSignUp;
+  title.textContent=isSignUp?"Sign Up 🌿":"Sign In 🌿";
+  btn.textContent=isSignUp?"Sign Up":"Sign In";
+  switcher.textContent=isSignUp?"Already have an account? Sign In":"No account? Sign Up";
+};
+roleSelect.onchange=()=>{
+  studentFields.style.display=roleSelect.value==="student"?"block":"none";
+};
 
-    toggleForm.onclick = () => {
-      isSignUp = !isSignUp;
-      if (isSignUp) {
-        signupFields.classList.remove("hidden");
-        signinFields.classList.add("hidden");
-        title.textContent = role === "teacher" ? "Teacher Sign Up" : "Student Sign Up";
-        toggleForm.textContent = "Already have an account? Sign In";
-      } else {
-        signupFields.classList.add("hidden");
-        signinFields.classList.remove("hidden");
-        title.textContent = role === "teacher" ? "Teacher Sign In" : "Student Sign In";
-        toggleForm.textContent = "Don't have an account? Sign Up";
-      }
-    };
-
-    studentBtn.onclick = () => {
-      role = "student";
-      studentBtn.style.background = "#43a047";
-      teacherBtn.style.background = "#66bb6a";
-      title.textContent = isSignUp ? "Student Sign Up" : "Student Sign In";
-    };
-
-    teacherBtn.onclick = () => {
-      role = "teacher";
-      teacherBtn.style.background = "#43a047";
-      studentBtn.style.background = "#66bb6a";
-      title.textContent = isSignUp ? "Teacher Sign Up" : "Teacher Sign In";
-    };
-
-    signupBtn.onclick = async () => {
-      const name = document.getElementById("name").value.trim();
-      const grade = document.getElementById("grade").value;
-      const age = document.getElementById("age").value;
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const confirmPassword = document.getElementById("confirmPassword").value;
-
-      if (password !== confirmPassword) {
-        alert("Passwords do not match!");
-        return;
-      }
-
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        if (role === "student") {
-          await set(ref(db, "students/" + user.uid), {
-            name, grade, age, email, verified: false
-          });
-          alert("Sign up successful! Waiting for teacher verification.");
-        } else {
-          await set(ref(db, "teachers/" + user.uid), { email });
-          alert("Teacher account created!");
-        }
-      } catch (err) {
-        alert(err.message);
-      }
-    };
-
-    signinBtn.onclick = async () => {
-      const email = document.getElementById("signinEmail").value.trim();
-      const password = document.getElementById("signinPassword").value;
-
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        if (role === "teacher") {
-          window.location.href = "verify.html";
-        } else {
-          const snapshot = await get(ref(db, "students/" + user.uid));
-          if (snapshot.exists()) {
-            const data = snapshot.val();
-            if (data.verified) {
-              window.location.href = "Echo3.html";
-            } else {
-              alert("Not yet verified by a teacher!");
-            }
-          } else {
-            alert("Account not found!");
-          }
-        }
-      } catch (err) {
-        alert(err.message);
-      }
-    };
-  </script>
+btn.onclick=async()=>{
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value.trim();
+  const role=roleSelect.value;
+  if(isSignUp){
+    if(role==="student"){
+      const name=document.getElementById("name").value.trim();
+      const grade=document.getElementById("grade").value;
+      const age=document.getElementById("age").value;
+      if(!name||!grade||!age){alert("Please fill all student fields.");return;}
+      try{
+        const cred=await createUserWithEmailAndPassword(auth,email,password);
+        await setDoc(doc(db,"students",cred.user.uid),{name,grade,age,email,verified:false});
+        alert("🎉 Account created! Please wait for teacher verification.");
+        signOut(auth);
+      }catch(e){alert(e.message);}
+    }else{
+      try{
+        const cred=await createUserWithEmailAndPassword(auth,email,password);
+        await setDoc(doc(db,"teachers",cred.user.uid),{email});
+        alert("Teacher account created!");
+        window.location="verify.html";
+      }catch(e){alert(e.message);}
+    }
+  }else{
+    try{
+      const cred=await signInWithEmailAndPassword(auth,email,password);
+      if(role==="teacher"){window.location="verify.html";return;}
+      const snap=await getDoc(doc(db,"students",cred.user.uid));
+      if(!snap.exists()){alert("Student record not found.");return;}
+      const data=snap.data();
+      if(data.verified){window.location="Echo3.html";}
+      else{alert("❌ Not yet verified by teacher.");signOut(auth);}
+    }catch(e){alert(e.message);}
+  }
+};
+</script>
 </body>
 </html>
