@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECOTrack — Verify Students</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #a8e063, #56ab2f);
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    h2 {
+      color: #fff;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      width: 350px;
+      max-height: 400px;
+      overflow-y: auto;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      animation: fadeIn 0.6s ease;
+    }
+    .student {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+      background: #f5f5f5;
+      border-radius: 10px;
+      padding: 10px;
+    }
+    button {
+      background: #56ab2f;
+      border: none;
+      color: #fff;
+      border-radius: 10px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    button:hover { background: #3e8e41; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <h2>Verify Students</h2>
+  <div class="card" id="studentList"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      databaseURL: "YOUR_DB_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MSG_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const studentList = document.getElementById('studentList');
+
+    onValue(ref(db, 'students'), snapshot => {
+      studentList.innerHTML = '';
+      snapshot.forEach(child => {
+        const student = child.val();
+        const id = child.key;
+        const div = document.createElement('div');
+        div.classList.add('student');
+        div.innerHTML = `
+          <span>${student.name}</span>
+          <button ${student.verified ? 'disabled' : ''}>${student.verified ? 'Verified' : 'Verify'}</button>
+        `;
+        const btn = div.querySelector('button');
+        btn.addEventListener('click', async () => {
+          await update(ref(db, 'students/' + id), { verified: true });
+          alert(student.name + ' is now verified!');
+        });
+        studentList.appendChild(div);
+      });
+    });
+  </script>
+</body>
+</html>

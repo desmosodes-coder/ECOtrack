@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECOTrack</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+    body {
+      height: 100vh;
+      background: linear-gradient(135deg, #a8e063, #56ab2f);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      width: 350px;
+      background: #fff;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: 0.4s;
+    }
+    h2 {
+      color: #56ab2f;
+      margin-bottom: 15px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #56ab2f;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+    button:hover { background: #3e8e41; }
+    .switch {
+      margin-top: 15px;
+      color: #333;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .role-switch {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    .role-switch button {
+      width: 45%;
+      background: #cdeccd;
+      color: #333;
+    }
+    .active-role {
+      background: #56ab2f !important;
+      color: #fff !important;
+    }
+    .fade-in { animation: fadeIn 0.5s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container fade-in" id="container">
+    <div class="role-switch">
+      <button id="studentBtn" class="active-role">Student</button>
+      <button id="teacherBtn">Teacher</button>
+    </div>
+    <h2 id="formTitle">Student Sign Up</h2>
+    <input type="text" id="name" placeholder="Full Name" />
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button id="authBtn">Sign Up</button>
+    <div class="switch" id="switchLink">Already have an account? Sign In</div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getDatabase, ref, set, get, child } 
+      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      databaseURL: "YOUR_DB_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MSG_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    const formTitle = document.getElementById('formTitle');
+    const authBtn = document.getElementById('authBtn');
+    const switchLink = document.getElementById('switchLink');
+    const studentBtn = document.getElementById('studentBtn');
+    const teacherBtn = document.getElementById('teacherBtn');
+    const nameField = document.getElementById('name');
+    const emailField = document.getElementById('email');
+    const passwordField = document.getElementById('password');
+    let isSignUp = true;
+    let isTeacher = false;
+
+    switchLink.addEventListener('click', () => {
+      isSignUp = !isSignUp;
+      updateForm();
+    });
+
+    studentBtn.addEventListener('click', () => {
+      isTeacher = false;
+      studentBtn.classList.add('active-role');
+      teacherBtn.classList.remove('active-role');
+      updateForm();
+    });
+
+    teacherBtn.addEventListener('click', () => {
+      isTeacher = true;
+      teacherBtn.classList.add('active-role');
+      studentBtn.classList.remove('active-role');
+      updateForm();
+    });
+
+    function updateForm() {
+      if (isTeacher) {
+        nameField.style.display = 'none';
+        switchLink.style.display = 'none';
+        formTitle.textContent = 'Teacher Sign In';
+        authBtn.textContent = 'Sign In';
+      } else {
+        nameField.style.display = isSignUp ? 'block' : 'none';
+        formTitle.textContent = isSignUp ? 'Student Sign Up' : 'Student Sign In';
+        authBtn.textContent = isSignUp ? 'Sign Up' : 'Sign In';
+        switchLink.textContent = isSignUp ? 'Already have an account? Sign In' : 'Don’t have an account? Sign Up';
+      }
+    }
+
+    authBtn.addEventListener('click', async () => {
+      const email = emailField.value.trim();
+      const password = passwordField.value.trim();
+      const name = nameField.value.trim();
+
+      if (!email || !password || (!isTeacher && isSignUp && !name)) {
+        alert('Please fill all fields');
+        return;
+      }
+
+      if (isTeacher) {
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          window.location.href = 'verify.html';
+        } catch (error) {
+          alert('Teacher login failed: ' + error.message);
+        }
+      } else {
+        if (isSignUp) {
+          try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            await set(ref(db, 'students/' + userCredential.user.uid), {
+              name: name,
+              email: email,
+              verified: false
+            });
+            alert('Sign up successful! Please wait for teacher verification.');
+          } catch (error) {
+            alert('Sign up failed: ' + error.message);
+          }
+        } else {
+          try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const dbRef = ref(db);
+            const snapshot = await get(child(dbRef, 'students/' + userCredential.user.uid));
+            if (snapshot.exists() && snapshot.val().verified) {
+              alert('Welcome back, ' + snapshot.val().name + '!');
+            } else {
+              alert('Your account has not been verified by the teacher yet.');
+            }
+          } catch (error) {
+            alert('Sign in failed: ' + error.message);
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
