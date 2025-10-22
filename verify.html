@@ -1,34 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ECOTrack - Teacher Verification</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECOTrack | Teacher Verification</title>
+
   <style>
-    body { font-family: 'Poppins', sans-serif; background: #d4fc79; background: linear-gradient(to right, #96e6a1, #d4fc79); text-align: center; margin: 0; padding: 20px; }
-    h2 { color: #388e3c; }
-    .student {
-      background: white;
-      border-radius: 15px;
-      padding: 15px;
-      margin: 10px auto;
-      width: 300px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    * {
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #9be15d, #00e3ae);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-top: 30px;
+      color: #2e7d32;
+      text-align: center;
+    }
+
+    .eco-icon {
+      font-size: 50px;
+      color: #4caf50;
+      animation: float 2s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .student-list {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      width: 90%;
+      max-width: 600px;
+      padding: 20px;
+      margin-top: 20px;
+      overflow-y: auto;
+      max-height: 70vh;
+    }
+
+    .student-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 10px;
+      background: #e8f5e9;
       transition: 0.3s;
     }
-    .student:hover { transform: scale(1.02); }
-    button { background: #4CAF50; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+
+    .student-card:hover {
+      background: #c8e6c9;
+      transform: translateY(-2px);
+    }
+
+    .student-info {
+      text-align: left;
+    }
+
+    button.verify-btn {
+      background: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button.verify-btn:hover {
+      background: #1b5e20;
+    }
+
+    .verified {
+      background: #81c784 !important;
+      color: white;
+    }
+
+    .logout {
+      margin-top: 20px;
+      background: #f44336;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .logout:hover {
+      background: #c62828;
+    }
   </style>
 </head>
 <body>
-  <h2>👩‍🏫 Teacher Verification Panel</h2>
-  <div id="studentList"></div>
+  <div class="eco-icon">🌿</div>
+  <h1>Teacher Verification Panel</h1>
+  <div class="student-list" id="studentList">Loading students...</div>
+  <button class="logout" id="logoutBtn">Log Out</button>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+    // 🔧 Replace with your real Firebase config
     const firebaseConfig = {
   apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
   authDomain: "registar-5f3fb.firebaseapp.com",
@@ -44,28 +133,57 @@
 
     const studentList = document.getElementById("studentList");
 
+    // 🌿 Fetch all students
     const studentsRef = ref(db, "students/");
     onValue(studentsRef, (snapshot) => {
+      const data = snapshot.val();
       studentList.innerHTML = "";
-      snapshot.forEach((child) => {
-        const student = child.val();
-        if (!student.verified) {
-          const div = document.createElement("div");
-          div.classList.add("student");
-          div.innerHTML = `
-            <p><b>${student.name}</b> (Grade ${student.grade}, Age ${student.age})</p>
-            <p>${student.email}</p>
-            <button onclick="verifyStudent('${child.key}')">✅ Verify</button>
-          `;
-          studentList.appendChild(div);
-        }
+
+      if (!data) {
+        studentList.innerHTML = "<p>No students found yet.</p>";
+        return;
+      }
+
+      Object.keys(data).forEach((id) => {
+        const student = data[id];
+        const div = document.createElement("div");
+        div.classList.add("student-card");
+        if (student.verified) div.classList.add("verified");
+
+        div.innerHTML = `
+          <div class="student-info">
+            <strong>${student.name}</strong><br>
+            Grade: ${student.grade} | Age: ${student.age}<br>
+            <small>${student.email}</small>
+          </div>
+          <button class="verify-btn" data-id="${id}" ${student.verified ? "disabled" : ""}>
+            ${student.verified ? "Verified" : "Verify"}
+          </button>
+        `;
+        studentList.appendChild(div);
+      });
+
+      document.querySelectorAll(".verify-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const uid = e.target.getAttribute("data-id");
+          update(ref(db, "students/" + uid), { verified: true })
+            .then(() => {
+              e.target.innerText = "Verified";
+              e.target.disabled = true;
+              e.target.parentElement.classList.add("verified");
+              alert("Student verified successfully!");
+            });
+        });
       });
     });
 
-    window.verifyStudent = async (uid) => {
-      await update(ref(db, "students/" + uid), { verified: true });
-      alert("Student verified!");
-    };
+    // 🌿 Logout
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        alert("Logged out!");
+        window.location.href = "index.html";
+      });
+    });
   </script>
 </body>
 </html>
