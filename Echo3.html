@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
@@ -7,13 +6,94 @@
     <title>ECOTrack - Transform Waste into Worth</title>
     <meta name="description" content="Join the green revolution with our comprehensive waste management platform. Track, reduce, and recycle your way to a sustainable future.">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Account dropdown styles */
+        .account-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background: var(--surface);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            width: 250px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .account-dropdown.show {
+            display: block;
+        }
+        
+        .account-info {
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 15px;
+        }
+        
+        .account-info h3 {
+            margin: 0 0 5px 0;
+            color: var(--text-primary);
+        }
+        
+        .account-info p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .account-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .account-actions button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .account-actions button:hover {
+            background: var(--primary-dark);
+        }
+        
+        .logout-btn {
+            background: var(--destructive) !important;
+        }
+        
+        .logout-btn:hover {
+            background: #b91c1c !important;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+        
+        .overlay.show {
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <!-- Top Navigation -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <a href="" class="">
+                <a href="#" id="logo-link">
                 <span class="logo-icon">🌱</span>
                 <span class="logo-text" data-testid="app-title">ECOTrack</span>
                 </a>
@@ -29,13 +109,28 @@
             </ul>
         </div>
             
-            <!-- Hamburger Menu Button -->
-            <button class="hamburger" id="hamburger-menu" aria-label="Toggle menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+        <!-- Hamburger Menu Button -->
+        <button class="hamburger" id="hamburger-menu" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </nav>
+    
+    <!-- Account Dropdown -->
+    <div class="account-dropdown" id="accountDropdown">
+        <div class="account-info">
+            <h3 id="studentName">Student Name</h3>
+            <p id="studentEmail">student@example.com</p>
+            <p id="studentGrade">Grade: 5</p>
+        </div>
+        <div class="account-actions">
+            <button class="logout-btn" id="logoutBtn">Log Out</button>
+        </div>
+    </div>
+    
+    <!-- Overlay for closing dropdown -->
+    <div class="overlay" id="overlay"></div>
 
     <!-- Main Content -->
     <main class="main-content" id="main-content">
@@ -184,7 +279,7 @@
                     <p data-key="info.composting.description">Create a balanced mix of green materials (food scraps) and brown materials (dry leaves, paper) for optimal composting conditions.</p>
                 </div>
                 <div class="info-card">
-                    <span class="info-icon">🏛️</span>
+                    <span class="info-icon">🏟️</span>
                     <h3 data-key="info.industrial.title">Industrial Waste</h3>
                     <p data-key="info.industrial.description">Businesses must follow specific regulations for waste disposal. Partner with certified waste management companies for proper handling and documentation.</p>
                 </div>
@@ -449,83 +544,87 @@
                 <h2 data-key="settings.title" data-testid="settings-title">Settings</h2>
                 <p data-key="settings.subtitle" data-testid="settings-subtitle">Customize your ECOTrack experience</p>
             </div>
-
-            <div class="settings-grid">
-                <!-- Theme Selection -->
-                <div class="settings-card" data-testid="theme-settings">
-                    <span class="settings-icon">🎨</span>
-                    <h3 data-key="settings.theme.title">Choose Theme</h3>
-                    <div class="theme-options">
-                        <div class="theme-option light-theme" data-testid="theme-light" data-theme="light">
-                            <span class="theme-name" data-key="settings.theme.light">Light</span>
-                        </div>
-                        <div class="theme-option dark-theme" data-testid="theme-dark" data-theme="dark">
-                            <span class="theme-name" data-key="settings.theme.dark">Dark</span>
-                        </div>
-                        <div class="theme-option forest-theme" data-testid="theme-forest" data-theme="forest">
-                            <span class="theme-name" data-key="settings.theme.forest">Forest</span>
-                        </div>
-                        <div class="theme-option ocean-theme" data-testid="theme-ocean" data-theme="ocean">
-                            <span class="theme-name" data-key="settings.theme.ocean">Ocean</span>
-                        </div>
-                        <div class="theme-option sunset-theme" data-testid="theme-sunset" data-theme="sunset">
-                            <span class="theme-name" data-key="settings.theme.sunset">Sunset</span>
-                        </div>
-                    </div>
-                    <p data-key="settings.theme.description">Choose from our collection of beautiful themes to personalize your ECOTrack experience.</p>
-                </div>
-
-                <!-- Language Selection -->
-                <div class="settings-card" data-testid="language-settings">
-                    <span class="settings-icon">🌐</span>
-                    <h3 data-key="settings.language.title">Language / Idioma</h3>
-                    <div class="language-options">
-                        <button class="language-option" data-testid="language-en" data-language="en">
-                            <span class="flag">🇺🇸</span>
-                            <div class="language-info">
-                                <div class="language-name">English</div>
-                                <div class="language-region">United States</div>
-                            </div>
-                        </button>
-                        <button class="language-option" data-testid="language-fil" data-language="fil">
-                            <span class="flag">🇵🇭</span>
-                            <div class="language-info">
-                                <div class="language-name">Filipino</div>
-                                <div class="language-region">Pilipinas</div>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Notifications -->
-                <div class="settings-card">
-                    <span class="settings-icon">🔔</span>
-                    <h3 data-key="settings.notifications.title">Notifications</h3>
-                    <p data-key="settings.notifications.description">Manage your notification preferences for reminders, achievements, and weekly reports.</p>
-                    <button class="settings-button" data-testid="button-configure-notifications" data-key="settings.notifications.button">Configure Notifications</button>
-                </div>
-
-                <!-- Privacy -->
-                <div class="settings-card">
-                    <span class="settings-icon">📊</span>
-                    <h3 data-key="settings.settings.privacy.title">Data & Privacy</h3>
-                    <p data-key="settings.privacy.description">Control your data sharing preferences and privacy settings for a personalized experience.</p>
-                    <button class="settings-button" data-testid="button-privacy-settings" data-key="settings.privacy.button">Privacy Settings</button>
-                </div>
-            </div>
+            
         </section>
-
     </main>
 
-    <!-- Notification -->
-    <div class="notification" id="notification"></div>
+    <script type="module">
+        // Import Firebase modules
+        import { app, auth, database } from "./firebase-config.js";
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+        
+        // Import existing script functionality
+        import './script.js';
+        import './eco-bot.js';
 
-    <script src="script.js"></script>
-    <script src="eco-bot.js"></script>
+        // DOM Elements
+        const logoLink = document.getElementById('logo-link');
+        const accountDropdown = document.getElementById('accountDropdown');
+        const overlay = document.getElementById('overlay');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const studentName = document.getElementById('studentName');
+        const studentEmail = document.getElementById('studentEmail');
+        const studentGrade = document.getElementById('studentGrade');
 
-    <audio autoplay loop hidden>
-  <source src="/music.mp3" type="audio/mpeg">
-</audio>
+        // Check authentication on page load
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                // If not authenticated, redirect to login
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Load student data
+            const studentRef = ref(database, "students/" + user.uid);
+            onValue(studentRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const studentData = snapshot.val();
+                    studentName.textContent = studentData.name;
+                    studentEmail.textContent = studentData.email;
+                    studentGrade.textContent = `Grade: ${studentData.grade}`;
+                }
+            });
+        });
 
+        // Toggle account dropdown
+        logoLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            accountDropdown.classList.toggle('show');
+            overlay.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking overlay
+        overlay.addEventListener('click', () => {
+            accountDropdown.classList.remove('show');
+            overlay.classList.remove('show');
+        });
+
+        // Logout functionality
+        logoutBtn.addEventListener('click', () => {
+            // Calculate time spent and update database
+            const startTime = sessionStorage.getItem('startTime');
+            if (startTime) {
+                const timeSpent = Math.floor((new Date().getTime() - parseInt(startTime)) / 1000); // in seconds
+                
+                const user = auth.currentUser;
+                if (user) {
+                    const studentRef = ref(database, "students/" + user.uid);
+                    // Update total time spent
+                    update(studentRef, {
+                        totalTimeSpent: timeSpent
+                    }).then(() => {
+                        signOut(auth).then(() => {
+                            window.location.href = 'index.html';
+                        });
+                    });
+                }
+            } else {
+                signOut(auth).then(() => {
+                    window.location.href = 'index.html';
+                });
+            }
+        });
+    </script>
 </body>
 </html>

@@ -105,12 +105,35 @@
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-8px); }
     }
+
+    .alert {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
   </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
 </head>
 <body>
   <div class="container">
     <div class="eco-icon">🌿</div>
     <h1>ECOTrack</h1>
+
+    <div id="alert-container"></div>
 
     <div class="role-switch">
       <button id="studentBtn" class="role-btn active">Student</button>
@@ -142,7 +165,7 @@
       <input id="signin-email" type="email" placeholder="Email" required>
       <input id="signin-password" type="password" placeholder="Password" required>
       <button type="submit">Sign In</button>
-      <div class="switch" id="toStudentSignup">Don’t have an account? Sign Up</div>
+      <div class="switch" id="toStudentSignup">Don't have an account? Sign Up</div>
     </form>
 
     <!-- TEACHER SIGN IN -->
@@ -155,25 +178,24 @@
 
   <script type="module">
     // Firebase SDK Imports
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { app, auth, database } from "./firebase-config.js";
+    import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // 🔧 Replace with your real Firebase config
-    const firebaseConfig = {
-  apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
-  authDomain: "registar-5f3fb.firebaseapp.com",
-  projectId: "registar-5f3fb",
-  storageBucket: "registar-5f3fb.firebasestorage.app",
-  messagingSenderId: "856198150739",
-  appId: "1:856198150739:web:801000f564b47f6333e4a6"
-};
+    // Alert functions
+    function showAlert(message, type) {
+      const alertContainer = document.getElementById('alert-container');
+      alertContainer.className = `alert alert-${type}`;
+      alertContainer.textContent = message;
+      alertContainer.style.display = 'block';
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        alertContainer.style.display = 'none';
+      }, 5000);
+    }
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-
-    // 🌿 Form Switching
+    // Form Switching
     const studentBtn = document.getElementById("studentBtn");
     const teacherBtn = document.getElementById("teacherBtn");
     const studentSignupForm = document.getElementById("student-signup-form");
@@ -208,7 +230,7 @@
       studentSignupForm.classList.remove("hidden");
     });
 
-    // 🌿 Student Sign Up
+    // Student Sign Up
     studentSignupForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const name = document.getElementById("signup-name").value;
@@ -219,57 +241,83 @@
       const confirm = document.getElementById("signup-confirm").value;
 
       if (password !== confirm) {
-        alert("Passwords do not match!");
+        showAlert("Passwords do not match!", "error");
         return;
       }
 
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           const user = userCredential.user;
-          set(ref(db, "students/" + user.uid), {
+          set(ref(database, "students/" + user.uid), {
             name: name,
             grade: grade,
             age: age,
             email: email,
+            verified: false, // Initially not verified
+            createdAt: new Date().toISOString(),
+            totalTimeSpent: 0 // Initialize time tracking
+          }).then(() => {
+            showAlert("Sign-up successful! Please wait for teacher verification.", "success");
+            // Reset form
+            studentSignupForm.reset();
           });
-          alert("Sign-up successful! Redirecting...");
-          window.location.href = "Echo3.html"; // Student redirect
         })
         .catch((error) => {
-          alert(error.message);
+          showAlert(error.message, "error");
         });
     });
 
-    // 🌿 Student Sign In
+    // Student Sign In
     studentSigninForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const email = document.getElementById("signin-email").value;
       const password = document.getElementById("signin-password").value;
 
       signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          alert("Welcome back!");
-          window.location.href = "Echo3.html"; // Student redirect
+        .then((userCredential) => {
+          const user = userCredential.user;
+          
+          // Check if student is verified
+          const studentRef = ref(database, "students/" + user.uid);
+          get(studentRef).then((snapshot) => {
+            if (snapshot.exists()) {
+              const studentData = snapshot.val();
+              if (studentData.verified) {
+                showAlert("Welcome back! Redirecting...", "success");
+                // Start session tracking
+                sessionStorage.setItem('startTime', new Date().getTime());
+                window.location.href = "Echo3.html"; // Student redirect
+              } else {
+                showAlert("Account not verified yet. Please wait for teacher verification.", "error");
+                // Sign out the user since they're not verified
+                auth.signOut();
+              }
+            } else {
+              showAlert("Student data not found.", "error");
+            }
+          });
         })
         .catch((error) => {
-          alert(error.message);
+          showAlert(error.message, "error");
         });
     });
 
-    // 🌿 Teacher Sign In
+    // Teacher Sign In
     teacherSigninForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const email = document.getElementById("teacher-email").value;
       const password = document.getElementById("teacher-password").value;
 
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          alert("Welcome Teacher!");
+      // For demo purposes, we'll check if it's a teacher email
+      // In a real app, you'd have a separate teachers collection
+      if (email === "teacher@ecotrack.com" && password === "teacher123") {
+        showAlert("Welcome Teacher!", "success");
+        setTimeout(() => {
           window.location.href = "verify.html"; // Teacher redirect
-        })
-        .catch((error) => {
-          alert(error.message);
-        });
+        }, 1500);
+      } else {
+        showAlert("Invalid teacher credentials.", "error");
+      }
     });
   </script>
 </body>
