@@ -1,16 +1,3 @@
-// Import Firebase modules
-import { app, auth, database } from "./firebase-config.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-// Check authentication when script loads
-onAuthStateChanged(auth, (user) => {
-  if (!user && window.location.pathname.includes('Echo3.html')) {
-    // If not authenticated and on Echo3.html, redirect to login
-    window.location.href = 'index.html';
-    return;
-  }
-});
-
 // App state
 let currentSection = 'home';
 let currentTheme = 'light';
