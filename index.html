@@ -2,34 +2,275 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Login</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECOTrack | Sign In & Sign Up</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #9be15d, #00e3ae);
+      overflow: hidden;
+    }
+
+    .container {
+      width: 360px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      padding: 30px;
+      text-align: center;
+      transition: all 0.5s ease;
+    }
+
+    h1 {
+      color: #2e7d32;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input,
+    select {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    button {
+      background: #2e7d32;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #1b5e20;
+    }
+
+    .switch {
+      margin-top: 10px;
+      color: #00796b;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .role-switch {
+      margin-bottom: 15px;
+    }
+
+    .role-btn {
+      background: #81c784;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 16px;
+      margin: 0 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .role-btn.active {
+      background: #2e7d32;
+      color: white;
+    }
+
+    .eco-icon {
+      font-size: 40px;
+      color: #4caf50;
+      animation: float 2s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h2>Student Portal</h2>
+    <div class="eco-icon">🌿</div>
+    <h1>ECOTrack</h1>
 
-    <div id="signup-form">
-      <h3>Sign Up</h3>
-      <input type="email" id="student-email" placeholder="Your Email" required />
-      <input type="password" id="student-password" placeholder="Password" required />
-      <button onclick="studentSignUp()">Sign Up</button>
-      <p id="signup-error" class="error"></p>
+    <div class="role-switch">
+      <button id="studentBtn" class="role-btn active">Student</button>
+      <button id="teacherBtn" class="role-btn">Teacher</button>
     </div>
 
-    <div id="signin-form">
-      <h3>Sign In</h3>
-      <input type="email" id="signin-email" placeholder="Email" required />
-      <input type="password" id="signin-password" placeholder="Password" required />
-      <button onclick="studentSignIn()">Sign In</button>
-      <p id="signin-error" class="error"></p>
-    </div>
+    <!-- STUDENT SIGN UP -->
+    <form id="student-signup-form">
+      <input id="signup-name" placeholder="Full Name" required>
+      <select id="signup-grade" required>
+        <option value="">Grade Level</option>
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+        <option>6</option>
+      </select>
+      <input id="signup-age" type="number" placeholder="Age" required>
+      <input id="signup-email" type="email" placeholder="Email" required>
+      <input id="signup-password" type="password" placeholder="Password" required>
+      <input id="signup-confirm" type="password" placeholder="Confirm Password" required>
+      <button type="submit">Sign Up</button>
+      <div class="switch" id="toStudentSignin">Already have an account? Sign In</div>
+    </form>
 
-    <p id="status">You must be verified by a teacher to access main site.</p>
+    <!-- STUDENT SIGN IN -->
+    <form id="student-signin-form" class="hidden">
+      <input id="signin-email" type="email" placeholder="Email" required>
+      <input id="signin-password" type="password" placeholder="Password" required>
+      <button type="submit">Sign In</button>
+      <div class="switch" id="toStudentSignup">Don’t have an account? Sign Up</div>
+    </form>
+
+    <!-- TEACHER SIGN IN -->
+    <form id="teacher-signin-form" class="hidden">
+      <input id="teacher-email" type="email" placeholder="Teacher Email" required>
+      <input id="teacher-password" type="password" placeholder="Password" required>
+      <button type="submit">Sign In</button>
+    </form>
   </div>
 
-  <script type="module" src="./firebase-config.js"></script>
-  <script type="module" src="./scripts/student.js"></script>
+  <script type="module">
+    // Firebase SDK Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    // 🔧 Replace with your real Firebase config
+    const firebaseConfig = {
+  apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
+  authDomain: "registar-5f3fb.firebaseapp.com",
+  projectId: "registar-5f3fb",
+  storageBucket: "registar-5f3fb.firebasestorage.app",
+  messagingSenderId: "856198150739",
+  appId: "1:856198150739:web:801000f564b47f6333e4a6"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // 🌿 Form Switching
+    const studentBtn = document.getElementById("studentBtn");
+    const teacherBtn = document.getElementById("teacherBtn");
+    const studentSignupForm = document.getElementById("student-signup-form");
+    const studentSigninForm = document.getElementById("student-signin-form");
+    const teacherSigninForm = document.getElementById("teacher-signin-form");
+    const toStudentSignin = document.getElementById("toStudentSignin");
+    const toStudentSignup = document.getElementById("toStudentSignup");
+
+    studentBtn.addEventListener("click", () => {
+      studentBtn.classList.add("active");
+      teacherBtn.classList.remove("active");
+      studentSignupForm.classList.remove("hidden");
+      studentSigninForm.classList.add("hidden");
+      teacherSigninForm.classList.add("hidden");
+    });
+
+    teacherBtn.addEventListener("click", () => {
+      teacherBtn.classList.add("active");
+      studentBtn.classList.remove("active");
+      studentSignupForm.classList.add("hidden");
+      studentSigninForm.classList.add("hidden");
+      teacherSigninForm.classList.remove("hidden");
+    });
+
+    toStudentSignin.addEventListener("click", () => {
+      studentSignupForm.classList.add("hidden");
+      studentSigninForm.classList.remove("hidden");
+    });
+
+    toStudentSignup.addEventListener("click", () => {
+      studentSigninForm.classList.add("hidden");
+      studentSignupForm.classList.remove("hidden");
+    });
+
+    // 🌿 Student Sign Up
+    studentSignupForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("signup-name").value;
+      const grade = document.getElementById("signup-grade").value;
+      const age = document.getElementById("signup-age").value;
+      const email = document.getElementById("signup-email").value;
+      const password = document.getElementById("signup-password").value;
+      const confirm = document.getElementById("signup-confirm").value;
+
+      if (password !== confirm) {
+        alert("Passwords do not match!");
+        return;
+      }
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          set(ref(db, "students/" + user.uid), {
+            name: name,
+            grade: grade,
+            age: age,
+            email: email,
+          });
+          alert("Sign-up successful! Redirecting...");
+          window.location.href = "Echo3.html"; // Student redirect
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
+    });
+
+    // 🌿 Student Sign In
+    studentSigninForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("signin-email").value;
+      const password = document.getElementById("signin-password").value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("Welcome back!");
+          window.location.href = "Echo3.html"; // Student redirect
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
+    });
+
+    // 🌿 Teacher Sign In
+    teacherSigninForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("teacher-email").value;
+      const password = document.getElementById("teacher-password").value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("Welcome Teacher!");
+          window.location.href = "verify.html"; // Teacher redirect
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
+    });
+  </script>
 </body>
 </html>
