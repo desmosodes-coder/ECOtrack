@@ -154,20 +154,18 @@
   </div>
 
   <script type="module">
-    // Firebase SDK Imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // 🔧 Replace with your real Firebase config
     const firebaseConfig = {
-  apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
-  authDomain: "registar-5f3fb.firebaseapp.com",
-  projectId: "registar-5f3fb",
-  storageBucket: "registar-5f3fb.firebasestorage.app",
-  messagingSenderId: "856198150739",
-  appId: "1:856198150739:web:801000f564b47f6333e4a6"
-};
+      apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
+      authDomain: "registar-5f3fb.firebaseapp.com",
+      projectId: "registar-5f3fb",
+      storageBucket: "registar-5f3fb.firebasestorage.app",
+      messagingSenderId: "856198150739",
+      appId: "1:856198150739:web:801000f564b47f6333e4a6"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -231,9 +229,10 @@
             grade: grade,
             age: age,
             email: email,
+            verified: false // Students start unverified
           });
-          alert("Sign-up successful! Redirecting...");
-          window.location.href = "Echo3.html"; // Student redirect
+          alert("Sign-up successful! Your account needs to be verified by a teacher before you can access the app.");
+          studentSignupForm.reset();
         })
         .catch((error) => {
           alert(error.message);
@@ -247,9 +246,21 @@
       const password = document.getElementById("signin-password").value;
 
       signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          alert("Welcome back!");
-          window.location.href = "Echo3.html"; // Student redirect
+        .then((userCredential) => {
+          const user = userCredential.user;
+          const dbRef = ref(db);
+          get(child(dbRef, "students/" + user.uid)).then((snapshot) => {
+            if (snapshot.exists()) {
+              const studentData = snapshot.val();
+              if (studentData.verified) {
+                window.location.href = "Echo3.html"; // Verified student redirect
+              } else {
+                alert("Your account has not been verified by a teacher yet. Please wait for verification.");
+              }
+            } else {
+              alert("User data not found!");
+            }
+          });
         })
         .catch((error) => {
           alert(error.message);
