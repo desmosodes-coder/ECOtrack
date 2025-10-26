@@ -6,11 +6,7 @@
   <title>ECOTrack | Sign In & Sign Up</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: "Poppins", sans-serif;
-    }
-
+    * { box-sizing: border-box; font-family: "Poppins", sans-serif; }
     body {
       margin: 0;
       display: flex;
@@ -20,7 +16,6 @@
       background: linear-gradient(135deg, #9be15d, #00e3ae);
       overflow: hidden;
     }
-
     .container {
       width: 360px;
       background: #fff;
@@ -30,26 +25,14 @@
       text-align: center;
       transition: all 0.5s ease;
     }
-
-    h1 {
-      color: #2e7d32;
-      margin-bottom: 20px;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    input,
-    select {
+    h1 { color: #2e7d32; margin-bottom: 20px; }
+    form { display: flex; flex-direction: column; gap: 10px; }
+    input, select {
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 14px;
     }
-
     button {
       background: #2e7d32;
       color: #fff;
@@ -60,26 +43,10 @@
       cursor: pointer;
       transition: 0.3s;
     }
-
-    button:hover {
-      background: #1b5e20;
-    }
-
-    .switch {
-      margin-top: 10px;
-      color: #00796b;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .role-switch {
-      margin-bottom: 15px;
-    }
-
+    button:hover { background: #1b5e20; }
+    .switch { margin-top: 10px; color: #00796b; cursor: pointer; font-size: 14px; }
+    .hidden { display: none; }
+    .role-switch { margin-bottom: 15px; }
     .role-btn {
       background: #81c784;
       border: none;
@@ -89,22 +56,9 @@
       cursor: pointer;
       transition: 0.3s;
     }
-
-    .role-btn.active {
-      background: #2e7d32;
-      color: white;
-    }
-
-    .eco-icon {
-      font-size: 40px;
-      color: #4caf50;
-      animation: float 2s infinite ease-in-out;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
+    .role-btn.active { background: #2e7d32; color: white; }
+    .eco-icon { font-size: 40px; color: #4caf50; animation: float 2s infinite ease-in-out; }
+    @keyframes float { 0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);} }
   </style>
 </head>
 <body>
@@ -122,12 +76,8 @@
       <input id="signup-name" placeholder="Full Name" required>
       <select id="signup-grade" required>
         <option value="">Grade Level</option>
-        <option>1</option>
-        <option>2</option>
-        <option>3</option>
-        <option>4</option>
-        <option>5</option>
-        <option>6</option>
+        <option>1</option><option>2</option><option>3</option>
+        <option>4</option><option>5</option><option>6</option>
       </select>
       <input id="signup-age" type="number" placeholder="Age" required>
       <input id="signup-email" type="email" placeholder="Email" required>
@@ -156,7 +106,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
@@ -169,7 +119,7 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getDatabase(app);
+    const db = getFirestore(app);
 
     // 🌿 Form Switching
     const studentBtn = document.getElementById("studentBtn");
@@ -181,33 +131,27 @@
     const toStudentSignup = document.getElementById("toStudentSignup");
 
     studentBtn.addEventListener("click", () => {
-      studentBtn.classList.add("active");
-      teacherBtn.classList.remove("active");
-      studentSignupForm.classList.remove("hidden");
-      studentSigninForm.classList.add("hidden");
+      studentBtn.classList.add("active"); teacherBtn.classList.remove("active");
+      studentSignupForm.classList.remove("hidden"); studentSigninForm.classList.add("hidden");
       teacherSigninForm.classList.add("hidden");
     });
 
     teacherBtn.addEventListener("click", () => {
-      teacherBtn.classList.add("active");
-      studentBtn.classList.remove("active");
-      studentSignupForm.classList.add("hidden");
-      studentSigninForm.classList.add("hidden");
+      teacherBtn.classList.add("active"); studentBtn.classList.remove("active");
+      studentSignupForm.classList.add("hidden"); studentSigninForm.classList.add("hidden");
       teacherSigninForm.classList.remove("hidden");
     });
 
     toStudentSignin.addEventListener("click", () => {
-      studentSignupForm.classList.add("hidden");
-      studentSigninForm.classList.remove("hidden");
+      studentSignupForm.classList.add("hidden"); studentSigninForm.classList.remove("hidden");
     });
 
     toStudentSignup.addEventListener("click", () => {
-      studentSigninForm.classList.add("hidden");
-      studentSignupForm.classList.remove("hidden");
+      studentSigninForm.classList.add("hidden"); studentSignupForm.classList.remove("hidden");
     });
 
-    // 🌿 Student Sign Up
-    studentSignupForm.addEventListener("submit", (e) => {
+    // 🌿 Student Sign Up (Firestore)
+    studentSignupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const name = document.getElementById("signup-name").value;
       const grade = document.getElementById("signup-grade").value;
@@ -216,71 +160,45 @@
       const password = document.getElementById("signup-password").value;
       const confirm = document.getElementById("signup-confirm").value;
 
-      if (password !== confirm) {
-        alert("Passwords do not match!");
-        return;
-      }
+      if(password !== confirm){ alert("Passwords do not match!"); return; }
 
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          set(ref(db, "students/" + user.uid), {
-            name: name,
-            grade: grade,
-            age: age,
-            email: email,
-            verified: false // Students start unverified
-          });
-          alert("Sign-up successful! Your account needs to be verified by a teacher before you can access the app.");
-          studentSignupForm.reset();
-        })
-        .catch((error) => {
-          alert(error.message);
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        await setDoc(doc(db, "students", user.uid), {
+          name, grade, age, email, verified: false, totalTimeSpent: 0
         });
+        alert("Sign-up successful! Your account needs verification by a teacher.");
+        studentSignupForm.reset();
+      } catch(error) { alert(error.message); }
     });
 
-    // 🌿 Student Sign In
-    studentSigninForm.addEventListener("submit", (e) => {
+    // 🌿 Student Sign In (Firestore)
+    studentSigninForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = document.getElementById("signin-email").value;
       const password = document.getElementById("signin-password").value;
-
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          const dbRef = ref(db);
-          get(child(dbRef, "students/" + user.uid)).then((snapshot) => {
-            if (snapshot.exists()) {
-              const studentData = snapshot.val();
-              if (studentData.verified) {
-                window.location.href = "Echo3.html"; // Verified student redirect
-              } else {
-                alert("Your account has not been verified by a teacher yet. Please wait for verification.");
-              }
-            } else {
-              alert("User data not found!");
-            }
-          });
-        })
-        .catch((error) => {
-          alert(error.message);
-        });
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const docSnap = await getDoc(doc(db, "students", user.uid));
+        if(docSnap.exists()){
+          if(docSnap.data().verified){
+            window.location.href = "Echo3.html";
+          } else { alert("Your account has not been verified by a teacher yet."); }
+        } else { alert("User data not found!"); }
+      } catch(error){ alert(error.message); }
     });
 
     // 🌿 Teacher Sign In
-    teacherSigninForm.addEventListener("submit", (e) => {
+    teacherSigninForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = document.getElementById("teacher-email").value;
       const password = document.getElementById("teacher-password").value;
-
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          alert("Welcome Teacher!");
-          window.location.href = "verify.html"; // Teacher redirect
-        })
-        .catch((error) => {
-          alert(error.message);
-        });
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = "verify.html";
+      } catch(error){ alert(error.message); }
     });
   </script>
 </body>

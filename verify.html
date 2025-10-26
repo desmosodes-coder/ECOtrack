@@ -6,11 +6,7 @@
   <title>ECOTrack | Teacher Verification</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: "Poppins", sans-serif;
-    }
-
+    * { box-sizing: border-box; font-family: "Poppins", sans-serif; }
     body {
       margin: 0;
       background: linear-gradient(135deg, #9be15d, #00e3ae);
@@ -21,24 +17,9 @@
       justify-content: flex-start;
       padding: 20px;
     }
-
-    h1 {
-      margin-top: 30px;
-      color: #2e7d32;
-      text-align: center;
-    }
-
-    .eco-icon {
-      font-size: 50px;
-      color: #4caf50;
-      animation: float 2s infinite ease-in-out;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-
+    h1 { margin-top: 30px; color: #2e7d32; text-align: center; }
+    .eco-icon { font-size: 50px; color: #4caf50; animation: float 2s infinite ease-in-out; }
+    @keyframes float { 0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);} }
     .student-list {
       background: #fff;
       border-radius: 16px;
@@ -50,7 +31,6 @@
       overflow-y: auto;
       max-height: 70vh;
     }
-
     .student-card {
       display: flex;
       justify-content: space-between;
@@ -61,142 +41,112 @@
       background: #e8f5e9;
       transition: 0.3s;
     }
-
-    .student-card:hover {
-      background: #c8e6c9;
-      transform: translateY(-2px);
-    }
-
-    .student-info {
-      text-align: left;
-      flex: 1;
-    }
-
-    .student-stats {
-      text-align: right;
-      margin-right: 15px;
-      color: #2e7d32;
-      font-size: 14px;
-    }
-
+    .student-card:hover { background: #c8e6c9; transform: translateY(-2px); }
+    .student-info { text-align: left; flex: 1; }
+    .student-stats { text-align: right; margin-right: 15px; color: #2e7d32; font-size: 14px; }
     button.verify-btn {
-      background: #2e7d32;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 6px 12px;
-      cursor: pointer;
-      transition: 0.3s;
-      min-width: 80px;
+      background: #2e7d32; color: white; border: none;
+      border-radius: 8px; padding: 6px 12px; cursor: pointer;
+      transition: 0.3s; min-width: 80px;
     }
-
-    button.verify-btn:hover {
-      background: #1b5e20;
-    }
-
-    .verified {
-      background: #81c784 !important;
-      color: white;
-    }
-
+    button.verify-btn:hover { background: #1b5e20; }
+    .verified { background: #81c784 !important; color: white; }
     .logout {
       margin-top: 20px;
-      background: #f44336;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
+      background: #f44336; border: none; color: white;
+      padding: 10px 20px; border-radius: 8px; cursor: pointer;
       transition: 0.3s;
     }
-
-    .logout:hover {
-      background: #c62828;
-    }
-
-    .search-container {
-      margin: 20px 0;
-      width: 90%;
-      max-width: 600px;
-    }
-
+    .logout:hover { background: #c62828; }
+    .search-container { margin: 20px 0; width: 90%; max-width: 600px; }
     .search-container input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 16px;
+      width: 100%; padding: 10px; border-radius: 8px;
+      border: 1px solid #ccc; font-size: 16px;
     }
-
-    .time-display {
-      font-weight: bold;
-      color: #1b5e20;
-    }
+    .time-display { font-weight: bold; color: #1b5e20; }
   </style>
 </head>
 <body>
   <div class="eco-icon">🌿</div>
   <h1>Teacher Verification Panel</h1>
-  
+
   <div class="search-container">
     <input type="text" id="searchInput" placeholder="Search students by name or email...">
   </div>
-  
+
   <div class="student-list" id="studentList">Loading students...</div>
   <button class="logout" id="logoutBtn">Log Out</button>
 
   <script type="module">
-    import { app, auth, database } from "./firebase-config.js";
-    import { ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
+      authDomain: "registar-5f3fb.firebaseapp.com",
+      projectId: "registar-5f3fb",
+      storageBucket: "registar-5f3fb.firebasestorage.app",
+      messagingSenderId: "856198150739",
+      appId: "1:856198150739:web:801000f564b47f6333e4a6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
     const studentList = document.getElementById("studentList");
     const searchInput = document.getElementById("searchInput");
     let allStudents = [];
 
-    // Fetch all students
-    const studentsRef = ref(database, "students/");
-    onValue(studentsRef, (snapshot) => {
-      const data = snapshot.val();
-      allStudents = [];
-      
-      if (!data) {
-        studentList.innerHTML = "<p>No students found yet.</p>";
+    // 🔒 Protect page: only signed-in teachers
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "index.html";
         return;
       }
 
-      Object.keys(data).forEach((id) => {
-        allStudents.push({ id, ...data[id] });
+      // Optional: check teacher role in Firestore
+      const teacherDoc = await getDoc(doc(db, "teachers", user.uid));
+      if (!teacherDoc.exists()) {
+        alert("Access denied. Only teachers can view this page.");
+        await signOut(auth);
+        window.location.href = "index.html";
+      } else {
+        fetchStudents();
+      }
+    });
+
+    // Fetch students from Firestore
+    async function fetchStudents() {
+      const querySnapshot = await getDocs(collection(db, "students"));
+      allStudents = [];
+      querySnapshot.forEach(docSnap => {
+        allStudents.push({ id: docSnap.id, ...docSnap.data() });
       });
-
       renderStudentList(allStudents);
-    });
+    }
 
-    // Search functionality
-    searchInput.addEventListener("input", (e) => {
-      const searchTerm = e.target.value.toLowerCase();
-      const filteredStudents = allStudents.filter(student => 
-        student.name.toLowerCase().includes(searchTerm) || 
-        student.email.toLowerCase().includes(searchTerm)
+    searchInput.addEventListener("input", e => {
+      const term = e.target.value.toLowerCase();
+      const filtered = allStudents.filter(s =>
+        s.name.toLowerCase().includes(term) || s.email.toLowerCase().includes(term)
       );
-      renderStudentList(filteredStudents);
+      renderStudentList(filtered);
     });
 
-    // Render student list
     function renderStudentList(students) {
       studentList.innerHTML = "";
-      
       if (students.length === 0) {
-        studentList.innerHTML = "<p>No students found matching your search.</p>";
+        studentList.innerHTML = "<p>No students found.</p>";
         return;
       }
 
-      students.forEach((student) => {
+      students.forEach(student => {
         const div = document.createElement("div");
         div.classList.add("student-card");
         if (student.verified) div.classList.add("verified");
 
-        // Format time spent
         let timeDisplay = "No activity";
         if (student.totalTimeSpent && student.totalTimeSpent > 0) {
           const minutes = Math.floor(student.totalTimeSpent / 60);
@@ -221,30 +171,27 @@
         studentList.appendChild(div);
       });
 
-      // Add event listeners to verify buttons
-      document.querySelectorAll(".verify-btn").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          const uid = e.target.getAttribute("data-id");
-          update(ref(database, "students/" + uid), { verified: true })
-            .then(() => {
-              e.target.innerText = "Verified";
-              e.target.disabled = true;
-              e.target.parentElement.classList.add("verified");
-              // Update the student in our local array
-              const studentIndex = allStudents.findIndex(s => s.id === uid);
-              if (studentIndex !== -1) {
-                allStudents[studentIndex].verified = true;
-              }
-            });
+      document.querySelectorAll(".verify-btn").forEach(btn => {
+        btn.addEventListener("click", async e => {
+          const uid = e.target.dataset.id;
+          try {
+            await updateDoc(doc(db, "students", uid), { verified: true });
+            e.target.innerText = "Verified";
+            e.target.disabled = true;
+            e.target.parentElement.classList.add("verified");
+            const idx = allStudents.findIndex(s => s.id === uid);
+            if (idx !== -1) allStudents[idx].verified = true;
+          } catch (err) {
+            console.error(err);
+            alert("Failed to verify student.");
+          }
         });
       });
     }
 
-    // Logout
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      signOut(auth).then(() => {
-        window.location.href = "index.html";
-      });
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
     });
   </script>
 </body>
