@@ -2,250 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ECOTrack | Teacher Verification</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: "Poppins", sans-serif;
-    }
-
-    body {
-      margin: 0;
-      background: linear-gradient(135deg, #9be15d, #00e3ae);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 20px;
-    }
-
-    h1 {
-      margin-top: 30px;
-      color: #2e7d32;
-      text-align: center;
-    }
-
-    .eco-icon {
-      font-size: 50px;
-      color: #4caf50;
-      animation: float 2s infinite ease-in-out;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-
-    .student-list {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-      width: 90%;
-      max-width: 800px;
-      padding: 20px;
-      margin-top: 20px;
-      overflow-y: auto;
-      max-height: 70vh;
-    }
-
-    .student-card {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 10px;
-      background: #e8f5e9;
-      transition: 0.3s;
-    }
-
-    .student-card:hover {
-      background: #c8e6c9;
-      transform: translateY(-2px);
-    }
-
-    .student-info {
-      text-align: left;
-      flex: 1;
-    }
-
-    .student-stats {
-      text-align: right;
-      margin-right: 15px;
-      color: #2e7d32;
-      font-size: 14px;
-    }
-
-    button.verify-btn {
-      background: #2e7d32;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 6px 12px;
-      cursor: pointer;
-      transition: 0.3s;
-      min-width: 80px;
-    }
-
-    button.verify-btn:hover {
-      background: #1b5e20;
-    }
-
-    .verified {
-      background: #81c784 !important;
-      color: white;
-    }
-
-    .logout {
-      margin-top: 20px;
-      background: #f44336;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .logout:hover {
-      background: #c62828;
-    }
-
-    .search-container {
-      margin: 20px 0;
-      width: 90%;
-      max-width: 600px;
-    }
-
-    .search-container input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-
-    .time-display {
-      font-weight: bold;
-      color: #1b5e20;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="eco-icon">🌿</div>
-  <h1>Teacher Verification Panel</h1>
-  
-  <div class="search-container">
-    <input type="text" id="searchInput" placeholder="Search students by name or email...">
+  <div class="container" id="teacher-container">
+    <h2>Teacher Login</h2>
+    <input type="email" id="teacher-email" placeholder="Teacher Email" required />
+    <input type="password" id="teacher-password" placeholder="Password" required />
+    <button onclick="teacherLogin()">Login</button>
+    <p id="teacher-error" class="error"></p>
+
+    <div id="dashboard" class="hidden">
+      <h3>Verify Students</h3>
+      <ul id="student-list"></ul>
+      <button onclick="teacherLogout()">Logout</button>
+    </div>
   </div>
-  
-  <div class="student-list" id="studentList">Loading students...</div>
-  <button class="logout" id="logoutBtn">Log Out</button>
 
-  <script type="module">
-    import { app, auth, database } from "./firebase-config.js";
-    import { ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    const studentList = document.getElementById("studentList");
-    const searchInput = document.getElementById("searchInput");
-    let allStudents = [];
-
-    // Fetch all students
-    const studentsRef = ref(database, "students/");
-    onValue(studentsRef, (snapshot) => {
-      const data = snapshot.val();
-      allStudents = [];
-      
-      if (!data) {
-        studentList.innerHTML = "<p>No students found yet.</p>";
-        return;
-      }
-
-      Object.keys(data).forEach((id) => {
-        allStudents.push({ id, ...data[id] });
-      });
-
-      renderStudentList(allStudents);
-    });
-
-    // Search functionality
-    searchInput.addEventListener("input", (e) => {
-      const searchTerm = e.target.value.toLowerCase();
-      const filteredStudents = allStudents.filter(student => 
-        student.name.toLowerCase().includes(searchTerm) || 
-        student.email.toLowerCase().includes(searchTerm)
-      );
-      renderStudentList(filteredStudents);
-    });
-
-    // Render student list
-    function renderStudentList(students) {
-      studentList.innerHTML = "";
-      
-      if (students.length === 0) {
-        studentList.innerHTML = "<p>No students found matching your search.</p>";
-        return;
-      }
-
-      students.forEach((student) => {
-        const div = document.createElement("div");
-        div.classList.add("student-card");
-        if (student.verified) div.classList.add("verified");
-
-        // Format time spent
-        let timeDisplay = "No activity";
-        if (student.totalTimeSpent && student.totalTimeSpent > 0) {
-          const minutes = Math.floor(student.totalTimeSpent / 60);
-          const seconds = student.totalTimeSpent % 60;
-          timeDisplay = `${minutes}m ${seconds}s`;
-        }
-
-        div.innerHTML = `
-          <div class="student-info">
-            <strong>${student.name}</strong><br>
-            Grade: ${student.grade} | Age: ${student.age}<br>
-            <small>${student.email}</small>
-          </div>
-          <div class="student-stats">
-            <div>Time Spent:</div>
-            <div class="time-display">${timeDisplay}</div>
-          </div>
-          <button class="verify-btn" data-id="${student.id}" ${student.verified ? "disabled" : ""}>
-            ${student.verified ? "Verified" : "Verify"}
-          </button>
-        `;
-        studentList.appendChild(div);
-      });
-
-      // Add event listeners to verify buttons
-      document.querySelectorAll(".verify-btn").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          const uid = e.target.getAttribute("data-id");
-          update(ref(database, "students/" + uid), { verified: true })
-            .then(() => {
-              e.target.innerText = "Verified";
-              e.target.disabled = true;
-              e.target.parentElement.classList.add("verified");
-              // Update the student in our local array
-              const studentIndex = allStudents.findIndex(s => s.id === uid);
-              if (studentIndex !== -1) {
-                allStudents[studentIndex].verified = true;
-              }
-            });
-        });
-      });
-    }
-
-    // Logout
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      signOut(auth).then(() => {
-        window.location.href = "index.html";
-      });
-    });
-  </script>
+  <script type="module" src="./firebase-config.js"></script>
+  <script type="module" src="./scripts/teacher.js"></script>
 </body>
 </html>
