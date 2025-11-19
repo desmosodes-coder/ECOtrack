@@ -757,116 +757,106 @@ function formatTime(seconds) {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-function startTimer(gameType) {
-    const game = gameState[gameType];
-    if (game.timer) {
-        clearInterval(game.timer);
+function startGameTimer(gameType) {
+    // Clear existing timer if any
+    if (gameState[gameType].timer) {
+        clearInterval(gameState[gameType].timer);
     }
     
-    game.timer = setInterval(() => {
-        game.timeLeft--;
-        const timerElement = document.getElementById(`${gameType}-timer`);
+    // Get time based on difficulty
+    const timeLimit = getDifficultyTimeLimit(gameState[gameType].difficulty);
+    gameState[gameType].timeLeft = timeLimit;
+    
+    // Update timer display
+    const timerElement = document.getElementById(`${gameType}-timer`);
+    if (timerElement) {
+        timerElement.textContent = formatTime(gameState[gameType].timeLeft);
+    }
+    
+    // Start new timer
+    gameState[gameType].timer = setInterval(() => {
+        gameState[gameType].timeLeft--;
+        
+        // Update timer display
         if (timerElement) {
-            timerElement.textContent = formatTime(game.timeLeft);
+            timerElement.textContent = formatTime(gameState[gameType].timeLeft);
         }
         
-        if (game.timeLeft <= 0) {
-            clearInterval(game.timer);
-            endGame(gameType, false); // Time's up
+        // Check if time is up
+        if (gameState[gameType].timeLeft <= 0) {
+            clearInterval(gameState[gameType].timer);
+            showNotification(`Time's up! Game over for ${gameType} game.`);
+            // Disable game interaction
+            disableGameInteraction(gameType);
         }
     }, 1000);
 }
 
-function stopTimer(gameType) {
-    const game = gameState[gameType];
-    if (game.timer) {
-        clearInterval(game.timer);
-        game.timer = null;
+function disableGameInteraction(gameType) {
+    // Disable game elements when timer runs out
+    const gameElement = document.getElementById(`${gameType}-game`);
+    if (gameElement) {
+        gameElement.classList.add('disabled');
     }
 }
 
-// Sorting Game Functions
+function enableGameInteraction(gameType) {
+    // Enable game elements when starting/resetting game
+    const gameElement = document.getElementById(`${gameType}-game`);
+    if (gameElement) {
+        gameElement.classList.remove('disabled');
+    }
+}
+
+function getDifficultyTimeLimit(difficulty) {
+    switch(difficulty) {
+        case 'easy': return 600; // 10 minutes
+        case 'normal': return 480; // 8 minutes
+        case 'hard': return 240; // 4 minutes
+        case 'nightmare': return 60; // 1 minute
+        case 'impossible': return 50; // 50 seconds
+        default: return 600; // 10 minutes
+    }
+}
+
+// Sorting Game Implementation
 function resetSortingGame() {
-    const game = gameState.sorting;
-    game.points = 0;
-    game.timeLeft = 600; // 10 minutes
+    gameState.sorting.points = 0;
+    document.getElementById('sorting-points').textContent = '0';
     
-    // Update points display
-    const pointsElement = document.getElementById('sorting-points');
-    if (pointsElement) {
-        pointsElement.textContent = game.points;
-    }
+    // Enable game interaction
+    enableGameInteraction('sorting');
     
-    // Update timer display
-    const timerElement = document.getElementById('sorting-timer');
-    if (timerElement) {
-        timerElement.textContent = formatTime(game.timeLeft);
-    }
+    // Start timer
+    startGameTimer('sorting');
     
-    // Generate waste items
-    generateSortingItems();
-    
-    // Stop any existing timer
-    stopTimer('sorting');
-}
-
-function generateSortingItems() {
     const itemsContainer = document.getElementById('sorting-items');
-    if (!itemsContainer) return;
-    
     itemsContainer.innerHTML = '';
     
-    // Get difficulty settings
-    const difficultySettings = {
-        easy: { count: 6, time: 600 },
-        normal: { count: 10, time: 600 },
-        hard: { count: 15, time: 600 },
-        nightmare: { count: 20, time: 300 },
-        impossible: { count: 30, time: 300 }
-    };
+    // Generate waste items based on difficulty
+    const itemCount = getDifficultyItemCount(gameState.sorting.difficulty);
+    gameState.sorting.items = generateWasteItems(itemCount);
     
-    const settings = difficultySettings[gameState.sorting.difficulty] || difficultySettings.easy;
-    gameState.sorting.timeLeft = settings.time;
-    
-    // Create items
-    for (let i = 0; i < settings.count; i++) {
-        // Randomly select a category
-        const categories = ['recyclable', 'organic', 'hazardous', 'general'];
-        const category = categories[Math.floor(Math.random() * categories.length)];
-        
-        // Randomly select an item from that category
-        const items = wasteItems[category];
-        const item = items[Math.floor(Math.random() * items.length)];
-        
+    // Create draggable items
+    gameState.sorting.items.forEach((item, index) => {
         const itemElement = document.createElement('div');
         itemElement.className = 'waste-item';
-        itemElement.setAttribute('data-category', category);
-        itemElement.setAttribute('data-testid', `waste-item-${i}`);
         itemElement.draggable = true;
         itemElement.innerHTML = `
-            <div class="item-icon">${item.icon}</div>
-            <div class="item-name">${item.name}</div>
+            <span class="waste-icon">${item.icon}</span>
+            <span class="waste-name">${item.name}</span>
         `;
+        itemElement.dataset.itemType = item.type;
+        itemElement.dataset.itemId = index;
         
         // Add drag events
         itemElement.addEventListener('dragstart', handleDragStart);
         itemElement.addEventListener('dragend', handleDragEnd);
         
         itemsContainer.appendChild(itemElement);
-    }
-}
-
-function handleDragStart(e) {
-    e.dataTransfer.setData('text/plain', e.target.getAttribute('data-category'));
-    e.target.classList.add('dragging');
-}
-
-function handleDragEnd(e) {
-    e.target.classList.remove('dragging');
-}
-
-// Add drop events to bins
-document.addEventListener('DOMContentLoaded', function() {
+    });
+    
+    // Setup bins
     const bins = document.querySelectorAll('.bin');
     bins.forEach(bin => {
         bin.addEventListener('dragover', handleDragOver);
@@ -874,7 +864,44 @@ document.addEventListener('DOMContentLoaded', function() {
         bin.addEventListener('dragleave', handleDragLeave);
         bin.addEventListener('drop', handleDrop);
     });
-});
+}
+
+function getDifficultyItemCount(difficulty) {
+    switch(difficulty) {
+        case 'easy': return 4;
+        case 'normal': return 6;
+        case 'hard': return 8;
+        case 'nightmare': return 12;
+        case 'impossible': return 16;
+        default: return 4;
+    }
+}
+
+function generateWasteItems(count) {
+    const items = [];
+    const types = ['recyclable', 'organic', 'hazardous', 'general'];
+    
+    for (let i = 0; i < count; i++) {
+        const type = types[Math.floor(Math.random() * types.length)];
+        const itemOptions = wasteItems[type];
+        const item = itemOptions[Math.floor(Math.random() * itemOptions.length)];
+        items.push({
+            ...item,
+            type: type
+        });
+    }
+    
+    return items;
+}
+
+function handleDragStart(e) {
+    e.dataTransfer.setData('text/plain', e.target.dataset.itemId);
+    e.target.classList.add('dragging');
+}
+
+function handleDragEnd(e) {
+    e.target.classList.remove('dragging');
+}
 
 function handleDragOver(e) {
     e.preventDefault();
@@ -893,366 +920,316 @@ function handleDrop(e) {
     e.preventDefault();
     e.target.classList.remove('drag-over');
     
-    const category = e.dataTransfer.getData('text/plain');
-    const binType = e.target.closest('.bin').getAttribute('data-bin-type');
+    const itemId = e.dataTransfer.getData('text/plain');
+    const itemElement = document.querySelector(`[data-item-id="${itemId}"]`);
+    const itemType = itemElement.dataset.itemType;
+    const binType = e.target.dataset.binType;
     
-    // Check if correct bin
-    if (category === binType) {
-        gameState.sorting.points += 10;
-        showNotification('Correct! +10 points');
+    // Check if item was dropped in correct bin
+    if (itemType === binType) {
+        // Correct bin - add points
+        const points = getDifficultyPoints(gameState.sorting.difficulty);
+        gameState.sorting.points += points;
+        document.getElementById('sorting-points').textContent = gameState.sorting.points;
+        
+        // Update total points
+        rewardsState.totalPoints += points;
+        saveRewardsState();
+        updateRewardsDisplay();
+        
+        // Show success notification
+        showNotification(`Correct! +${points} points`);
+        
+        // Remove item
+        itemElement.remove();
+        
+        // Check if game is complete
+        if (document.querySelectorAll('.waste-item').length === 0) {
+            clearInterval(gameState.sorting.timer);
+            showNotification(`Game complete! Total points: ${gameState.sorting.points}`);
+        }
     } else {
-        gameState.sorting.points -= 5;
-        showNotification('Wrong bin! -5 points');
-    }
-    
-    // Update points display
-    const pointsElement = document.getElementById('sorting-points');
-    if (pointsElement) {
-        pointsElement.textContent = gameState.sorting.points;
-    }
-    
-    // Remove the item
-    const draggedItem = document.querySelector('.dragging');
-    if (draggedItem) {
-        draggedItem.remove();
-    }
-    
-    // Check if game is complete
-    const itemsContainer = document.getElementById('sorting-items');
-    if (itemsContainer && itemsContainer.children.length === 0) {
-        endGame('sorting', true);
+        // Wrong bin - show notification
+        showNotification('Wrong bin! Try again.');
     }
 }
 
-function endGame(gameType, isCompleted) {
-    stopTimer(gameType);
-    
-    if (isCompleted) {
-        showNotification(`Game completed! Final score: ${gameState[gameType].points} points`);
-    } else {
-        showNotification(`Time's up! Final score: ${gameState[gameType].points} points`);
-    }
-    
-    // Update rewards
-    updateRewards(gameType, gameState[gameType].points);
-}
-
-// Matching Game Functions
+// Matching Game Implementation
 function resetMatchingGame() {
-    const game = gameState.matching;
-    game.points = 0;
-    game.matchedPairs = 0;
-    game.timeLeft = 600; // 10 minutes
-    game.cards = [];
-    game.flippedCards = [];
+    gameState.matching.points = 0;
+    gameState.matching.flippedCards = [];
+    gameState.matching.matchedPairs = 0;
+    document.getElementById('matching-points').textContent = '0';
     
-    // Update points display
-    const pointsElement = document.getElementById('matching-points');
-    if (pointsElement) {
-        pointsElement.textContent = game.points;
-    }
+    // Enable game interaction
+    enableGameInteraction('matching');
     
-    // Update timer display
-    const timerElement = document.getElementById('matching-timer');
-    if (timerElement) {
-        timerElement.textContent = formatTime(game.timeLeft);
-    }
+    // Start timer
+    startGameTimer('matching');
     
-    // Generate cards
-    generateMatchingCards();
-    
-    // Stop any existing timer
-    stopTimer('matching');
-}
-
-function generateMatchingCards() {
     const board = document.getElementById('matching-board');
-    if (!board) return;
-    
     board.innerHTML = '';
     
-    // Get difficulty settings
-    const difficultySettings = {
-        easy: { pairs: 6, time: 600 },
-        normal: { pairs: 8, time: 600 },
-        hard: { pairs: 10, time: 600 },
-        nightmare: { pairs: 12, time: 300 },
-        impossible: { pairs: 15, time: 300 }
-    };
-    
-    const settings = difficultySettings[gameState.matching.difficulty] || difficultySettings.easy;
-    gameState.matching.timeLeft = settings.time;
-    
-    // Create pairs of waste items
-    const allItems = [];
-    Object.values(wasteItems).forEach(category => {
-        allItems.push(...category);
-    });
-    
-    // Select random items for pairs
-    const selectedItems = [];
-    while (selectedItems.length < settings.pairs && allItems.length > 0) {
-        const randomIndex = Math.floor(Math.random() * allItems.length);
-        const item = allItems.splice(randomIndex, 1)[0];
-        selectedItems.push(item);
-        selectedItems.push({...item}); // Add duplicate for matching
-    }
-    
-    // Shuffle the items
-    shuffleArray(selectedItems);
+    // Generate cards based on difficulty
+    const pairCount = getDifficultyPairCount(gameState.matching.difficulty);
+    gameState.matching.cards = generateMatchingCards(pairCount);
     
     // Create card elements
-    selectedItems.forEach((item, index) => {
-        const card = document.createElement('div');
-        card.className = 'matching-card';
-        card.setAttribute('data-item', item.name);
-        card.setAttribute('data-testid', `matching-card-${index}`);
-        card.innerHTML = `
-            <div class="card-front"></div>
-            <div class="card-back">${item.icon}</div>
+    gameState.matching.cards.forEach((card, index) => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'matching-card';
+        cardElement.innerHTML = `
+            <div class="card-front">${card.icon}</div>
+            <div class="card-back">❓</div>
         `;
+        cardElement.dataset.cardType = card.type;
+        cardElement.dataset.cardId = index;
+        cardElement.dataset.cardName = card.name;
         
-        card.addEventListener('click', () => flipCard(card, item.name));
-        board.appendChild(card);
-        
-        gameState.matching.cards.push({
-            element: card,
-            item: item.name,
-            isFlipped: false,
-            isMatched: false
-        });
+        cardElement.addEventListener('click', () => flipMatchingCard(cardElement));
+        board.appendChild(cardElement);
     });
-    
-    // Update board grid
-    board.style.gridTemplateColumns = `repeat(${Math.ceil(Math.sqrt(settings.pairs * 2))}, 1fr)`;
 }
 
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+function getDifficultyPairCount(difficulty) {
+    switch(difficulty) {
+        case 'easy': return 4;
+        case 'normal': return 5;
+        case 'hard': return 6;
+        case 'nightmare': return 8;
+        case 'impossible': return 10;
+        default: return 4;
     }
 }
 
-function flipCard(cardElement, itemName) {
-    const game = gameState.matching;
+function generateMatchingCards(pairCount) {
+    const cards = [];
+    const types = ['recyclable', 'organic', 'hazardous', 'general'];
     
-    // Don't allow flipping if two cards are already flipped or card is matched
-    if (game.flippedCards.length >= 2 || 
-        game.flippedCards.some(card => card.element === cardElement) ||
-        game.cards.find(c => c.element === cardElement && c.isMatched)) {
+    for (let i = 0; i < pairCount; i++) {
+        const type = types[Math.floor(Math.random() * types.length)];
+        const itemOptions = wasteItems[type];
+        const item = itemOptions[Math.floor(Math.random() * itemOptions.length)];
+        
+        // Add two cards for each pair
+        cards.push({...item, type: type});
+        cards.push({...item, type: type});
+    }
+    
+    // Shuffle cards
+    return shuffleArray(cards);
+}
+
+function flipMatchingCard(cardElement) {
+    // Prevent flipping if already matched or two cards are already flipped
+    if (cardElement.classList.contains('matched') || 
+        gameState.matching.flippedCards.length >= 2 ||
+        gameState.matching.flippedCards.includes(cardElement)) {
         return;
     }
     
     // Flip the card
     cardElement.classList.add('flipped');
-    const card = game.cards.find(c => c.element === cardElement);
-    if (card) {
-        card.isFlipped = true;
-        game.flippedCards.push(card);
-    }
+    gameState.matching.flippedCards.push(cardElement);
     
     // Check for match when two cards are flipped
-    if (game.flippedCards.length === 2) {
-        const [card1, card2] = game.flippedCards;
+    if (gameState.matching.flippedCards.length === 2) {
+        const [card1, card2] = gameState.matching.flippedCards;
         
-        if (card1.item === card2.item) {
+        if (card1.dataset.cardType === card2.dataset.cardType &&
+            card1.dataset.cardName === card2.dataset.cardName) {
             // Match found
-            card1.isMatched = true;
-            card2.isMatched = true;
-            game.matchedPairs++;
-            game.points += 20;
-            
-            // Update points display
-            const pointsElement = document.getElementById('matching-points');
-            if (pointsElement) {
-                pointsElement.textContent = game.points;
-            }
-            
-            showNotification('Match found! +20 points');
-            
-            // Check if game is complete
-            if (game.matchedPairs === game.cards.length / 2) {
-                endGame('matching', true);
-            }
-        } else {
-            // No match, flip cards back after delay
-            game.points -= 5;
-            
-            // Update points display
-            const pointsElement = document.getElementById('matching-points');
-            if (pointsElement) {
-                pointsElement.textContent = game.points;
-            }
-            
             setTimeout(() => {
-                card1.element.classList.remove('flipped');
-                card2.element.classList.remove('flipped');
-                card1.isFlipped = false;
-                card2.isFlipped = false;
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                
+                // Add points
+                const points = getDifficultyPoints(gameState.matching.difficulty) * 2;
+                gameState.matching.points += points;
+                document.getElementById('matching-points').textContent = gameState.matching.points;
+                
+                // Update total points
+                rewardsState.totalPoints += points;
+                saveRewardsState();
+                updateRewardsDisplay();
+                
+                // Show notification
+                showNotification(`Match found! +${points} points`);
+                
+                // Reset flipped cards
+                gameState.matching.flippedCards = [];
+                gameState.matching.matchedPairs++;
+                
+                // Check if game is complete
+                const totalPairs = getDifficultyPairCount(gameState.matching.difficulty);
+                if (gameState.matching.matchedPairs === totalPairs) {
+                    clearInterval(gameState.matching.timer);
+                    showNotification(`Game complete! Total points: ${gameState.matching.points}`);
+                }
+            }, 1000);
+        } else {
+            // No match
+            setTimeout(() => {
+                card1.classList.remove('flipped');
+                card2.classList.remove('flipped');
+                gameState.matching.flippedCards = [];
+                showNotification('No match! Try again.');
             }, 1000);
         }
-        
-        // Clear flipped cards
-        game.flippedCards = [];
     }
 }
 
-// Memory Game Functions
+// Memory Game Implementation
 function resetMemoryGame() {
-    const game = gameState.memory;
-    game.points = 0;
-    game.matchedPairs = 0;
-    game.moves = 0;
-    game.timeLeft = 600; // 10 minutes
-    game.cards = [];
-    game.flippedCards = [];
+    gameState.memory.points = 0;
+    gameState.memory.flippedCards = [];
+    gameState.memory.matchedPairs = 0;
+    gameState.memory.moves = 0;
+    document.getElementById('memory-points').textContent = '0';
     
-    // Update points display
-    const pointsElement = document.getElementById('memory-points');
-    if (pointsElement) {
-        pointsElement.textContent = game.points;
-    }
+    // Enable game interaction
+    enableGameInteraction('memory');
     
-    // Update timer display
-    const timerElement = document.getElementById('memory-timer');
-    if (timerElement) {
-        timerElement.textContent = formatTime(game.timeLeft);
-    }
+    // Start timer
+    startGameTimer('memory');
     
-    // Generate cards
-    generateMemoryCards();
-    
-    // Stop any existing timer
-    stopTimer('memory');
-}
-
-function generateMemoryCards() {
     const board = document.getElementById('memory-board');
-    if (!board) return;
-    
     board.innerHTML = '';
     
-    // Get difficulty settings
-    const difficultySettings = {
-        easy: { pairs: 6, time: 600 },
-        normal: { pairs: 8, time: 600 },
-        hard: { pairs: 10, time: 600 },
-        nightmare: { pairs: 12, time: 300 },
-        impossible: { pairs: 15, time: 300 }
-    };
-    
-    const settings = difficultySettings[gameState.memory.difficulty] || difficultySettings.easy;
-    gameState.memory.timeLeft = settings.time;
-    
-    // Create pairs of waste items
-    const allItems = [];
-    Object.values(wasteItems).forEach(category => {
-        allItems.push(...category);
-    });
-    
-    // Select random items for pairs
-    const selectedItems = [];
-    while (selectedItems.length < settings.pairs && allItems.length > 0) {
-        const randomIndex = Math.floor(Math.random() * allItems.length);
-        const item = allItems.splice(randomIndex, 1)[0];
-        selectedItems.push(item);
-        selectedItems.push({...item}); // Add duplicate for matching
-    }
-    
-    // Shuffle the items
-    shuffleArray(selectedItems);
+    // Generate cards based on difficulty
+    const pairCount = getDifficultyPairCount(gameState.memory.difficulty);
+    gameState.memory.cards = generateMemoryCards(pairCount);
     
     // Create card elements
-    selectedItems.forEach((item, index) => {
-        const card = document.createElement('div');
-        card.className = 'memory-card';
-        card.setAttribute('data-item', item.name);
-        card.setAttribute('data-testid', `memory-card-${index}`);
-        card.innerHTML = `
-            <div class="card-front"></div>
-            <div class="card-back">${item.icon}</div>
+    gameState.memory.cards.forEach((card, index) => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'memory-card';
+        cardElement.innerHTML = `
+            <div class="card-front">${card.icon}</div>
+            <div class="card-back">❓</div>
         `;
+        cardElement.dataset.cardId = index;
+        cardElement.dataset.cardValue = card.value;
         
-        card.addEventListener('click', () => flipMemoryCard(card, item.name));
-        board.appendChild(card);
-        
-        gameState.memory.cards.push({
-            element: card,
-            item: item.name,
-            isFlipped: false,
-            isMatched: false
+        cardElement.addEventListener('click', () => flipMemoryCard(cardElement));
+        board.appendChild(cardElement);
+    });
+}
+
+function generateMemoryCards(pairCount) {
+    const cards = [];
+    const values = [];
+    
+    // Create pairs of values
+    for (let i = 1; i <= pairCount; i++) {
+        values.push(i);
+        values.push(i);
+    }
+    
+    // Create card objects with values and icons
+    values.forEach((value, index) => {
+        cards.push({
+            value: value,
+            icon: getMemoryCardIcon(value)
         });
     });
     
-    // Update board grid
-    board.style.gridTemplateColumns = `repeat(${Math.ceil(Math.sqrt(settings.pairs * 2))}, 1fr)`;
+    // Shuffle cards
+    return shuffleArray(cards);
 }
 
-function flipMemoryCard(cardElement, itemName) {
-    const game = gameState.memory;
-    
-    // Don't allow flipping if two cards are already flipped or card is matched
-    if (game.flippedCards.length >= 2 || 
-        game.flippedCards.some(card => card.element === cardElement) ||
-        game.cards.find(c => c.element === cardElement && c.isMatched)) {
+function getMemoryCardIcon(value) {
+    const icons = ['♻️', '🌱', '⚠️', '🗑️', '🍎', '🥥', '📦', '🔋', '📱', '🧴'];
+    return icons[value - 1] || '❓';
+}
+
+function flipMemoryCard(cardElement) {
+    // Prevent flipping if already matched or two cards are already flipped
+    if (cardElement.classList.contains('matched') || 
+        gameState.memory.flippedCards.length >= 2 ||
+        gameState.memory.flippedCards.includes(cardElement)) {
         return;
     }
     
     // Flip the card
     cardElement.classList.add('flipped');
-    const card = game.cards.find(c => c.element === cardElement);
-    if (card) {
-        card.isFlipped = true;
-        game.flippedCards.push(card);
-    }
+    gameState.memory.flippedCards.push(cardElement);
+    gameState.memory.moves++;
     
     // Check for match when two cards are flipped
-    if (game.flippedCards.length === 2) {
-        game.moves++;
-        const [card1, card2] = game.flippedCards;
+    if (gameState.memory.flippedCards.length === 2) {
+        const [card1, card2] = gameState.memory.flippedCards;
         
-        if (card1.item === card2.item) {
+        if (card1.dataset.cardValue === card2.dataset.cardValue) {
             // Match found
-            card1.isMatched = true;
-            card2.isMatched = true;
-            game.matchedPairs++;
-            game.points += Math.max(10, 50 - game.moves); // More points for fewer moves
-            
-            // Update points display
-            const pointsElement = document.getElementById('memory-points');
-            if (pointsElement) {
-                pointsElement.textContent = game.points;
-            }
-            
-            showNotification('Match found! +' + Math.max(10, 50 - game.moves) + ' points');
-            
-            // Check if game is complete
-            if (game.matchedPairs === game.cards.length / 2) {
-                endGame('memory', true);
-            }
-        } else {
-            // No match, flip cards back after delay
             setTimeout(() => {
-                card1.element.classList.remove('flipped');
-                card2.element.classList.remove('flipped');
-                card1.isFlipped = false;
-                card2.isFlipped = false;
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                
+                // Add points (more points for fewer moves)
+                const points = Math.max(10, getDifficultyPoints(gameState.memory.difficulty) - (gameState.memory.moves * 0.5));
+                gameState.memory.points += Math.floor(points);
+                document.getElementById('memory-points').textContent = gameState.memory.points;
+                
+                // Update total points
+                rewardsState.totalPoints += Math.floor(points);
+                saveRewardsState();
+                updateRewardsDisplay();
+                
+                // Show notification
+                showNotification(`Match found! +${Math.floor(points)} points`);
+                
+                // Reset flipped cards
+                gameState.memory.flippedCards = [];
+                gameState.memory.matchedPairs++;
+                
+                // Check if game is complete
+                const totalPairs = getDifficultyPairCount(gameState.memory.difficulty);
+                if (gameState.memory.matchedPairs === totalPairs) {
+                    clearInterval(gameState.memory.timer);
+                    showNotification(`Game complete! Total points: ${gameState.memory.points}`);
+                }
+            }, 1000);
+        } else {
+            // No match
+            setTimeout(() => {
+                card1.classList.remove('flipped');
+                card2.classList.remove('flipped');
+                gameState.memory.flippedCards = [];
+                showNotification('No match! Try again.');
             }, 1000);
         }
-        
-        // Clear flipped cards
-        game.flippedCards = [];
     }
 }
 
-// Rewards Functions
+// Helper function to get points based on difficulty
+function getDifficultyPoints(difficulty) {
+    switch(difficulty) {
+        case 'easy': return 10;
+        case 'normal': return 15;
+        case 'hard': return 20;
+        case 'nightmare': return 30;
+        case 'impossible': return 50;
+        default: return 10;
+    }
+}
+
+// Helper function to shuffle array
+function shuffleArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
+
+// Eco Rewards System Implementation
 function loadRewardsState() {
     const saved = localStorage.getItem('ecotrack-rewards');
     if (saved) {
         try {
-            const savedState = JSON.parse(saved);
-            rewardsState = {...rewardsState, ...savedState};
+            rewardsState = JSON.parse(saved);
         } catch (error) {
             console.error('Error loading rewards state:', error);
         }
@@ -1263,129 +1240,232 @@ function saveRewardsState() {
     localStorage.setItem('ecotrack-rewards', JSON.stringify(rewardsState));
 }
 
-function updateRewards(gameType, points) {
-    // Update total points
-    rewardsState.totalPoints += points;
-    
-    // Check rewards
-    Object.values(rewardsState.rewards).forEach(reward => {
-        // Special handling for Difficulty Master reward
-        if (reward.game === "nightmare") {
-            // Check if all games have been completed on nightmare difficulty
-            const nightmareCompleted = ['sorting', 'matching', 'memory'].every(game => 
-                gameState[game].difficulty === 'nightmare'
-            );
-            if (nightmareCompleted && !reward.earned) {
-                reward.earned = true;
-                showNotification(`🎉 Achievement Unlocked: ${reward.name}!`);
-            }
-        } 
-        // Special handling for Eco Hero reward
-        else if (reward.game === "total") {
-            if (rewardsState.totalPoints >= reward.pointsRequired && !reward.earned) {
-                reward.earned = true;
-                showNotification(`🎉 Achievement Unlocked: ${reward.name}!`);
-            }
-        }
-        // Regular game-specific rewards
-        else if (reward.game === gameType) {
-            if (points >= reward.pointsRequired && !reward.earned) {
-                reward.earned = true;
-                showNotification(`🎉 Achievement Unlocked: ${reward.name}!`);
-            }
-        }
-        // First Steps reward (any game)
-        else if (reward.game === "sorting" && gameType === "sorting") {
-            if (points >= reward.pointsRequired && !reward.earned) {
-                reward.earned = true;
-                showNotification(`🎉 Achievement Unlocked: ${reward.name}!`);
-            }
-        }
-    });
-    
-    saveRewardsState();
-    updateRewardsDisplay();
-}
-
 function updateRewardsDisplay() {
+    // Update rewards status
     Object.entries(rewardsState.rewards).forEach(([id, reward]) => {
-        const card = document.querySelector(`.reward-card[data-reward-id="${id}"]`);
-        if (card) {
-            const statusElement = card.querySelector('.reward-status');
-            if (statusElement) {
-                statusElement.textContent = reward.earned ? 'Unlocked' : 'Locked';
-                statusElement.className = reward.earned ? 'reward-status unlocked' : 'reward-status locked';
+        const rewardCard = document.querySelector(`[data-reward-id="${id}"]`);
+        if (rewardCard) {
+            const statusElement = rewardCard.querySelector('.reward-status');
+            if (reward.earned) {
+                statusElement.textContent = 'Earned!';
+                statusElement.className = 'reward-status earned';
+            } else {
+                statusElement.textContent = 'Locked';
+                statusElement.className = 'reward-status locked';
+            }
+        }
+    });
+    
+    // Check for reward completion
+    checkRewardsCompletion();
+}
+
+function checkRewardsCompletion() {
+    Object.entries(rewardsState.rewards).forEach(([id, reward]) => {
+        if (!reward.earned) {
+            let rewardEarned = false;
+            
+            switch(reward.game) {
+                case 'total':
+                    rewardEarned = rewardsState.totalPoints >= reward.pointsRequired;
+                    break;
+                case 'nightmare':
+                    // Check if all games have been completed on nightmare difficulty
+                    rewardEarned = (gameState.sorting.difficulty === 'nightmare' && gameState.sorting.points > 0) &&
+                                   (gameState.matching.difficulty === 'nightmare' && gameState.matching.points > 0) &&
+                                   (gameState.memory.difficulty === 'nightmare' && gameState.memory.points > 0);
+                    break;
+                default:
+                    // Check if specific game points meet requirement
+                    if (gameState[reward.game]) {
+                        rewardEarned = gameState[reward.game].points >= reward.pointsRequired;
+                    }
+                    break;
+            }
+            
+            if (rewardEarned) {
+                rewardsState.rewards[id].earned = true;
+                showNotification(`🏆 Reward earned: ${reward.name}!`);
+                saveRewardsState();
+                updateRewardsDisplay();
+            }
+        }
+    });
+}
+// ===================================
+// AUDIO CONTROLS
+// ===================================
+
+// Get audio element
+const backgroundAudio = document.getElementById('background-audio');
+const autoplayToggle = document.getElementById('autoplay-toggle');
+const volumeSlider = document.getElementById('volume-slider');
+const volumeValue = document.getElementById('volume-value');
+const testAudioBtn = document.getElementById('test-audio-btn');
+
+// Load saved settings
+function loadAudioSettings() {
+    const savedAutoplay = localStorage.getItem('audioAutoplay');
+    const savedVolume = localStorage.getItem('audioVolume');
+    
+    if (savedAutoplay !== null) {
+        autoplayToggle.checked = savedAutoplay === 'true';
+    }
+    
+    if (savedVolume !== null) {
+        const volume = parseInt(savedVolume);
+        volumeSlider.value = volume;
+        volumeValue.textContent = volume + '%';
+        if (backgroundAudio) {
+            backgroundAudio.volume = volume / 100;
+        }
+    } else {
+        // Default volume
+        if (backgroundAudio) {
+            backgroundAudio.volume = 0.7;
+        }
+    }
+    
+    // Handle autoplay
+    if (autoplayToggle.checked && backgroundAudio) {
+        // Try to play, handle autoplay restrictions
+        const playPromise = backgroundAudio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.log('Autoplay prevented:', error);
+            });
+        }
+    }
+}
+
+// Autoplay toggle
+if (autoplayToggle) {
+    autoplayToggle.addEventListener('change', function() {
+        localStorage.setItem('audioAutoplay', this.checked);
+        
+        if (backgroundAudio) {
+            if (this.checked) {
+                backgroundAudio.play().catch(error => {
+                    console.log('Play prevented:', error);
+                });
+            } else {
+                backgroundAudio.pause();
             }
         }
     });
 }
 
-// Calculator Functions
-document.addEventListener('DOMContentLoaded', function() {
-    const calculateBtn = document.getElementById('calculate-btn');
-    if (calculateBtn) {
-        calculateBtn.addEventListener('click', calculateWaste);
-    }
-});
-
-function calculateWaste() {
-    const frequency = parseInt(document.getElementById('waste-frequency').value) || 0;
-    const amount = parseInt(document.getElementById('waste-amount').value) || 0;
-    const wasteType = document.getElementById('waste-type').value;
-    
-    if (frequency <= 0 || amount <= 0) {
-        showNotification('Please enter valid values');
-        return;
-    }
-    
-    const daily = frequency * amount / 7;
-    const weekly = frequency * amount;
-    const monthly = weekly * 4.33; // Average weeks per month
-    const yearly = weekly * 52;
-    
-    // Update results
-    document.getElementById('daily-waste-result').textContent = daily.toFixed(1) + ' kg';
-    document.getElementById('weekly-waste-result').textContent = weekly.toFixed(1) + ' kg';
-    document.getElementById('monthly-waste-result').textContent = monthly.toFixed(1) + ' kg';
-    document.getElementById('yearly-waste-result').textContent = yearly.toFixed(1) + ' kg';
-    
-    showNotification('Waste calculation completed!');
+// Volume slider
+if (volumeSlider) {
+    volumeSlider.addEventListener('input', function() {
+        const volume = this.value;
+        volumeValue.textContent = volume + '%';
+        localStorage.setItem('audioVolume', volume);
+        
+        if (backgroundAudio) {
+            backgroundAudio.volume = volume / 100;
+        }
+        
+        // Update slider background
+        const percentage = (volume / 100) * 100;
+        this.style.background = `linear-gradient(to right, var(--primary) 0%, var(--primary) ${percentage}%, #ddd ${percentage}%, #ddd 100%)`;
+    });
 }
 
-// Task Tracker Functions
-document.addEventListener('DOMContentLoaded', function() {
-    // Load saved task states
-    const savedTasks = localStorage.getItem('ecotrack-tasks');
-    if (savedTasks) {
-        try {
-            const tasks = JSON.parse(savedTasks);
-            Object.entries(tasks).forEach(([id, completed]) => {
-                const checkbox = document.getElementById(id);
-                if (checkbox) {
-                    checkbox.checked = completed;
-                }
-            });
-        } catch (error) {
-            console.error('Error loading tasks:', error);
+// Test audio button
+if (testAudioBtn) {
+    testAudioBtn.addEventListener('click', function() {
+        if (backgroundAudio) {
+            if (backgroundAudio.paused) {
+                backgroundAudio.play().catch(error => {
+                    alert('Unable to play audio. Please check your browser settings.');
+                });
+                this.textContent = '⏸️ Pause Audio';
+            } else {
+                backgroundAudio.pause();
+                this.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"></path></svg> Test Audio';
+            }
         }
+    });
+}
+
+// Initialize audio settings on page load
+loadAudioSettings();
+
+// ===================================
+// ENHANCED CALCULATOR WITH NEW CATEGORIES
+// ===================================
+
+const calculateBtn = document.getElementById('calculate-btn');
+const wasteFrequency = document.getElementById('waste-frequency');
+const wasteAmount = document.getElementById('waste-amount');
+const wasteCategory = document.getElementById('waste-category');
+
+// Category information
+const categoryInfo = {
+    biodegradable: {
+        name: 'Biodegradable',
+        decompositionTime: '2-8 weeks',
+        examples: 'Food scraps, yard waste, paper products, natural fibers',
+        impact: 'Low environmental impact - breaks down naturally and can be composted',
+        tips: 'Compost at home to reduce landfill waste and create nutrient-rich soil',
+        color: '#22c55e'
+    },
+    'non-biodegradable': {
+        name: 'Non-Biodegradable',
+        decompositionTime: '100-1000+ years',
+        examples: 'Plastics, metals, glass, synthetic materials',
+        impact: 'High environmental impact - persists in environment for centuries',
+        tips: 'Recycle whenever possible and reduce usage of single-use items',
+        color: '#ef4444'
     }
-    
-    // Add event listeners to task checkboxes
-    document.querySelectorAll('.task-item input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            saveTaskState();
+};
+
+if (calculateBtn) {
+    calculateBtn.addEventListener('click', function() {
+        const frequency = parseFloat(wasteFrequency.value) || 0;
+        const amount = parseFloat(wasteAmount.value) || 0;
+        const category = wasteCategory.value;
+        
+        if (frequency > 0 && amount > 0) {
+            // Calculate waste amounts
+            const dailyWaste = (frequency * amount) / 7;
+            const weeklyWaste = frequency * amount;
+            const monthlyWaste = weeklyWaste * 4.33;
+            const yearlyWaste = weeklyWaste * 52;
             
-            if (this.checked) {
-                showNotification('Task completed! Great job!');
+            // Update results
+            document.getElementById('daily-waste-result').textContent = dailyWaste.toFixed(2) + ' kg';
+            document.getElementById('weekly-waste-result').textContent = weeklyWaste.toFixed(2) + ' kg';
+            document.getElementById('monthly-waste-result').textContent = monthlyWaste.toFixed(2) + ' kg';
+            document.getElementById('yearly-waste-result').textContent = yearlyWaste.toFixed(2) + ' kg';
+            
+            // Update category impact
+            const categoryData = categoryInfo[category];
+            if (categoryData) {
+                const impactText = `
+                    <strong>${categoryData.name}</strong><br>
+                    <small>Decomposition: ${categoryData.decompositionTime}</small><br>
+                    <small>${categoryData.impact}</small>
+                `;
+                document.getElementById('category-impact-result').innerHTML = impactText;
+            }
+            
+            // Show notification
+            showNotification(`Calculation complete! Your yearly ${categoryData.name.toLowerCase()} waste: ${yearlyWaste.toFixed(2)} kg`, 'success');
+        } else {
+            showNotification('Please enter valid values for frequency and amount', 'error');
+        }
+    });
+}
+
+// Auto-calculate on input change
+if (wasteFrequency && wasteAmount && wasteCategory) {
+    [wasteFrequency, wasteAmount, wasteCategory].forEach(element => {
+        element.addEventListener('change', function() {
+            if (calculateBtn) {
+                calculateBtn.click();
             }
         });
     });
-});
-
-function saveTaskState() {
-    const tasks = {};
-    document.querySelectorAll('.task-item input[type="checkbox"]').forEach(checkbox => {
-        tasks[checkbox.id] = checkbox.checked;
-    });
-    localStorage.setItem('ecotrack-tasks', JSON.stringify(tasks));
 }

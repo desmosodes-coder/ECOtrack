@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
@@ -7,13 +6,215 @@
     <title>ECOTrack - Transform Waste into Worth</title>
     <meta name="description" content="Join the green revolution with our comprehensive waste management platform. Track, reduce, and recycle your way to a sustainable future.">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Falling Leaves Animation */
+        .falling-leaves-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .leaf {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #2d7d4a, #43a862);
+            border-radius: 0 100% 0 100%;
+            opacity: 0.8;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Theme-based leaf colors */
+        [data-theme="light"] .leaf {
+            background: linear-gradient(45deg, #2d7d4a, #43a862);
+        }
+
+        [data-theme="dark"] .leaf {
+            background: linear-gradient(45deg, #1e5535, #2d7d4a);
+        }
+
+        [data-theme="forest"] .leaf {
+            background: linear-gradient(45deg, #16a34a, #22c55e);
+        }
+
+        /* Waste Information Styles */
+        .waste-info-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .waste-intro {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        .waste-intro-content h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .waste-intro-content p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .waste-image {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .waste-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .comparison-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .comparison-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px var(--shadow);
+        }
+
+        .comparison-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .waste-type-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .comparison-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .comparison-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .comparison-card li {
+            color: var(--text-secondary);
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-card li:before {
+            content: "🌿 ";
+            margin-right: 0.5rem;
+        }
+
+        .waste-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .waste-type-card {
+            background: var(--surface);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .waste-type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px var(--shadow);
+        }
+
+        .waste-card-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .waste-type-card h4 {
+            color: var(--primary);
+            padding: 1rem 1rem 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        .waste-type-card p {
+            color: var(--text-secondary);
+            padding: 0 1rem 1rem;
+            line-height: 1.6;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .waste-info-container {
+                padding: 1rem;
+            }
+            
+            .waste-intro {
+                padding: 1.5rem;
+            }
+            
+            .comparison-card {
+                padding: 1.5rem;
+            }
+            
+            .waste-types-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Top Navigation -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <a href="" class="">
+                <a href="index.html" class="logo-link">
                 <span class="logo-icon">🌱</span>
                 <span class="logo-text" data-testid="app-title">ECOTrack</span>
                 </a>
@@ -21,10 +222,9 @@
             
             <ul class="nav-menu" id="nav-menu">
                 <li><a href="#" data-section="home" data-testid="nav-home">🏠<span class="nav-text">Home</span></a></li>
-                <li><a href="#" data-section="info" data-testid="nav-info">📊<span class="nav-text">Info</span></a></li>
+                <li><a href="#" data-section="waste-information" data-testid="nav-waste-information">🗑️<span class="nav-text">Waste Information</span></a></li>
                 <li><a href="#" data-section="games" data-testid="nav-games">🎮<span class="nav-text">Games</span></a></li>
                 <li><a href="#" data-section="tracker" data-testid="nav-tracker">📈<span class="nav-text">Tracker</span></a></li>
-                <li><a href="#" data-section="about" data-testid="nav-about">ℹ️<span class="nav-text">About</span></a></li>
                 <li><a href="#" data-section="settings" data-testid="nav-settings">⚙️<span class="nav-text">Settings</span></a></li>
             </ul>
         </div>
@@ -151,82 +351,157 @@
         </section>
 
         <!-- Info Section -->
-        <section class="section" id="info-section" data-testid="info-section">
+        <!-- Waste Information Section -->
+        <section class="section" id="waste-information-section" data-testid="waste-information-section">
             <div class="section-header">
-                <h2 data-key="info.title">Waste Management Information</h2>
-                <p data-key="info.subtitle">Learn about sustainable waste disposal practices</p>
+                <h2>🌈 Kids Waste Disposal Guide 🌈</h2>
+                <p>Learn about biodegradable and non-biodegradable waste through fun activities!</p>
             </div>
 
-            <div class="info-grid">
-                <div class="info-card">
-                    <span class="info-icon">🔍</span>
-                    <h3 data-key="info.categories.title">Waste Categories</h3>
-                    <p data-key="info.categories.description">Organic waste should be composted to create nutrient-rich soil. Keep food scraps, yard trimmings, and biodegradable materials separate from other waste streams.</p>
+            <div class="waste-info-container">
+                <!-- What is Waste Disposal -->
+                <div class="waste-intro">
+                    <div class="waste-intro-content">
+                        <h3>🌍 What is Waste Disposal, Kids? 🌍</h3>
+                        <p>Waste disposal is the process of managing and getting rid of waste materials in a safe, environmentally responsible manner. Proper waste disposal helps protect our environment, conserves natural resources, and prevents pollution of air, water, and soil.</p>
+                        <img src="https://images.unsplash.com/photo-1588499386464-ca2387b97fc7?w=400&h=300&fit=crop" alt="Waste Disposal Process" class="waste-image">
+                    </div>
                 </div>
-                <div class="info-card">
-                    <span class="info-icon">🔄</span>
-                    <h3 data-key="info.recycling.title">Recycling Guidelines</h3>
-                    <p data-key="info.recycling.description">Clean containers before recycling. Remove caps and lids from bottles. Check local recycling programs for specific material acceptance policies.</p>
+
+                <!-- Biodegradable vs Non-Biodegradable -->
+                <div class="waste-comparison">
+                    <div class="comparison-card">
+                        <h3>🌱 Biodegradable Waste</h3>
+                        <img src="https://images.unsplash.com/photo-1615461066159-fea0960485d5?w=300&h=200&fit=crop" alt="Biodegradable Waste" class="waste-type-image">
+                        <p>Biodegradable waste breaks down naturally through biological processes. This includes food scraps, yard waste, paper, and other organic materials that can be composted.</p>
+                        <ul>
+                            <li>Food scraps and leftovers</li>
+                            <li>Yard trimmings and leaves</li>
+                            <li>Paper and cardboard</li>
+                            <li>Wood and natural fibers</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card">
+                        <h3>⚙️ Non-Biodegradable Waste</h3>
+                        <img src="https://images.unsplash.com/photo-1614027164843-1c8395c0274a?w=300&h=200&fit=crop" alt="Non-Biodegradable Waste" class="waste-type-image">
+                        <p>Non-biodegradable waste does not break down naturally and can persist in the environment for hundreds of years. These materials require special disposal or recycling methods.</p>
+                        <ul>
+                            <li>Plastics and synthetic materials</li>
+                            <li>Metal and aluminum</li>
+                            <li>Glass products</li>
+                            <li>Electronic components</li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="info-card">
-                    <span class="info-icon">⚠️</span>
-                    <h3 data-key="info.hazardous.title">Hazardous Waste</h3>
-                    <p data-key="info.hazardous.description">Electronics, batteries, chemicals, and medical waste require special disposal methods. Never put these items in regular trash or recycling bins.</p>
-                </div>
-                <div class="info-card">
-                    <span class="info-icon">💡</span>
-                    <h3 data-key="info.reduction.title">Reduction Tips</h3>
-                    <p data-key="info.reduction.description">Buy only what you need, choose reusable products, repair instead of replacing, and donate items in good condition to reduce overall waste generation.</p>
-                </div>
-                <div class="info-card">
-                    <span class="info-icon">🌱</span>
-                    <h3 data-key="info.composting.title">Composting Guide</h3>
-                    <p data-key="info.composting.description">Create a balanced mix of green materials (food scraps) and brown materials (dry leaves, paper) for optimal composting conditions.</p>
-                </div>
-                <div class="info-card">
-                    <span class="info-icon">🏛️</span>
-                    <h3 data-key="info.industrial.title">Industrial Waste</h3>
-                    <p data-key="info.industrial.description">Businesses must follow specific regulations for waste disposal. Partner with certified waste management companies for proper handling and documentation.</p>
+
+                <!-- Waste Types Grid -->
+                <div class="waste-types-grid">
+                    <div class="waste-type-card">
+                        <img src="https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=250&h=180&fit=crop" alt="General Waste" class="waste-card-image">
+                        <h4>🗑️ General Waste</h4>
+                        <p>General waste includes non-recyclable household items that cannot be composted or recycled. This goes to landfills and should be minimized.</p>
+                    </div>
+                    
+                    <div class="waste-type-card">
+                        <img src="https://images.unsplash.com/photo-1603714183732-fb6a6a0b3d1a?w=250&h=180&fit=crop" alt="Electronic Waste" class="waste-card-image">
+                        <h4>💻 Electronic Waste</h4>
+                        <p>E-waste includes old computers, phones, batteries, and other electronic devices. These contain valuable materials and hazardous substances requiring special handling.</p>
+                    </div>
+                    
+                    <div class="waste-type-card">
+                        <img src="https://images.unsplash.com/photo-1605608309092-ea7e2d9e6c48?w=250&h=180&fit=crop" alt="Recyclable Waste" class="waste-card-image">
+                        <h4>♻️ Recyclable Waste</h4>
+                        <p>Recyclable materials can be processed and used to create new products. This includes paper, plastic, glass, and metal that can be sorted and reprocessed.</p>
+                    </div>
+                    
+                    <div class="waste-type-card">
+                        <img src="https://images.unsplash.com/photo-1589927986089-35812375d839?w=250&h=180&fit=crop" alt="Organic Waste" class="waste-card-image">
+                        <h4>🌿 Organic Waste</h4>
+                        <p>Organic waste comes from plant and animal sources and can be composted. This includes food scraps, yard waste, and other biodegradable materials.</p>
+                    </div>
+                    
+                    <div class="waste-type-card">
+                        <img src="https://images.unsplash.com/photo-1632318814631-c1e0e4f9a7b4?w=250&h=180&fit=crop" alt="Hazardous Waste" class="waste-card-image">
+                        <h4>☣️ Hazardous Waste</h4>
+                        <p>Hazardous waste contains harmful substances that can endanger human health or the environment. This includes chemicals, paints, batteries, and medical waste.</p>
+                    </div>
                 </div>
             </div>
+
+            <!-- Falling Leaves Animation Container -->
+            <div class="falling-leaves-container"></div>
         </section>
 
         <!-- Games Section -->
         <section class="section" id="games-section" data-testid="games-section">
             <div class="section-header">
-                <h2 data-key="games.title">Eco-Friendly Games</h2>
-                <p data-key="games.subtitle">Learn while you play</p>
+                <h2 data-key="games.title">🌈 Kids Eco-Friendly Games 🌈</h2>
+                <p data-key="games.subtitle">Learn about biodegradable & non-biodegradable waste while having fun!</p>
             </div>
 
             <div class="games-grid">
                 <!-- Sorting Game -->
                 <div class="game-card">
                     <span class="game-icon">🗑️</span>
-                    <h3>Waste Sorting Challenge</h3>
-                    <p>Test your knowledge by correctly sorting different types of waste into appropriate bins. Earn points for accuracy!</p>
-                    <button class="game-button" id="sorting-game-btn">Play Now</button>
+                <!-- Biodegradable Sorting Game -->
+                <div class="game-card colorful-card sorting-game">
+                    <span class="game-icon">🌈🗂️</span>
+                    <h3>Biodegradable Sorting 🌱</h3>
+                    <p>Help sort biodegradable and non-biodegradable waste into colorful bins! Race against time and earn points!</p>
+                    <div class="game-stats">
+                        <span>⏱️ Time Challenge</span>
+                        <span>🏆 Points System</span>
+                    </div>
+                    <button class="game-button rainbow-btn" id="biodegradable-sorting-btn">Play Now! 🎮</button>
                 </div>
                 
-                <!-- Matching Game -->
-                <div class="game-card">
-                    <span class="game-icon">🧩</span>
-                    <h3>Recycling Matching Game</h3>
-                    <p>Match waste items with their correct disposal method. Improve your waste management knowledge while having fun!</p>
-                    <button class="game-button" id="matching-game-btn">Start Game</button>
+                <!-- Waste Matching Game -->
+                <div class="game-card colorful-card matching-game">
+                    <span class="game-icon">🎯🧩</span>
+                    <h3>Waste Matching Game 🎪</h3>
+                    <p>Match waste items with their correct disposal categories! Perfect matches earn bonus points!</p>
+                    <div class="game-stats">
+                        <span>⏱️ Speed Bonus</span>
+                        <span>🏆 Perfect Matches</span>
+                    </div>
+                    <button class="game-button rainbow-btn" id="waste-matching-btn">Start Game! 🚀</button>
                 </div>
                 
-                <!-- Memory Game -->
-                <div class="game-card">
-                    <span class="game-icon">🧠</span>
-                    <h3>Eco Memory Game</h3>
-                    <p>Flip cards to find matching pairs of waste items and their proper disposal methods. Challenge your memory and learn simultaneously!</p>
-                    <button class="game-button" id="memory-game-btn">Play Game</button>
+                <!-- Waste Spelling Game -->
+                <div class="game-card colorful-card spelling-game">
+                    <span class="game-icon">✏️📝</span>
+                    <h3>Waste Word Spelling 📚</h3>
+                    <p>Learn to spell important waste disposal words while earning points for each correct letter!</p>
+                    <div class="game-stats">
+                        <span>⏱️ Time Pressure</span>
+                        <span>🏆 Letter Points</span>
+                    </div>
+                    <button class="game-button rainbow-btn" id="waste-spelling-btn">Play Game! 🌟</button>
                 </div>
-            </div>
-            
-            <!-- Game Container -->
-            <div id="game-container">
-                <!-- Sorting Game Container -->
+
+                <!-- Waste Puzzle Game -->
+                <div class="game-card colorful-card puzzle-game">
+                    <span class="game-icon">🧩🌍</span>
+                    <h3>Waste Disposal Puzzle 🧩</h3>
+                    <p>Solve fun puzzles about proper waste disposal! Challenge your brain and save the planet!</p>
+                    <div class="game-stats">
+                        <span>⏱️ Brain Challenge</span>
+                        <span>🏆 Smart Solutions</span>
+                    </div>
+                    <button class="game-button rainbow-btn" id="waste-puzzle-btn">Play Game! 🎯</button>
+                </div>
+
+                <!-- Waste Memory Game -->
+                <div class="game-card colorful-card memory-game">
+                    <span class="game-icon">🧠🎲</span>
+                    <h3>Waste Memory Game 🎮</h3>
+                    <p>Test your memory by matching waste cards with their disposal methods! Can you find all pairs?</p>
+                    <div class="game-stats">
+                        <span>⏱️ Memory Test</span>
+                        <span>🏆 Match Master</span>
+                    </div>
+                    <button class="game-button rainbow-btn" id="waste-memory-btn">Play Game! 🏆</button>
+                </div>
                 <div id="sorting-game" class="game-content">
                     <h3>Waste Sorting Challenge</h3>
                     <div class="difficulty-selector">
@@ -311,24 +586,93 @@
                     </div>
                     <button class="reset-button" id="reset-memory">Reset Game</button>
                 </div>
+               <!-- Game Container for Dynamic Game Content -->
+               <div id="game-container" class="game-container"></div>
             </div>
         </section>
 
         <!-- Tracker Section -->
         <section class="section" id="tracker-section" data-testid="tracker-section">
             <div class="section-header">
-                <h2 data-key="tracker.title">Waste Disposal Calculator</h2>
-                <p data-key="tracker.subtitle">Calculate your waste disposal needs</p>
+                <h2 data-key="tracker.title">🌱 Kids Waste Tracker 🌱</h2>
+                <p data-key="tracker.subtitle">Track your waste and help save the Earth!</p>
             </div>
 
-            <div class="calculator-container">
-                <div class="calculator-card">
-                    <h3>Waste Disposal Estimator</h3>
-                    <div class="calculator-inputs">
-                        <div class="input-group">
-                            <label for="waste-frequency">How many times per week do you dispose of waste?</label>
-                            <input type="number" id="waste-frequency" min="1" max="7" value="3">
+            <div class="tracker-container">
+                <!-- Waste Type Selection -->
+                <div class="waste-type-selector">
+                    <h3>🗂️ What type of waste is it?</h3>
+                    <div class="waste-type-options">
+                        <label class="waste-type-option">
+                            <input type="radio" name="waste-type" value="biodegradable" checked>
+                            <span class="waste-icon">🍃</span>
+                            <span class="waste-label">Biodegradable</span>
+                            <span class="waste-desc">(Like food scraps, paper)</span>
+                        </label>
+                        <label class="waste-type-option">
+                            <input type="radio" name="waste-type" value="non-biodegradable">
+                            <span class="waste-icon">🥤</span>
+                            <span class="waste-label">Non-Biodegradable</span>
+                            <span class="waste-desc">(Like plastic, metal)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Image Drop Zone -->
+                <div class="drop-zone-container">
+                    <h3>📸 Take a picture of your waste!</h3>
+                    <div id="drop-zone" class="drop-zone">
+                        <div class="drop-zone-content">
+                            <span class="drop-icon">📷</span>
+                            <p class="drop-text">Drag & drop your waste picture here</p>
+                            <p class="drop-subtext">or click to browse</p>
+                            <input type="file" id="file-input" accept="image/*" multiple>
                         </div>
+                    </div>
+                    <div id="image-preview" class="image-preview"></div>
+                </div>
+
+                <!-- Calculate Button -->
+                <div class="calculate-section">
+                    <button id="calculate-btn" class="fun-calculate-button" disabled>
+                        <span class="btn-icon">🧮</span>
+                        <span class="btn-text">Calculate My Waste!</span>
+                    </button>
+                    <p class="calc-info">✨ You need to add a picture before calculating!</p>
+                </div>
+
+                <!-- Results Display -->
+                <div id="results-display" class="results-display" style="display: none;">
+                    <h3>🎊 Your Waste Results! 🎊</h3>
+                    <div class="result-cards">
+                        <div class="result-card">
+                            <span class="result-icon">⚖️</span>
+                            <span class="result-label">Total Items:</span>
+                            <span id="total-items" class="result-value">0</span>
+                        </div>
+                        <div class="result-card">
+                            <span class="result-icon">🌍</span>
+                            <span class="result-label">Earth Impact:</span>
+                            <span id="earth-impact" class="result-value">Good!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Section -->
+            <div class="history-section">
+                <h3>📚 Your Waste History 📚</h3>
+                <div id="history-container" class="history-container">
+                    <div class="empty-history">
+                        <span class="empty-icon">🌟</span>
+                        <p>No waste tracked yet. Start tracking to see your history!</p>
+                    </div>
+                </div>
+                <button id="clear-history" class="clear-button" style="display: none;">
+                    <span class="btn-icon">🗑️</span>
+                    Clear All History
+                </button>
+            </div>
                         
                         <div class="input-group">
                             <label for="waste-amount">Average amount of waste per disposal (in kg):</label>
@@ -336,13 +680,10 @@
                         </div>
                         
                         <div class="input-group">
-                            <label for="waste-type">Type of waste:</label>
-                            <select id="waste-type">
-                                <option value="general">General Waste</option>
-                                <option value="recyclable">Recyclable Waste</option>
-                                <option value="organic">Organic Waste</option>
-                                <option value="hazardous">Hazardous Waste</option>
-                                <option value="electronic">Electronic Waste</option>
+                            <label for="waste-category">Waste Category:</label>
+                            <select id="waste-category">
+                                <option value="biodegradable">Biodegradable</option>
+                                <option value="non-biodegradable">Non-Biodegradable</option>
                             </select>
                         </div>
                     </div>
@@ -364,6 +705,10 @@
                         <div class="result-item">
                             <span>Yearly Waste:</span>
                             <span id="yearly-waste-result">0 kg</span>
+                        </div>
+                        <div class="result-item category-info">
+                            <span>Category Impact:</span>
+                            <span id="category-impact-result">-</span>
                         </div>
                     </div>
                     
@@ -403,44 +748,6 @@
         </section>
 
         <!-- About Section -->
-        <section class="section" id="about-section" data-testid="about-section">
-            <div class="section-header">
-                <h2 data-key="about.title">About ECOTrack</h2>
-                <p data-key="about.subtitle">Our mission for a sustainable future</p>
-            </div>
-
-            <div class="about-grid">
-                <div class="about-card">
-                    <span class="about-icon">🎯</span>
-                    <h3 data-key="about.mission.title">Our Mission</h3>
-                    <p data-key="about.mission.description">To create a world where waste is minimized, resources are conserved, and every individual contributes to environmental sustainability through informed actions and smart technology.</p>
-                </div>
-                <div class="about-card">
-                    <span class="about-icon">👥</span>
-                    <h3 data-key="about.team.title">Our Team</h3>
-                    <p data-key="about.team.description">A dedicated group of environmental scientists, software engineers, and sustainability experts working together to develop innovative solutions for waste management challenges.</p>
-                </div>
-                <div class="about-card">
-                    <span class="about-icon">🌍</span>
-                    <h3 data-key="about.impact.title">Global Impact</h3>
-                    <p data-key="about.impact.description">Since our launch, ECOTrack users have diverted over 2 million pounds of waste from landfills and reduced carbon emissions by 15,000 tons through improved recycling practices.</p>
-                </div>
-                <div class="about-card">
-                    <span class="about-icon">🔬</span>
-                    <h3 data-key="about.technology.title">Technology</h3>
-                    <p data-key="about.technology.description">Our platform uses advanced analytics and machine learning to provide personalized waste reduction recommendations and track environmental impact in real-time.</p>
-                </div>
-                <div class="about-card">
-                    <span class="about-icon">🤝</span>
-                    <h3 data-key="about.partnerships.title">Partnerships</h3>
-                    <p data-key="about.partnerships.description">We collaborate with local waste management companies, environmental organizations, and municipalities to create comprehensive sustainability programs.</p>
-                </div>
-                <div class="about-card">
-                    <span class="about-icon">📚</span>
-                    <h3 data-key="about.education.title">Education</h3>
-                    <p data-key="about.education.description">Through workshops, online resources, and community programs, we educate individuals and businesses about sustainable waste management practices.</p>
-                </div>
-            </div>
         </section>
 
         <!-- Settings Section -->
@@ -474,6 +781,8 @@
                     </div>
                     <p data-key="settings.theme.description">Choose from our collection of beautiful themes to personalize your ECOTrack experience.</p>
                 </div>
+
+                <!-- Audio Controls -->
 
                 <!-- Language Selection -->
                 <div class="settings-card" data-testid="language-settings">
@@ -520,9 +829,91 @@
     <!-- Notification -->
     <div class="notification" id="notification"></div>
 
+
+    <script>
+        // Falling Leaves Animation
+        function createFallingLeaves() {
+            const container = document.querySelector(".falling-leaves-container");
+            if (!container) return;
+            
+            // Clear existing leaves
+            container.innerHTML = "";
+            
+            // Create leaves
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const leaf = document.createElement("div");
+                    leaf.className = "leaf";
+                    
+                    // Random position
+                    leaf.style.left = Math.random() * 100 + "%";
+                    
+                    // Random animation duration
+                    const duration = 8 + Math.random() * 12;
+                    leaf.style.animationDuration = duration + "s";
+                    
+                    // Random delay
+                    leaf.style.animationDelay = Math.random() * 5 + "s";
+                    
+                    // Random size
+                    const size = 15 + Math.random() * 10;
+                    leaf.style.width = size + "px";
+                    leaf.style.height = size + "px";
+                    
+                    container.appendChild(leaf);
+                }, i * 300);
+            }
+        }
+
+        // Initialize falling leaves when waste information section is shown
+        function initWasteInformationSection() {
+            const wasteInfoSection = document.getElementById("waste-information-section");
+            if (!wasteInfoSection) return;
+            
+            // Create observer to detect when section becomes visible
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        createFallingLeaves();
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            observer.observe(wasteInfoSection);
+        }
+
+        // Update falling leaves when theme changes
+        function updateLeavesForTheme() {
+            const leaves = document.querySelectorAll(".leaf");
+            leaves.forEach(leaf => {
+                // Force re-render to apply new theme colors
+                leaf.style.display = "none";
+                setTimeout(() => {
+                    leaf.style.display = "";
+                }, 10);
+            });
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener("DOMContentLoaded", function() {
+            initWasteInformationSection();
+            
+            // Listen for theme changes
+            const themeButtons = document.querySelectorAll("[data-theme]");
+            themeButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    setTimeout(updateLeavesForTheme, 100);
+                });
+            });
+        });
+    </script>
     <script src="script.js"></script>
-    <script src="eco-bot.js"></script>
-    <script type="module" defer>
+    <script src="ecobot.js"></script>
+       <script src="script waste info.js"></script>
+       <script src="kids game.js"></script>
+          <script src="waste_tracker_functionality.js"></script>
+
+          <script type="module" defer>
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -571,8 +962,6 @@
             }
         });
     </script>
-    <audio autoplay loop hidden>
-  <source src="/music.mp3" type="audio/mpeg">
-</audio>
+
 </body>
 </html>
