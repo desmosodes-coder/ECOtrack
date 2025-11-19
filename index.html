@@ -71,10 +71,10 @@
       <button id="teacherBtn" class="role-btn">Teacher</button>
     </div>
 
-    <!-- STUDENT SIGN IN (DEFAULT VISIBLE) -->
+    <!-- STUDENT SIGN IN (NOW DEFAULT VISIBLE) -->
     <form id="student-signin-form">
-      <input id="signin-email" type="email" maxlength="50" placeholder="Email" required>
-      <input id="signin-password" type="password" maxlength="50" placeholder="Password" required>
+      <input id="signin-email" type="email" maxlength="16" type="email" placeholder="Email" required>
+      <input id="signin-password" type="password" maxlength="16" type="password" placeholder="Password" required>
       <button type="submit">Sign In</button>
       <div class="switch" id="toStudentSignup">Don’t have an account? Sign Up</div>
     </form>
@@ -84,25 +84,21 @@
       <input id="signup-name" placeholder="Full Name" required>
       <select id="signup-grade" required>
         <option value="">Grade Level</option>
-        <option value="Grade 1">Grade 1</option>
-        <option value="Grade 2">Grade 2</option>
-        <option value="Grade 3">Grade 3</option>
-        <option value="Grade 4">Grade 4</option>
-        <option value="Grade 5">Grade 5</option>
-        <option value="Grade 6">Grade 6</option>
+        <option>1</option><option>2</option><option>3</option>
+        <option>4</option><option>5</option><option>6</option>
       </select>
       <input id="signup-age" type="number" placeholder="Age" required>
-      <input id="signup-email" type="email" maxlength="50" placeholder="Email" required>
-      <input id="signup-password" type="password" maxlength="50" placeholder="Password" required>
-      <input id="signup-confirm" type="password" maxlength="50" placeholder="Confirm Password" required>
+      <input id="signup-email" type="email" maxlength="16" type="email" placeholder="Email" required>
+      <input id="signup-password" type="password" maxlength="16" type="password" placeholder="Password" required>
+      <input id="signup-confirm" type="password" maxlength="16" type="password" placeholder="Confirm Password" required>
       <button type="submit">Sign Up</button>
       <div class="switch" id="toStudentSignin">Already have an account? Sign In</div>
     </form>
 
     <!-- TEACHER SIGN IN -->
     <form id="teacher-signin-form" class="hidden">
-      <input id="teacher-email" type="email" maxlength="50" placeholder="Teacher Email" required>
-      <input id="teacher-password" type="password" maxlength="50" placeholder="Password" required>
+      <input id="teacher-email" type="email" maxlength="16" type="email" placeholder="Teacher Email" required>
+      <input id="teacher-password" type="password" maxlength="16" type="password" placeholder="Password" required>
       <button type="submit">Sign In</button>
     </form>
   </div>
@@ -135,6 +131,7 @@
 
     studentBtn.addEventListener("click", () => {
       studentBtn.classList.add("active"); teacherBtn.classList.remove("active");
+
       studentSigninForm.classList.remove("hidden");
       studentSignupForm.classList.add("hidden");
       teacherSigninForm.classList.add("hidden");
@@ -142,6 +139,7 @@
 
     teacherBtn.addEventListener("click", () => {
       teacherBtn.classList.add("active"); studentBtn.classList.remove("active");
+
       studentSigninForm.classList.add("hidden");
       studentSignupForm.classList.add("hidden");
       teacherSigninForm.classList.remove("hidden");
@@ -160,36 +158,26 @@
     studentSignupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const name = document.getElementById("signup-name").value.trim();
+      const name = document.getElementById("signup-name").value;
       const grade = document.getElementById("signup-grade").value;
       const age = document.getElementById("signup-age").value;
-      const email = document.getElementById("signup-email").value.trim();
+      const email = document.getElementById("signup-email").value;
       const password = document.getElementById("signup-password").value;
       const confirm = document.getElementById("signup-confirm").value;
 
-      if (password !== confirm) { alert("Passwords do not match!"); return; }
+      if(password !== confirm){ alert("Passwords do not match!"); return; }
 
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Save student doc; grade is stored as "Grade X"
         await setDoc(doc(db, "students", user.uid), {
-          name,
-          grade,
-          age,
-          email,
-          verified: false,
-          totalTimeSpent: 0
+          name, grade, age, email, verified: false, totalTimeSpent: 0
         });
 
         alert("Sign-up successful! Your account needs verification by a teacher.");
         studentSignupForm.reset();
-        studentSigninForm.classList.remove("hidden");
-        studentSignupForm.classList.add("hidden");
-      } catch (error) {
-        alert(error.message);
-      }
+      } catch(error) { alert(error.message); }
     });
 
     studentSigninForm.addEventListener("submit", async (e) => {
@@ -204,8 +192,8 @@
 
         const docSnap = await getDoc(doc(db, "students", user.uid));
 
-        if (docSnap.exists()) {
-          if (docSnap.data().verified) {
+        if(docSnap.exists()){
+          if(docSnap.data().verified){
             window.location.href = "Echo3.html";
           } else {
             alert("Your account has not been verified by a teacher yet.");
@@ -213,9 +201,7 @@
         } else {
           alert("User data not found!");
         }
-      } catch (error) {
-        alert(error.message);
-      }
+      } catch(error){ alert(error.message); }
     });
 
     teacherSigninForm.addEventListener("submit", async (e) => {
@@ -225,12 +211,9 @@
       const password = document.getElementById("teacher-password").value;
 
       try {
-        // teacher auth; verify credentials then go to verify.html
         await signInWithEmailAndPassword(auth, email, password);
         window.location.href = "verify.html";
-      } catch (error) {
-        alert(error.message);
-      }
+      } catch(error){ alert(error.message); }
     });
   </script>
 </body>
