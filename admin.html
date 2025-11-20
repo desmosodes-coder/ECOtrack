@@ -55,7 +55,7 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  const ADMIN_EMAIL = "YOUR_ADMIN_EMAIL_HERE";
+  const ADMIN_EMAIL = "ninongry6000@gmail.com";
 
   onAuthStateChanged(auth, (user) => {
     if (!user || user.email !== ADMIN_EMAIL) {
