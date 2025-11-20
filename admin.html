@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Teacher Verification Panel</title>
+  <title>Admin – Verify Teachers</title>
 
   <style>
     * { box-sizing: border-box; font-family: Poppins; }
     body {
       background: linear-gradient(135deg, #9be15d, #00e3ae);
-      margin: 0; padding: 20px;
+      padding: 20px; margin: 0;
     }
     h1 { text-align: center; color: #2e7d32; }
-    .student-list {
+    .teacher-list {
       max-width: 700px; margin: auto;
       background: white; padding: 20px; border-radius: 15px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1)
@@ -31,15 +31,16 @@
   </style>
 </head>
 <body>
-<h1>Teacher Panel – Verify Students</h1>
 
-<div class="student-list" id="list">Loading...</div>
+<h1>Admin Panel – Verify Teachers</h1>
+
+<div class="teacher-list" id="list">Loading...</div>
 <button class="logout" id="logout">Log Out</button>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getFirestore, doc, getDoc, getDocs, collection, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, getDocs, collection, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
@@ -54,47 +55,41 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  const list = document.getElementById("list");
+  const ADMIN_EMAIL = "YOUR_ADMIN_EMAIL_HERE";
 
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) return (window.location = "index.html");
-
-    const tSnap = await getDoc(doc(db, "teachers", user.uid));
-    if (!tSnap.exists() || !tSnap.data().verified) {
-      alert("You are not a verified teacher.");
+  onAuthStateChanged(auth, (user) => {
+    if (!user || user.email !== ADMIN_EMAIL) {
+      alert("Unauthorized.");
       return window.location = "index.html";
     }
-
-    const teacher = tSnap.data();
-    loadStudents(teacher.grade, teacher.section);
+    loadTeachers();
   });
 
-  async function loadStudents(grade, section) {
-    const q = await getDocs(collection(db, "students"));
+  async function loadTeachers() {
+    const q = await getDocs(collection(db, "teachers"));
+    const list = document.getElementById("list");
     list.innerHTML = "";
 
     q.forEach(docSnap => {
-      const s = docSnap.data();
-      if (s.grade === grade && s.section.toLowerCase() === section.toLowerCase()) {
-        const div = document.createElement("div");
-        div.className = "card" + (s.verified ? " verified" : "");
-        div.innerHTML = `
-          <div>
-            <b>${s.name}</b><br>
-            Grade ${s.grade} – ${s.section}<br>
-            ${s.email}
-          </div>
-          <button ${s.verified ? "disabled" : ""} data-id="${docSnap.id}">
-            ${s.verified ? "Verified" : "Verify"}
-          </button>
-        `;
-        list.appendChild(div);
-      }
+      const t = docSnap.data();
+      const div = document.createElement("div");
+      div.className = "card" + (t.verified ? " verified" : "");
+      div.innerHTML = `
+        <div>
+          <b>${t.name}</b><br>
+          Grade ${t.grade} – ${t.section}<br>
+          ${t.email}
+        </div>
+        <button ${t.verified ? "disabled" : ""} data-id="${docSnap.id}">
+          ${t.verified ? "Verified" : "Verify"}
+        </button>
+      `;
+      list.appendChild(div);
     });
 
     document.querySelectorAll("button[data-id]").forEach(btn => {
       btn.onclick = async () => {
-        await updateDoc(doc(db, "students", btn.dataset.id), { verified: true });
+        await updateDoc(doc(db, "teachers", btn.dataset.id), { verified: true });
         btn.innerText = "Verified";
         btn.disabled = true;
         btn.parentElement.classList.add("verified");
@@ -107,5 +102,6 @@
     window.location = "index.html";
   };
 </script>
+
 </body>
 </html>
