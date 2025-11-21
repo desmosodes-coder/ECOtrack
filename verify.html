@@ -2,44 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Teacher Verification Panel</title>
+  <title>Teacher Verification</title>
 
   <style>
-    * { box-sizing: border-box; font-family: Poppins; }
-    body {
-      background: linear-gradient(135deg, #9be15d, #00e3ae);
-      margin: 0; padding: 20px;
-    }
-    h1 { text-align: center; color: #2e7d32; }
-    .student-list {
-      max-width: 700px; margin: auto;
-      background: white; padding: 20px; border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1)
-    }
-    .card {
-      padding: 15px; border-radius: 10px;
-      background: #e8f5e9; margin-bottom: 10px;
-      display: flex; justify-content: space-between;
-    }
-    .verified { background: #81c784 !important; color: white; }
-    button {
-      background: #2e7d32; border: none;
-      color: white; padding: 8px 12px;
-      border-radius: 8px; cursor: pointer;
-    }
-    .logout { margin-top: 20px; display: block; width: 120px; margin-left: auto; margin-right: auto; }
+    * { font-family: Poppins; box-sizing: border-box; }
+    body { background:linear-gradient(135deg,#9be15d,#00e3ae); padding:20px; }
+    h1 { text-align:center; color:#2e7d32; }
+    .list { max-width:700px; margin:auto; background:white; padding:20px; border-radius:15px; }
+    .card { background:#e8f5e9; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; }
+    .verified { background:#81c784 !important; color:white; }
+    button { background:#2e7d32; color:white; border:none; padding:8px 12px; border-radius:8px; }
+    button:hover { background:#1b5e20; }
+    .logout { margin-top:20px; display:block; width:120px; margin:auto; }
   </style>
 </head>
 <body>
-<h1>Teacher Panel – Verify Students</h1>
 
-<div class="student-list" id="list">Loading...</div>
+<h1>Teacher — Verify Students</h1>
+<div class="list" id="list">Loading students...</div>
 <button class="logout" id="logout">Log Out</button>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getFirestore, doc, getDoc, getDocs, collection, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, updateDoc, doc, getDoc } 
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
@@ -51,50 +38,56 @@
   };
 
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+  const auth = getAuth();
+  const db = getFirestore();
 
-  const list = document.getElementById("list");
+  let TEACHER = null;
 
   onAuthStateChanged(auth, async (user) => {
-    if (!user) return (window.location = "index.html");
+    if (!user) return window.location="index.html";
 
     const tSnap = await getDoc(doc(db, "teachers", user.uid));
+
     if (!tSnap.exists() || !tSnap.data().verified) {
-      alert("You are not a verified teacher.");
-      return window.location = "index.html";
+      alert("You are NOT a verified teacher.");
+      return window.location="index.html";
     }
 
-    const teacher = tSnap.data();
-    loadStudents(teacher.grade, teacher.section);
+    TEACHER = tSnap.data();
+    loadStudents();
   });
 
-  async function loadStudents(grade, section) {
+  async function loadStudents() {
     const q = await getDocs(collection(db, "students"));
+    const list = document.getElementById("list");
     list.innerHTML = "";
 
-    q.forEach(docSnap => {
-      const s = docSnap.data();
-      if (s.grade === grade && s.section.toLowerCase() === section.toLowerCase()) {
+    q.forEach(s => {
+      let d = s.data();
+
+      // filter students by matching grade + section
+      if (d.grade == TEACHER.grade && d.section.toLowerCase() == TEACHER.section.toLowerCase()) {
         const div = document.createElement("div");
-        div.className = "card" + (s.verified ? " verified" : "");
+        div.className = "card" + (d.verified ? " verified" : "");
+
         div.innerHTML = `
           <div>
-            <b>${s.name}</b><br>
-            Grade ${s.grade} – ${s.section}<br>
-            ${s.email}
+            <b>${d.name}</b><br>
+            Grade ${d.grade} – ${d.section}<br>
+            ${d.email}
           </div>
-          <button ${s.verified ? "disabled" : ""} data-id="${docSnap.id}">
-            ${s.verified ? "Verified" : "Verify"}
+          <button ${d.verified ? "disabled" : ""} data-id="${s.id}">
+            ${d.verified ? "Verified" : "Verify"}
           </button>
         `;
+
         list.appendChild(div);
       }
     });
 
     document.querySelectorAll("button[data-id]").forEach(btn => {
       btn.onclick = async () => {
-        await updateDoc(doc(db, "students", btn.dataset.id), { verified: true });
+        await updateDoc(doc(db, "students", btn.dataset.id), { verified:true });
         btn.innerText = "Verified";
         btn.disabled = true;
         btn.parentElement.classList.add("verified");
@@ -104,8 +97,9 @@
 
   document.getElementById("logout").onclick = () => {
     signOut(auth);
-    window.location = "index.html";
+    window.location="index.html";
   };
 </script>
+
 </body>
 </html>
