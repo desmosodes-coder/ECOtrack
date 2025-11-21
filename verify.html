@@ -1,105 +1,251 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Teacher Verification</title>
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ECOTrack | Teacher Verification</title>
   <style>
-    * { font-family: Poppins; box-sizing: border-box; }
-    body { background:linear-gradient(135deg,#9be15d,#00e3ae); padding:20px; }
-    h1 { text-align:center; color:#2e7d32; }
-    .list { max-width:700px; margin:auto; background:white; padding:20px; border-radius:15px; }
-    .card { background:#e8f5e9; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; }
-    .verified { background:#81c784 !important; color:white; }
-    button { background:#2e7d32; color:white; border:none; padding:8px 12px; border-radius:8px; }
-    button:hover { background:#1b5e20; }
-    .logout { margin-top:20px; display:block; width:120px; margin:auto; }
+    * { box-sizing: border-box; font-family: "Poppins", sans-serif; }
+    body {
+      margin: 0;
+      background: linear-gradient(135deg,#9be15d,#00e3ae);
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:20px;
+    }
+    .eco-icon { font-size:48px; margin-top:12px; }
+    h1 { margin-top:8px;color:#2e7d32;text-align:center; }
+    .controls { width:90%; max-width:900px; display:flex; gap:12px; align-items:center; justify-content:space-between; margin-top:16px; }
+    input[type="text"] { padding:10px; border-radius:8px; border:1px solid #ccc; font-size:16px; background:white; flex:1; }
+    .teacherInfo { font-weight:700; color:#064e3b; }
+    .student-list { width:90%; max-width:900px; background:#fff; border-radius:12px; padding:18px; margin-top:18px;
+      box-shadow:0 8px 18px rgba(0,0,0,0.12); max-height:70vh; overflow:auto; }
+    .student-card { display:flex; align-items:center; justify-content:space-between; padding:12px; margin:8px 0; border-radius:10px;
+      background:#e8f5e9; transition:all .15s; }
+    .student-card.verified { background:#81c784; color:#fff; }
+    .student-info { flex:1; text-align:left; }
+    .student-stats { margin-right:12px; text-align:right; color:#2e7d32; min-width:110px; }
+    button.verify-btn { background:#2e7d32; color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
+    button.verify-btn[disabled] { opacity:.7; cursor:default; }
+    button.reject-btn { background:#e53935; color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
+    .hint { width:90%; max-width:900px; color:#2e7d32; margin-top:12px; font-weight:600; }
+    .logout { margin-top:18px; background:#f44336; color:#fff; border:none; padding:10px 18px; border-radius:8px; cursor:pointer; }
+    @media(max-width:520px){ .controls { flex-direction:column; } .student-stats{display:none;} }
   </style>
 </head>
 <body>
+  <div class="eco-icon">🌿</div>
+  <h1>Teacher Verification Panel</h1>
 
-<h1>Teacher — Verify Students</h1>
-<div class="list" id="list">Loading students...</div>
-<button class="logout" id="logout">Log Out</button>
+  <div class="controls">
+    <div id="teacherInfo" class="teacherInfo">Loading your grade & section…</div>
+    <input id="searchInput" type="text" placeholder="Search students by name or email (optional)" />
+  </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getFirestore, collection, getDocs, updateDoc, doc, getDoc } 
-    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  <div id="studentList" class="student-list" aria-live="polite">Loading students…</div>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
-    authDomain: "registar-5f3fb.firebaseapp.com",
-    projectId: "registar-5f3fb",
-    storageBucket: "registar-5f3fb.firebasestorage.app",
-    messagingSenderId: "856198150739",
-    appId: "1:856198150739:web:801000f564b47f6333e4a6"
-  };
+  <button id="logoutBtn" class="logout">Log Out</button>
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
-  const db = getFirestore();
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  let TEACHER = null;
+    // ----- Firebase config (same as index.html) -----
+    const firebaseConfig = {
+  apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
+  authDomain: "registar-5f3fb.firebaseapp.com",
+  projectId: "registar-5f3fb",
+  storageBucket: "registar-5f3fb.firebasestorage.app",
+  messagingSenderId: "856198150739",
+  appId: "1:856198150739:web:801000f564b47f6333e4a6"
+};
+    // -----------------------------------------------
 
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) return window.location="index.html";
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    const tSnap = await getDoc(doc(db, "teachers", user.uid));
+    const studentList = document.getElementById("studentList");
+    const searchInput = document.getElementById("searchInput");
+    const teacherInfo = document.getElementById("teacherInfo");
+    const logoutBtn = document.getElementById("logoutBtn");
 
-    if (!tSnap.exists() || !tSnap.data().verified) {
-      alert("You are NOT a verified teacher.");
-      return window.location="index.html";
-    }
+    let teacherGrade = "";
+    let teacherSection = "";
+    let pendingStudents = [];
+    let currentUser = null;
 
-    TEACHER = tSnap.data();
-    loadStudents();
-  });
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = "index.html"; return; }
+      currentUser = user;
 
-  async function loadStudents() {
-    const q = await getDocs(collection(db, "students"));
-    const list = document.getElementById("list");
-    list.innerHTML = "";
+      try {
+        // teacher record stored in 'teachers' collection after admin approval
+        const tdoc = await getDoc(doc(db, "teachers", user.uid));
+        if (!tdoc.exists()) {
+          alert("Teacher account not found or not approved. Contact admin.");
+          await signOut(auth);
+          window.location.href = "index.html";
+          return;
+        }
+        const t = tdoc.data();
+        if (!t.verified && t.verified !== true) {
+          alert("Your account is not approved by admin yet.");
+          await signOut(auth);
+          window.location.href = "index.html";
+          return;
+        }
 
-    q.forEach(s => {
-      let d = s.data();
-
-      // filter students by matching grade + section
-      if (d.grade == TEACHER.grade && d.section.toLowerCase() == TEACHER.section.toLowerCase()) {
-        const div = document.createElement("div");
-        div.className = "card" + (d.verified ? " verified" : "");
-
-        div.innerHTML = `
-          <div>
-            <b>${d.name}</b><br>
-            Grade ${d.grade} – ${d.section}<br>
-            ${d.email}
-          </div>
-          <button ${d.verified ? "disabled" : ""} data-id="${s.id}">
-            ${d.verified ? "Verified" : "Verify"}
-          </button>
-        `;
-
-        list.appendChild(div);
+        // grade stored could be "Grade 1" or "1" — normalize for client-side matching
+        teacherGrade = String(t.grade || "").trim();
+        teacherSection = String(t.section || "").trim();
+        teacherInfo.innerText = `Assigned: ${teacherGrade} • ${teacherSection}`;
+        await loadPendingStudents();
+      } catch (err) {
+        console.error("Error loading teacher data:", err);
+        alert("Error loading data — check console.");
+        await signOut(auth);
+        window.location.href = "index.html";
       }
     });
 
-    document.querySelectorAll("button[data-id]").forEach(btn => {
-      btn.onclick = async () => {
-        await updateDoc(doc(db, "students", btn.dataset.id), { verified:true });
-        btn.innerText = "Verified";
-        btn.disabled = true;
-        btn.parentElement.classList.add("verified");
-      };
+    async function loadPendingStudents() {
+      studentList.innerHTML = `<p style="text-align:center">Loading…</p>`;
+      try {
+        // Query pending requests (can't reliably query grade format, so filter client-side)
+        const q = query(collection(db, "verificationRequests"), where("status", "==", "pending"));
+        const snap = await getDocs(q);
+        pendingStudents = [];
+        snap.forEach(s => pendingStudents.push({ id: s.id, ...s.data() }));
+
+        // Client-side filter: normalize grade to compare "Grade 1" and "1"
+        const normalize = g => String(g||"").toLowerCase().replace(/\s+/g, "");
+        const tg = normalize(teacherGrade);
+        const ts = String(teacherSection||"").toLowerCase().trim();
+
+        pendingStudents = pendingStudents.filter(s => {
+          const sg = normalize(s.grade);
+          const ss = String(s.section||"").toLowerCase().trim();
+          return sg === tg && ss === ts;
+        });
+
+        renderStudents(pendingStudents);
+      } catch (err) {
+        console.error("Failed to load pending students:", err);
+        studentList.innerHTML = `<p style="text-align:center">Failed to load students. Check console.</p>`;
+      }
+    }
+
+    function renderStudents(list) {
+      const term = (searchInput.value || "").trim().toLowerCase();
+      const filtered = list.filter(s => {
+        if (!term) return true;
+        const name = (s.firstName || s.name || "") + " " + (s.lastName || "");
+        return name.toLowerCase().includes(term) || (s.email || "").toLowerCase().includes(term);
+      });
+
+      if (filtered.length === 0) {
+        studentList.innerHTML = `<p style="text-align:center">No pending requests for ${teacherGrade} • ${teacherSection}.</p>`;
+        return;
+      }
+
+      studentList.innerHTML = "";
+      filtered.forEach(s => {
+        const div = document.createElement("div");
+        div.className = "student-card";
+        div.innerHTML = `
+          <div class="student-info">
+            <strong>${escapeHtml((s.firstName||s.name)||"Unnamed")} ${escapeHtml(s.middleInitial||"") } ${escapeHtml(s.lastName||"")}</strong><br>
+            Grade: ${escapeHtml(s.grade||"")}${s.age? " | Age: " + escapeHtml(s.age):""}<br>
+            Section: ${escapeHtml(s.section||"")}<br>
+            <small>${escapeHtml(s.email||"")}</small>
+          </div>
+
+          <div class="student-stats">
+            <div>Status:</div>
+            <div class="status-text">Pending</div>
+          </div>
+
+          <div>
+            <button class="verify-btn" data-req="${escapeHtml(s.id)}" data-id="${escapeHtml(s.studentId || s.id)}">Verify</button>
+            <button class="reject-btn" data-req="${escapeHtml(s.id)}">Reject</button>
+          </div>
+        `;
+        studentList.appendChild(div);
+      });
+
+      attachButtons();
+    }
+
+    function attachButtons() {
+      document.querySelectorAll(".verify-btn").forEach(btn => {
+        btn.onclick = async () => {
+          const reqId = btn.dataset.req;
+          const studentId = btn.dataset.id;
+          btn.disabled = true;
+          try {
+            const reqRef = doc(db, "verificationRequests", reqId);
+            const reqSnap = await getDoc(reqRef);
+            if (!reqSnap.exists()) { alert("Request missing."); return; }
+            const data = reqSnap.data();
+
+            // Write to students/{studentId}
+            await setDoc(doc(db, "students", studentId), {
+              studentId,
+              firstName: data.firstName || data.name || "",
+              middleInitial: data.middleInitial || "",
+              lastName: data.lastName || "",
+              email: data.email || "",
+              grade: data.grade || "",
+              section: data.section || "",
+              age: data.age || null,
+              verified: true,
+              verifiedBy: currentUser.uid,
+              verifiedAt: serverTimestamp(),
+              createdAt: data.requestedAt || serverTimestamp()
+            });
+
+            // mark request approved
+            await updateDoc(reqRef, { status: "approved", reviewedAt: serverTimestamp(), reviewedBy: currentUser.uid });
+
+            // reload
+            await loadPendingStudents();
+          } catch (err) {
+            console.error("Verify failed:", err);
+            alert("Failed to verify: " + (err.message||err));
+            btn.disabled = false;
+          }
+        };
+      });
+
+      document.querySelectorAll(".reject-btn").forEach(btn => {
+        btn.onclick = async () => {
+          const reqId = btn.dataset.req;
+          if (!confirm("Reject this verification request?")) return;
+          try {
+            await updateDoc(doc(db, "verificationRequests", reqId), { status: "rejected", reviewedAt: serverTimestamp(), reviewedBy: currentUser.uid });
+            await loadPendingStudents();
+          } catch (err) {
+            console.error("Reject failed:", err);
+            alert("Failed to reject: " + (err.message||err));
+          }
+        };
+      });
+    }
+
+    searchInput.addEventListener("input", () => renderStudents(pendingStudents));
+
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
     });
-  }
 
-  document.getElementById("logout").onclick = () => {
-    signOut(auth);
-    window.location="index.html";
-  };
-</script>
-
+    function escapeHtml(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"); }
+  </script>
 </body>
 </html>

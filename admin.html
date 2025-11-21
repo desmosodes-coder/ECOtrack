@@ -1,97 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Panel</title>
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ECOTrack | Admin Panel</title>
   <style>
-    * { font-family: Poppins; box-sizing: border-box; }
-    body { background:linear-gradient(135deg,#9be15d,#00e3ae); margin:0; padding:20px; }
-    h1 { text-align:center; color:#2e7d32; }
-    .list { max-width:700px; margin:auto; background:white; padding:20px; border-radius:15px; }
-    .card { background:#e8f5e9; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; }
-    .verified { background:#81c784 !important; color:white; }
-    button { background:#2e7d32; color:white; border:none; padding:8px 12px; border-radius:8px; }
-    button:hover { background:#1b5e20; }
-    .logout { margin-top:20px; display:block; width:120px; margin:auto; }
+    * { box-sizing: border-box; font-family: "Poppins", sans-serif; }
+    body { margin:0; background: linear-gradient(135deg,#9be15d,#00e3ae); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:20px; }
+    .panel { width:90%; max-width:1000px; background:#fff; border-radius:12px; padding:18px; box-shadow:0 8px 18px rgba(0,0,0,0.12); }
+    h1 { color:#2e7d32; margin:6px 0 12px; text-align:center; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { padding:10px; border-bottom:1px solid #eee; text-align:left; }
+    th { background: linear-gradient(to right, #00b4db, #0083b0); color:#fff; }
+    .verify-btn, .deny-btn { padding:8px 12px; border-radius:8px; color:#fff; border:none; cursor:pointer; }
+    .verify-btn { background:#4caf50; margin-right:8px; }
+    .deny-btn { background:#f44336; }
+    .logout { margin-top:14px; background:#f44336; color:#fff; border:none; padding:10px 14px; border-radius:8px; cursor:pointer; }
+    .search { width:100%; padding:8px 10px; margin-bottom:12px; border-radius:8px; border:1px solid #ccc; }
   </style>
 </head>
 <body>
+  <div class="panel">
+    <h1>Admin — Teacher Approvals</h1>
 
-<h1>Admin — Verify Teachers</h1>
-<div class="list" id="list">Loading...</div>
-<button class="logout" id="logout">Log Out</button>
+    <input id="searchInput" class="search" placeholder="Search pending teachers by name or email">
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getFirestore, collection, getDocs, updateDoc, doc, getDoc } 
-    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    <h3>Pending Requests</h3>
+    <table id="pendingTable">
+      <thead>
+        <tr><th>Name</th><th>Grade</th><th>Section</th><th>Email</th><th>Action</th></tr>
+      </thead>
+      <tbody><tr><td colspan="5" style="text-align:center">Loading...</td></tr></tbody>
+    </table>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
-    authDomain: "registar-5f3fb.firebaseapp.com",
-    projectId: "registar-5f3fb",
-    storageBucket: "registar-5f3fb.firebasestorage.app",
-    messagingSenderId: "856198150739",
-    appId: "1:856198150739:web:801000f564b47f6333e4a6"
-  };
+    <h3 style="margin-top:18px">Approved Teachers</h3>
+    <table id="approvedTable">
+      <thead><tr><th>Name</th><th>Email</th><th>Grade</th><th>Section</th><th>Status</th></tr></thead>
+      <tbody><tr><td colspan="5" style="text-align:center">Loading...</td></tr></tbody>
+    </table>
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
-  const db = getFirestore();
+    <button id="logoutBtn" class="logout">Log Out</button>
+  </div>
 
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) return window.location="index.html";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const adminSnap = await getDoc(doc(db, "admins", user.uid));
-    if (!adminSnap.exists()) {
-      alert("NOT ADMIN!");
-      return window.location="index.html";
+    const firebaseConfig = {
+  apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
+  authDomain: "registar-5f3fb.firebaseapp.com",
+  projectId: "registar-5f3fb",
+  storageBucket: "registar-5f3fb.firebasestorage.app",
+  messagingSenderId: "856198150739",
+  appId: "1:856198150739:web:801000f564b47f6333e4a6"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const pendingTbody = document.querySelector("#pendingTable tbody");
+    const approvedTbody = document.querySelector("#approvedTable tbody");
+    const searchInput = document.getElementById("searchInput");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    let pendingRequests = [];
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = "index.html"; return; }
+      // ensure this auth user is an admin in admins collection
+      const adm = await getDoc(doc(db, "admins", user.uid));
+      if (!adm.exists()) {
+        alert("Admin access denied.");
+        await signOut(auth);
+        window.location.href = "index.html";
+        return;
+      }
+
+      await loadPendingRequests();
+      await loadApprovedTeachers();
+    });
+
+    async function loadPendingRequests() {
+      pendingTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">Loading...</td></tr>`;
+      const q = query(collection(db, "teacherVerificationRequests"), where("status", "==", "pending"));
+      const snap = await getDocs(q);
+      pendingRequests = [];
+      snap.forEach(s => pendingRequests.push({ id: s.id, ...s.data() }));
+
+      renderPending(pendingRequests);
     }
 
-    loadTeachers();
-  });
+    function renderPending(list) {
+      const term = (searchInput.value || "").trim().toLowerCase();
+      const filtered = list.filter(i => {
+        if (!term) return true;
+        return (i.firstName||"").toLowerCase().includes(term) ||
+               (i.lastName||"").toLowerCase().includes(term) ||
+               (i.email||"").toLowerCase().includes(term);
+      });
 
-  async function loadTeachers() {
-    const q = await getDocs(collection(db, "teachers"));
-    const list = document.getElementById("list");
-    list.innerHTML = "";
+      if (filtered.length === 0) {
+        pendingTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">No pending teacher requests.</td></tr>`;
+        return;
+      }
 
-    q.forEach(t => {
-      let d = t.data();
+      pendingTbody.innerHTML = "";
+      filtered.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${escapeHtml(r.firstName||"")} ${escapeHtml(r.middleInitial||"")} ${escapeHtml(r.lastName||"")}</td>
+          <td>${escapeHtml(r.advisoryGrade||"")}</td>
+          <td>${escapeHtml(r.advisorySection||"")}</td>
+          <td>${escapeHtml(r.email||"")}</td>
+          <td>
+            <button class="verify-btn" data-id="${escapeHtml(r.teacherId)}" data-req="${escapeHtml(r.id)}">Approve</button>
+            <button class="deny-btn" data-req="${escapeHtml(r.id)}">Deny</button>
+          </td>
+        `;
+        pendingTbody.appendChild(tr);
+      });
 
-      const div = document.createElement("div");
-      div.className = "card" + (d.verified ? " verified" : "");
-      div.innerHTML = `
-        <div>
-          <b>${d.name}</b><br>
-          Grade ${d.grade} – ${d.section}<br>
-          ${d.email}
-        </div>
-        <button ${d.verified ? "disabled" : ""} data-id="${t.id}">
-          ${d.verified ? "Verified" : "Verify"}
-        </button>
-      `;
+      attachPendingButtons();
+    }
 
-      list.appendChild(div);
-    });
+    function attachPendingButtons() {
+      document.querySelectorAll(".verify-btn").forEach(btn => {
+        btn.onclick = async () => {
+          const teacherId = btn.dataset.id;
+          const reqId = btn.dataset.req;
+          try {
+            const reqRef = doc(db, "teacherVerificationRequests", reqId);
+            const reqSnap = await getDoc(reqRef);
+            if (!reqSnap.exists()) { alert("Request not found"); return; }
+            const data = reqSnap.data();
 
-    document.querySelectorAll("button[data-id]").forEach(btn => {
-      btn.onclick = async () => {
-        await updateDoc(doc(db, "teachers", btn.dataset.id), { verified:true });
-        btn.innerText = "Verified";
-        btn.disabled = true;
-        btn.parentElement.classList.add("verified");
-      };
-    });
-  }
+            // Save approved teacher into 'teachers' collection
+            await setDoc(doc(db, "teachers", teacherId), {
+              teacherId,
+              firstName: data.firstName || "",
+              middleInitial: data.middleInitial || "",
+              lastName: data.lastName || "",
+              email: data.email || "",
+              grade: data.advisoryGrade || "",
+              section: data.advisorySection || "",
+              verified: true,
+              verifiedAt: serverTimestamp()
+            });
 
-  document.getElementById("logout").onclick = () => {
-    signOut(auth);
-    window.location="index.html";
-  };
-</script>
+            // Mark request approved
+            await updateDoc(reqRef, { status: "approved", reviewedAt: serverTimestamp() });
 
+            alert("Teacher approved.");
+            await loadPendingRequests();
+            await loadApprovedTeachers();
+          } catch (err) {
+            console.error(err);
+            alert("Approve failed: " + (err.message||err));
+          }
+        };
+      });
+
+      document.querySelectorAll(".deny-btn").forEach(btn => {
+        btn.onclick = async () => {
+          const reqId = btn.dataset.req;
+          if (!confirm("Deny this teacher request?")) return;
+          try {
+            await updateDoc(doc(db, "teacherVerificationRequests", reqId), { status: "rejected", reviewedAt: serverTimestamp() });
+            alert("Request denied.");
+            await loadPendingRequests();
+          } catch (err) {
+            console.error(err);
+            alert("Deny failed: " + (err.message||err));
+          }
+        };
+      });
+    }
+
+    async function loadApprovedTeachers() {
+      approvedTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">Loading...</td></tr>`;
+      const q = query(collection(db, "teachers"), where("verified", "==", true));
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        approvedTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">No approved teachers yet.</td></tr>`;
+        return;
+      }
+      approvedTbody.innerHTML = "";
+      snap.forEach(s => {
+        const d = s.data();
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${escapeHtml(d.firstName||"")} ${escapeHtml(d.middleInitial||"")} ${escapeHtml(d.lastName||"")}</td>
+          <td>${escapeHtml(d.email||"")}</td>
+          <td>${escapeHtml(d.grade||"")}</td>
+          <td>${escapeHtml(d.section||"")}</td>
+          <td>${escapeHtml(d.verified ? "Verified" : "—")}</td>
+        `;
+        approvedTbody.appendChild(tr);
+      });
+    }
+
+    searchInput.addEventListener("input", () => renderPending(pendingRequests));
+    logoutBtn.addEventListener("click", async () => { await signOut(auth); window.location.href = "index.html"; });
+
+    function escapeHtml(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"); }
+  </script>
 </body>
 </html>

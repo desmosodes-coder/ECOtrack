@@ -43,6 +43,7 @@
     }
     .role-btn.active { background:#2e7d32; color:white; }
     .switch { cursor:pointer; font-size:14px; color:#00796b; margin-top:5px; }
+    small.note { color:#666; display:block; margin-top:6px; }
   </style>
 </head>
 <body>
@@ -59,70 +60,93 @@
 
   <!-- STUDENT SIGN IN -->
   <form id="student-signin-form">
-    <input id="signin-email" type="email" placeholder="Email" maxlength="25" required>
-    <input id="signin-password" type="password" placeholder="Password" maxlength="30" required>
+    <input id="signin-email" type="email" placeholder="Email" maxlength="30" required>
+    <input id="signin-password" type="password" placeholder="Password" maxlength="22" required>
     <button type="submit">Sign In</button>
     <div class="switch" id="toStudentSignup">Don’t have an account? Sign Up</div>
+    <small class="note">Students need teacher verification before signing in.</small>
   </form>
 
   <!-- STUDENT SIGN UP -->
   <form id="student-signup-form" class="hidden">
-    <input id="signup-name" placeholder="Full Name" required>
+    <input id="signup-name" placeholder="Full Name" maxlength="80" required>
+
     <select id="signup-grade" required>
       <option value="">Grade Level</option>
-      <option>1</option><option>2</option><option>3</option>
-      <option>4</option><option>5</option><option>6</option>
+      <option value="Grade 1">Grade 1</option>
+      <option value="Grade 2">Grade 2</option>
+      <option value="Grade 3">Grade 3</option>
+      <option value="Grade 4">Grade 4</option>
+      <option value="Grade 5">Grade 5</option>
+      <option value="Grade 6">Grade 6</option>
     </select>
-    <input id="signup-section" placeholder="Section / Advisory" required>
-    <input id="signup-age" type="number" placeholder="Age" required>
-    <input id="signup-email" type="email" placeholder="Email" maxlength="25" required>
-    <input id="signup-password" type="password" placeholder="Password" maxlength="30" required>
-    <input id="signup-confirm" type="password" placeholder="Confirm Password" maxlength="30" required>
+
+    <input id="signup-section" placeholder="Section / Advisory" maxlength="18" required>
+    <input id="signup-age" type="number" placeholder="Age" required min="3" max="120">
+    <input id="signup-email" type="email" placeholder="Email" maxlength="30" required>
+    <input id="signup-password" type="password" placeholder="Password" maxlength="22" required>
+    <input id="signup-confirm" type="password" placeholder="Confirm Password" maxlength="22" required>
     <button type="submit">Sign Up</button>
     <div class="switch" id="toStudentSignin">Already have an account? Sign In</div>
   </form>
 
   <!-- TEACHER SIGN IN -->
   <form id="teacher-signin-form" class="hidden">
-    <input id="teacher-email" type="email" placeholder="Teacher Email" maxlength="25" required>
-    <input id="teacher-password" type="password" placeholder="Password" maxlength="30" required>
+    <input id="teacher-email" type="email" placeholder="Teacher Email" maxlength="30" required>
+    <input id="teacher-password" type="password" placeholder="Password" maxlength="22" required>
     <button type="submit">Sign In</button>
     <div class="switch" id="toTeacherSignup">Create Teacher Account</div>
+    <small class="note">Teachers need admin approval before signing in.</small>
   </form>
 
   <!-- TEACHER SIGN UP -->
   <form id="teacher-signup-form" class="hidden">
-    <input id="t-name" placeholder="Full Name" required>
+    <input id="t-name" placeholder="Full Name" maxlength="80" required>
+
     <select id="t-grade" required>
       <option value="">Grade Level</option>
-      <option>1</option><option>2</option><option>3</option>
-      <option>4</option><option>5</option><option>6</option>
+      <option value="Grade 1">Grade 1</option>
+      <option value="Grade 2">Grade 2</option>
+      <option value="Grade 3">Grade 3</option>
+      <option value="Grade 4">Grade 4</option>
+      <option value="Grade 5">Grade 5</option>
+      <option value="Grade 6">Grade 6</option>
     </select>
-    <input id="t-section" placeholder="Section / Advisory" required>
-    <input id="t-email" type="email" placeholder="Email" maxlength="25" required>
-    <input id="t-password" type="password" placeholder="Password" maxlength="30" required>
-    <input id="t-confirm" type="password" placeholder="Confirm Password" maxlength="30" required>
+
+    <input id="t-section" placeholder="Section / Advisory" maxlength="18" required>
+    <input id="t-email" type="email" placeholder="Email" maxlength="30" required>
+    <input id="t-password" type="password" placeholder="Password" maxlength="22" required>
+    <input id="t-confirm" type="password" placeholder="Confirm Password" maxlength="22" required>
     <button type="submit">Sign Up</button>
     <div class="switch" id="toTeacherSignin">Already have an account? Sign In</div>
   </form>
 
   <!-- ADMIN SIGN IN -->
   <form id="admin-signin-form" class="hidden">
-    <input id="admin-email" type="email" placeholder="Admin Email" maxlength="25" required>
-    <input id="admin-password" type="password" placeholder="Password" maxlength="30" required>
+    <input id="admin-email" type="email" placeholder="Admin Email" maxlength="30" required>
+    <input id="admin-password" type="password" placeholder="Password" maxlength="22" required>
     <button type="submit">Sign In</button>
+    <small class="note">Admin sign-in only — no signup here.</small>
   </form>
 
 </div>
 
 <script type="module">
-
 /* ——— FIREBASE IMPORTS ——— */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ——— FIREBASE CONFIG ——— */
 const firebaseConfig = {
@@ -149,6 +173,12 @@ const teacherSignin = document.getElementById("teacher-signin-form");
 const teacherSignup = document.getElementById("teacher-signup-form");
 const adminSignin = document.getElementById("admin-signin-form");
 
+const toStudentSignup = document.getElementById("toStudentSignup");
+const toStudentSignin = document.getElementById("toStudentSignin");
+const toTeacherSignup = document.getElementById("toTeacherSignup");
+const toTeacherSignin = document.getElementById("toTeacherSignin");
+
+/* ——— SIMPLE UI SWITCHING ——— */
 function hideAll() {
   studentSignin.classList.add("hidden");
   studentSignup.classList.add("hidden");
@@ -157,7 +187,6 @@ function hideAll() {
   adminSignin.classList.add("hidden");
 }
 
-/* ——— ROLE SWITCHING ——— */
 studentBtn.onclick = () => { hideAll(); studentSignin.classList.remove("hidden"); studentBtn.classList.add("active"); teacherBtn.classList.remove("active"); adminBtn.classList.remove("active"); };
 teacherBtn.onclick = () => { hideAll(); teacherSignin.classList.remove("hidden"); teacherBtn.classList.add("active"); studentBtn.classList.remove("active"); adminBtn.classList.remove("active"); };
 adminBtn.onclick = () => { hideAll(); adminSignin.classList.remove("hidden"); adminBtn.classList.add("active"); studentBtn.classList.remove("active"); teacherBtn.classList.remove("active"); };
@@ -169,133 +198,207 @@ toTeacherSignup.onclick = () => { teacherSignin.classList.add("hidden"); teacher
 toTeacherSignin.onclick = () => { teacherSignup.classList.add("hidden"); teacherSignin.classList.remove("hidden"); };
 
 /* ————————————————————————————————————————————
-   STUDENT SIGN UP  ✔ Email ≤25  ✔ Password ≤30
+   Helper to get value safely
+   — use document.getElementById for every input so hyphen IDs work correctly
+————————————————————————————————————————————————*/
+const $ = id => document.getElementById(id);
+
+/* ————————————————————————————————————————————
+   STUDENT SIGN UP -> create verification request (pending)
+   stored in collection: verificationRequests/{uid}
+   Fields: studentId, firstName, lastName, age, email, grade, section, status, requestedAt
 ———————————————————————————————————————————— */
 studentSignup.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const name = signup-name.value;
-  const grade = signup-grade.value;
-  const section = signup-section.value;
-  const age = signup-age.value;
-  const email = signup-email.value;
-  const password = signup-password.value;
-  const confirm = signup-confirm.value;
+  const name = $("signup-name").value.trim();
+  const grade = $("signup-grade").value;
+  const section = $("signup-section").value.trim();
+  const age = Number($("signup-age").value);
+  const email = $("signup-email").value.trim();
+  const password = $("signup-password").value;
+  const confirm = $("signup-confirm").value;
 
-  if (email.length > 25) return alert("Email must not exceed 25 characters.");
-  if (password.length > 30) return alert("Password must not exceed 30 characters.");
-  if (confirm.length > 30) return alert("Password confirmation must not exceed 30 characters.");
-  if (password !== confirm) return alert("Passwords do not match!");
+  if (!name || !grade || !section || !email || !password) return alert("Please fill all fields.");
+  if (email.length > 30) return alert("Email must be at most 30 characters.");
+  if (password.length > 22) return alert("Password must be at most 22 characters.");
+  if (password !== confirm) return alert("Passwords do not match.");
+  if (section.length > 18) return alert("Section/advisory must be at most 18 characters.");
 
   try {
-    const user = (await createUserWithEmailAndPassword(auth, email, password)).user;
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    const uid = cred.user.uid;
 
-    await setDoc(doc(db, "students", user.uid), {
-      name, grade, section, age, email, verified: false, totalTimeSpent: 0
+    // create a verification request for teachers to approve
+    await setDoc(doc(db, "verificationRequests", uid), {
+      studentId: uid,
+      firstName: name,
+      lastName: "",            // you can split name later if you prefer
+      middleInitial: "",
+      email,
+      age: isFinite(age) ? age : null,
+      grade,
+      section,
+      status: "pending",
+      requestedAt: serverTimestamp()
     });
 
-    alert("Student created! Waiting for teacher verification.");
-  } catch (err) { alert(err.message); }
+    alert("Sign-up successful. Wait for your teacher to verify your account.");
+    // reset form
+    $("signup-name").value = "";
+    $("signup-grade").value = "";
+    $("signup-section").value = "";
+    $("signup-age").value = "";
+    $("signup-email").value = "";
+    $("signup-password").value = "";
+    $("signup-confirm").value = "";
+    hideAll();
+    studentSignin.classList.remove("hidden");
+
+  } catch (err) {
+    alert(err.message || "Sign up failed.");
+  }
 });
 
 /* ————————————————————————————————————————————
-   STUDENT SIGN IN  ✔ Email ≤25  ✔ Password ≤30
+   STUDENT SIGN IN -> only allowed if students/{uid}.verified === true
 ———————————————————————————————————————————— */
 studentSignin.addEventListener("submit", async (e) => {
   e.preventDefault();
+  const email = $("signin-email").value.trim();
+  const password = $("signin-password").value;
 
-  const email = signin-email.value;
-  const password = signin-password.value;
-
-  if (email.length > 25) return alert("Email must not exceed 25 characters.");
-  if (password.length > 30) return alert("Password must not exceed 30 characters.");
+  if (email.length > 30) return alert("Email must be at most 30 characters.");
+  if (password.length > 22) return alert("Password must be at most 22 characters.");
 
   try {
-    const user = (await signInWithEmailAndPassword(auth, email, password)).user;
-    const snap = await getDoc(doc(db, "students", user.uid));
-
-    if (!snap.exists()) return alert("Student data missing!");
-    if (!snap.data().verified) return alert("Your teacher has not verified your account.");
-
+    const userCred = await signInWithEmailAndPassword(auth, email, password);
+    const uid = userCred.user.uid;
+    const snap = await getDoc(doc(db, "students", uid));
+    if (!snap.exists()) return alert("Student profile not found. Are you verified?");
+    const data = snap.data();
+    if (!data.verified) return alert("Your account is not yet verified by your teacher.");
+    // success -> go to student area
     window.location.href = "Echo3.html";
-  } catch (err) { alert(err.message); }
+  } catch (err) {
+    alert(err.message || "Sign in failed.");
+  }
 });
 
 /* ————————————————————————————————————————————
-   TEACHER SIGN UP  ✔ Email ≤25  ✔ Password ≤30
+   TEACHER SIGN UP -> create teacher verification request (pending)
+   stored in teacherVerificationRequests/{uid}
 ———————————————————————————————————————————— */
 teacherSignup.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const name = t-name.value;
-  const grade = t-grade.value;
-  const section = t-section.value;
-  const email = t-email.value;
-  const password = t-password.value;
-  const confirm = t-confirm.value;
+  const name = $("t-name").value.trim();
+  const grade = $("t-grade").value;
+  const section = $("t-section").value.trim();
+  const email = $("t-email").value.trim();
+  const password = $("t-password").value;
+  const confirm = $("t-confirm").value;
 
-  if (email.length > 25) return alert("Email must not exceed 25 characters.");
-  if (password.length > 30) return alert("Password must not exceed 30 characters.");
-  if (confirm.length > 30) return alert("Password confirmation must not exceed 30 characters.");
-  if (password !== confirm) return alert("Passwords do not match!");
+  if (!name || !grade || !section || !email || !password) return alert("Please fill all fields.");
+  if (email.length > 30) return alert("Email must be at most 30 characters.");
+  if (password.length > 22) return alert("Password must be at most 22 characters.");
+  if (password !== confirm) return alert("Passwords do not match.");
+  if (section.length > 18) return alert("Section/advisory must be at most 18 characters.");
 
   try {
-    const user = (await createUserWithEmailAndPassword(auth, email, password)).user;
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    const uid = cred.user.uid;
 
-    await setDoc(doc(db, "teachers", user.uid), {
-      name, grade, section, email, verified: false
+    await setDoc(doc(db, "teacherVerificationRequests", uid), {
+      teacherId: uid,
+      firstName: name,
+      lastName: "",
+      middleInitial: "",
+      email,
+      advisoryGrade: grade,
+      advisorySection: section,
+      status: "pending",
+      requestedAt: serverTimestamp()
     });
 
-    alert("Teacher created! Waiting for admin verification.");
-  } catch (err) { alert(err.message); }
+    alert("Teacher account created. Wait for admin approval.");
+    // reset
+    $("t-name").value = "";
+    $("t-grade").value = "";
+    $("t-section").value = "";
+    $("t-email").value = "";
+    $("t-password").value = "";
+    $("t-confirm").value = "";
+    hideAll();
+    teacherSignin.classList.remove("hidden");
+  } catch (err) {
+    alert(err.message || "Teacher sign up failed.");
+  }
 });
 
 /* ————————————————————————————————————————————
-   TEACHER SIGN IN  ✔ Email ≤25  ✔ Password ≤30
+   TEACHER SIGN IN -> only allowed if teachers/{uid}.verified === true
 ———————————————————————————————————————————— */
 teacherSignin.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const email = teacher-email.value;
-  const password = teacher-password.value;
+  const email = $("teacher-email").value.trim();
+  const password = $("teacher-password").value;
 
-  if (email.length > 25) return alert("Email must not exceed 25 characters.");
-  if (password.length > 30) return alert("Password must not exceed 30 characters.");
+  if (email.length > 30) return alert("Email must be at most 30 characters.");
+  if (password.length > 22) return alert("Password must be at most 22 characters.");
 
   try {
-    const user = (await signInWithEmailAndPassword(auth, email, password)).user;
-    const snap = await getDoc(doc(db, "teachers", user.uid));
+    const userCred = await signInWithEmailAndPassword(auth, email, password);
+    const uid = userCred.user.uid;
 
-    if (!snap.exists()) return alert("Not a teacher account!");
-    if (!snap.data().verified) return alert("Admin has not verified your account.");
+    const snap = await getDoc(doc(db, "teachers", uid));
+    if (!snap.exists()) {
+      alert("Teacher account not approved yet or profile missing.");
+      // sign out immediately to prevent session confusion
+      await signOut(auth);
+      return;
+    }
+    const data = snap.data();
+    if (!data.verified) {
+      await signOut(auth);
+      return alert("Admin has not approved your account yet.");
+    }
 
+    // success -> teacher goes to verify page
     window.location.href = "verify.html";
-  } catch (err) { alert(err.message); }
+  } catch (err) {
+    alert(err.message || "Teacher sign in failed.");
+  }
 });
 
 /* ————————————————————————————————————————————
-   ADMIN SIGN IN  ✔ Email ≤25  ✔ Password ≤30
+   ADMIN SIGN IN -> allowed only if admins/{uid} exists
 ———————————————————————————————————————————— */
 adminSignin.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const email = admin-email.value;
-  const password = admin-password.value;
+  const email = $("admin-email").value.trim();
+  const password = $("admin-password").value;
 
-  if (email.length > 25) return alert("Email must not exceed 25 characters.");
-  if (password.length > 30) return alert("Password must not exceed 30 characters.");
+  if (email.length > 30) return alert("Email must be at most 30 characters.");
+  if (password.length > 22) return alert("Password must be at most 22 characters.");
 
   try {
-    const user = (await signInWithEmailAndPassword(auth, email, password)).user;
-    const adminSnap = await getDoc(doc(db, "admins", user.uid));
+    const userCred = await signInWithEmailAndPassword(auth, email, password);
+    const uid = userCred.user.uid;
+    const adminSnap = await getDoc(doc(db, "admins", uid));
 
     if (!adminSnap.exists()) {
-      alert("You are NOT an admin.");
-      return;
+      await signOut(auth);
+      return alert("Admin access denied.");
     }
 
+    // success
     window.location.href = "admin.html";
-  } catch (err) { alert(err.message); }
+  } catch (err) {
+    alert(err.message || "Admin sign in failed.");
+  }
 });
 
 </script>
