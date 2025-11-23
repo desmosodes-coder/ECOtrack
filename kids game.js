@@ -764,9 +764,73 @@ function endGame(gameType) {
     clearInterval(gameTimer);
     showSuccessMessage(`⏰ Time's up! Final Score: ${gamePoints} points! 🏆`);
     
+    // Dispatch game completion event for task system
+    dispatchGameCompletionEvent(gameType, gamePoints);
+    
     setTimeout(() => {
         hideAllGames();
     }, 3000);
+}
+
+// Dispatch game completion event for home task system
+function dispatchGameCompletionEvent(gameType, score) {
+    // Map game types to proper names
+    const gameTypeMap = {
+        'sorting': 'sorting',
+        'biodegradable-sorting': 'sorting',
+        'matching': 'matching',
+        'waste-matching': 'matching',
+        'spelling': 'spelling',
+        'waste-spelling': 'spelling',
+        'puzzle': 'puzzle',
+        'waste-puzzle': 'puzzle',
+        'memory': 'memory',
+        'waste-memory': 'memory'
+    };
+    
+    const normalizedGameType = gameTypeMap[gameType] || gameType;
+    
+    // Calculate accuracy based on points (max points per game varies)
+    let accuracy = 100;
+    let mistakes = 0;
+    
+    // Estimate accuracy based on score (this is simplified)
+    if (normalizedGameType === 'sorting') {
+        accuracy = Math.min(100, (score / 50) * 100);
+        mistakes = Math.max(0, 10 - Math.floor(score / 10));
+    } else if (normalizedGameType === 'matching') {
+        accuracy = Math.min(100, (score / 60) * 100);
+        mistakes = Math.max(0, 8 - Math.floor(score / 15));
+    } else if (normalizedGameType === 'spelling') {
+        accuracy = Math.min(100, (score / 40) * 100);
+        mistakes = Math.max(0, 6 - Math.floor(score / 20));
+    } else if (normalizedGameType === 'memory') {
+        accuracy = Math.min(100, (score / 90) * 100);
+        mistakes = Math.max(0, 12 - Math.floor(score / 30));
+    }
+    
+    // Save game score to localStorage for total points tracking
+    let gameScores = JSON.parse(localStorage.getItem('gameScores') || '{}');
+    if (!gameScores[normalizedGameType]) {
+        gameScores[normalizedGameType] = { points: 0, bestScore: 0, gamesPlayed: 0 };
+    }
+    gameScores[normalizedGameType].points += score;
+    gameScores[normalizedGameType].bestScore = Math.max(gameScores[normalizedGameType].bestScore, score);
+    gameScores[normalizedGameType].gamesPlayed += 1;
+    gameScores[normalizedGameType].difficulty = 'easy';
+    localStorage.setItem('gameScores', JSON.stringify(gameScores));
+    
+    // Dispatch the event
+    window.dispatchEvent(new CustomEvent('gameCompleted', {
+        detail: {
+            type: normalizedGameType,
+            score: score,
+            difficulty: 'easy', // Default difficulty, can be enhanced
+            mistakes: mistakes,
+            accuracy: Math.round(accuracy),
+            timestamp: Date.now()
+        }
+    }));
 }
 
 // End game functions

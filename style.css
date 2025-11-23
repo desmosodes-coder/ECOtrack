@@ -9,6 +9,13 @@
     box-sizing: border-box;
 }
 
+/* Kids Friendly Font */
+* {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Bradley Hand', 'Kristen ITC', 'Tempus Sans ITC', 'Verdana', 'Geneva', sans-serif !important;
+    font-size: 1.05em;
+    font-weight: 600;
+}
+
 /* Theme Variables */
 :root {
     /* Light theme colors */
