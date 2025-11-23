@@ -3,43 +3,158 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ECOTrack | Admin Panel</title>
+  <title>ECOTrack | Admin Panel — EcoLux</title>
   <style>
-    * { box-sizing: border-box; font-family: "Poppins", sans-serif; }
-    body { margin:0; background: linear-gradient(135deg,#9be15d,#00e3ae); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:20px; }
-    .panel { width:90%; max-width:1000px; background:#fff; border-radius:12px; padding:18px; box-shadow:0 8px 18px rgba(0,0,0,0.12); }
-    h1 { color:#2e7d32; margin:6px 0 12px; text-align:center; }
-    table { width:100%; border-collapse:collapse; }
-    th, td { padding:10px; border-bottom:1px solid #eee; text-align:left; }
-    th { background: linear-gradient(to right, #00b4db, #0083b0); color:#fff; }
-    .verify-btn, .deny-btn { padding:8px 12px; border-radius:8px; color:#fff; border:none; cursor:pointer; }
-    .verify-btn { background:#4caf50; margin-right:8px; }
-    .deny-btn { background:#f44336; }
-    .logout { margin-top:14px; background:#f44336; color:#fff; border:none; padding:10px 14px; border-radius:8px; cursor:pointer; }
-    .search { width:100%; padding:8px 10px; margin-bottom:12px; border-radius:8px; border:1px solid #ccc; }
+    /* Reset & base */
+    *{box-sizing:border-box;margin:0;padding:0;font-family:Inter, Poppins, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+    :root{
+      --bg-1: linear-gradient(135deg,#072b14 0%, #0b3a23 35%, #06332a 100%);
+      --glass-bg: rgba(255,255,255,0.06);
+      --panel-bg: rgba(255,255,255,0.08);
+      --accent-emerald: #00b37e; /* emerald */
+      --accent-neon: #b9ff00; /* neon lime */
+      --accent-gold: #caa038; /* gold-green */
+      --muted: rgba(255,255,255,0.85);
+      --card-radius: 14px;
+      --glass-blur: 10px;
+      --shadow: 0 8px 30px rgba(2,12,6,0.55);
+    }
+
+    html,body{height:100%;}
+    body{
+      min-height:100vh;
+      background: var(--bg-1);
+      color:var(--muted);
+      padding:28px;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;align-items:flex-start;justify-content:center;
+    }
+
+    /* Frame */
+    .wrap{width:100%;max-width:1200px}
+
+    header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+    .brand{
+      display:flex;align-items:center;gap:12px;background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      padding:8px 12px;border-radius:12px;backdrop-filter: blur(6px);border:1px solid rgba(255,255,255,0.06)
+    }
+    .logo-circle{width:56px;height:56px;border-radius:12px;display:grid;place-items:center;font-size:28px;background:linear-gradient(135deg,var(--accent-emerald),var(--accent-neon));box-shadow:0 6px 18px rgba(0,0,0,0.4);color:#05220f}
+    h1{font-size:20px;color:var(--muted);letter-spacing:0.2px}
+    .subtitle{font-size:12px;color:rgba(255,255,255,0.7)}
+
+    /* Top controls */
+    .top-controls{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .search{flex:1;max-width:640px;display:flex;gap:8px}
+    .search input{flex:1;padding:12px 14px;border-radius:12px;border:none;background:rgba(255,255,255,0.06);color:var(--muted);outline:none;box-shadow:inset 0 -1px 0 rgba(0,0,0,0.2)}
+    .pill{padding:10px 14px;border-radius:999px;background:linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:8px}
+
+    /* Panel area */
+    .panel{background:var(--panel-bg);border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow);backdrop-filter:blur(var(--glass-blur));border:1px solid rgba(255,255,255,0.06)}
+    .grid{display:grid;grid-template-columns:1fr 380px;gap:18px}
+
+    /* Tables / cards */
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.04)}
+    table{width:100%;border-collapse:collapse;color:var(--muted)}
+    thead th{font-size:13px;padding:10px 12px;text-align:left;color:rgba(255,255,255,0.9);background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-bottom:1px solid rgba(255,255,255,0.04)}
+    tbody td{padding:12px;border-bottom:1px dashed rgba(255,255,255,0.03);font-size:14px}
+
+    .actions{display:flex;gap:8px}
+    .btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
+    .btn-approve{background:linear-gradient(90deg,var(--accent-emerald),var(--accent-neon));color:#05220f;box-shadow:0 6px 18px rgba(0,179,126,0.12);border:1px solid rgba(255,255,255,0.06)}
+    .btn-deny{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.08)}
+    .btn-logout{background:linear-gradient(90deg,#a63a2b, var(--accent-gold));border:none;padding:10px 14px;border-radius:10px;color:#06160d;font-weight:700}
+
+    /* right column */
+    .stats{display:flex;flex-direction:column;gap:12px}
+    .stat-item{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
+    .stat-item h4{margin-bottom:6px;font-size:13px;color:rgba(255,255,255,0.9)}
+    .stat-big{font-size:20px;font-weight:700;color:var(--accent-neon)}
+
+    /* responsive */
+    @media (max-width:980px){
+      .grid{grid-template-columns:1fr}
+      .logo-circle{width:48px;height:48px;font-size:22px}
+    }
+    @media (max-width:520px){
+      body{padding:14px}
+      header{flex-direction:column;align-items:flex-start}
+      .search input{padding:10px}
+      thead{display:none}
+      table, tbody, tr, td{display:block;width:100%}
+      tbody td{padding:10px 6px;border:none;border-bottom:1px solid rgba(255,255,255,0.03)}
+      .actions{margin-top:8px}
+    }
+
+    /* tiny micro-interactions */
+    .row:hover{transform:translateY(-4px);transition:all .18s}
+    .glow{box-shadow:0 6px 32px rgba(185,255,0,0.08), inset 0 1px 0 rgba(255,255,255,0.02)}
   </style>
 </head>
 <body>
-  <div class="panel">
-    <h1>Admin — Teacher Approvals</h1>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo-circle">🌿</div>
+        <div>
+          <h1>ECOTrack — Admin</h1>
+          <div class="subtitle">Teacher Approvals • Eco-Lux Glass</div>
+        </div>
+      </div>
+    </header>
 
-    <input id="searchInput" class="search" placeholder="Search pending teachers by name or email">
+    <div class="top-controls">
+      <div class="search">
+        <input id="searchInput" class="searchInput" placeholder="Search pending teachers by name or email" aria-label="Search pending teachers" />
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="pill">Admins only</div>
+        <button id="logoutBtn" class="btn btn-logout">Log Out</button>
+      </div>
+    </div>
 
-    <h3>Pending Requests</h3>
-    <table id="pendingTable">
-      <thead>
-        <tr><th>Name</th><th>Grade</th><th>Section</th><th>Email</th><th>Action</th></tr>
-      </thead>
-      <tbody><tr><td colspan="5" style="text-align:center">Loading...</td></tr></tbody>
-    </table>
+    <div class="grid">
+      <div class="panel card">
+        <h3 style="margin-bottom:12px;color:var(--muted)">Pending Requests</h3>
+        <div style="overflow:auto;max-height:56vh">
+          <table id="pendingTable" aria-live="polite">
+            <thead>
+              <tr><th>Name</th><th>Grade</th><th>Section</th><th>Email</th><th>Action</th></tr>
+            </thead>
+            <tbody><tr><td colspan="5" style="text-align:center">Loading...</td></tr></tbody>
+          </table>
+        </div>
 
-    <h3 style="margin-top:18px">Approved Teachers</h3>
-    <table id="approvedTable">
-      <thead><tr><th>Name</th><th>Email</th><th>Grade</th><th>Section</th><th>Status</th></tr></thead>
-      <tbody><tr><td colspan="5" style="text-align:center">Loading...</td></tr></tbody>
-    </table>
+        <h3 style="margin-top:14px;color:var(--muted)">Approved Teachers</h3>
+        <div style="overflow:auto;max-height:28vh;margin-top:8px">
+          <table id="approvedTable">
+            <thead><tr><th>Name</th><th>Email</th><th>Grade</th><th>Section</th><th>Status</th></tr></thead>
+            <tbody><tr><td colspan="5" style="text-align:center">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
 
-    <button id="logoutBtn" class="logout">Log Out</button>
+      <aside class="stats">
+        <div class="stat-item">
+          <h4>Overview</h4>
+          <div class="stat-big" id="totalPending">—</div>
+          <div style="font-size:13px;margin-top:6px;color:rgba(255,255,255,0.7)">Pending teacher verifications</div>
+        </div>
+
+        <div class="stat-item">
+          <h4>Quick Actions</h4>
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+            <button id="approveAll" class="btn btn-approve">Approve All Visible</button>
+            <button id="refreshBtn" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)">Refresh</button>
+          </div>
+        </div>
+
+        <div class="stat-item">
+          <h4>Support</h4>
+          <div style="font-size:13px;color:rgba(255,255,255,0.75)">Need help? Contact the lead admin.</div>
+        </div>
+      </aside>
+    </div>
   </div>
 
   <script type="module">
@@ -49,6 +164,7 @@
       getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+    // Firebase config (unchanged)
     const firebaseConfig = {
   apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
   authDomain: "registar-5f3fb.firebaseapp.com",
@@ -62,151 +178,117 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // Element refs
     const pendingTbody = document.querySelector("#pendingTable tbody");
     const approvedTbody = document.querySelector("#approvedTable tbody");
     const searchInput = document.getElementById("searchInput");
     const logoutBtn = document.getElementById("logoutBtn");
+    const totalPendingEl = document.getElementById("totalPending");
+    const approveAllBtn = document.getElementById("approveAll");
+    const refreshBtn = document.getElementById("refreshBtn");
 
     let pendingRequests = [];
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) { window.location.href = "index.html"; return; }
-      // ensure this auth user is an admin in admins collection
       const adm = await getDoc(doc(db, "admins", user.uid));
-      if (!adm.exists()) {
-        alert("Admin access denied.");
-        await signOut(auth);
-        window.location.href = "index.html";
-        return;
-      }
-
+      if (!adm.exists()) { alert("Admin access denied."); await signOut(auth); window.location.href = "index.html"; return; }
       await loadPendingRequests();
       await loadApprovedTeachers();
     });
 
-    async function loadPendingRequests() {
+    async function loadPendingRequests(){
       pendingTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">Loading...</td></tr>`;
-      const q = query(collection(db, "teacherVerificationRequests"), where("status", "==", "pending"));
+      const q = query(collection(db, "teacherVerificationRequests"), where("status","==","pending"));
       const snap = await getDocs(q);
       pendingRequests = [];
       snap.forEach(s => pendingRequests.push({ id: s.id, ...s.data() }));
-
       renderPending(pendingRequests);
     }
 
-    function renderPending(list) {
-      const term = (searchInput.value || "").trim().toLowerCase();
+    function renderPending(list){
+      const term = (searchInput.value||"").trim().toLowerCase();
       const filtered = list.filter(i => {
         if (!term) return true;
-        return (i.firstName||"").toLowerCase().includes(term) ||
-               (i.lastName||"").toLowerCase().includes(term) ||
-               (i.email||"").toLowerCase().includes(term);
+        return (i.firstName||"").toLowerCase().includes(term) || (i.lastName||"").toLowerCase().includes(term) || (i.email||"").toLowerCase().includes(term);
       });
 
-      if (filtered.length === 0) {
-        pendingTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">No pending teacher requests.</td></tr>`;
-        return;
-      }
+      totalPendingEl.innerText = filtered.length;
 
+      if (filtered.length===0){ pendingTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">No pending teacher requests.</td></tr>`; return; }
       pendingTbody.innerHTML = "";
       filtered.forEach(r => {
-        const tr = document.createElement("tr");
+        const tr = document.createElement('tr'); tr.className='row';
         tr.innerHTML = `
           <td>${escapeHtml(r.firstName||"")} ${escapeHtml(r.middleInitial||"")} ${escapeHtml(r.lastName||"")}</td>
           <td>${escapeHtml(r.advisoryGrade||"")}</td>
           <td>${escapeHtml(r.advisorySection||"")}</td>
           <td>${escapeHtml(r.email||"")}</td>
           <td>
-            <button class="verify-btn" data-id="${escapeHtml(r.teacherId)}" data-req="${escapeHtml(r.id)}">Approve</button>
-            <button class="deny-btn" data-req="${escapeHtml(r.id)}">Deny</button>
+            <div class="actions">
+              <button class="btn btn-approve" data-id="${escapeHtml(r.teacherId)}" data-req="${escapeHtml(r.id)}">Approve</button>
+              <button class="btn btn-deny" data-req="${escapeHtml(r.id)}">Deny</button>
+            </div>
           </td>
         `;
         pendingTbody.appendChild(tr);
       });
-
       attachPendingButtons();
     }
 
-    function attachPendingButtons() {
-      document.querySelectorAll(".verify-btn").forEach(btn => {
+    function attachPendingButtons(){
+      document.querySelectorAll('.btn-approve').forEach(btn=>{
         btn.onclick = async () => {
-          const teacherId = btn.dataset.id;
-          const reqId = btn.dataset.req;
-          try {
-            const reqRef = doc(db, "teacherVerificationRequests", reqId);
+          const teacherId = btn.dataset.id; const reqId = btn.dataset.req;
+          try{
+            const reqRef = doc(db,"teacherVerificationRequests",reqId);
             const reqSnap = await getDoc(reqRef);
-            if (!reqSnap.exists()) { alert("Request not found"); return; }
+            if (!reqSnap.exists()){ alert('Request not found'); return; }
             const data = reqSnap.data();
-
-            // Save approved teacher into 'teachers' collection
-            await setDoc(doc(db, "teachers", teacherId), {
-              teacherId,
-              firstName: data.firstName || "",
-              middleInitial: data.middleInitial || "",
-              lastName: data.lastName || "",
-              email: data.email || "",
-              grade: data.advisoryGrade || "",
-              section: data.advisorySection || "",
-              verified: true,
-              verifiedAt: serverTimestamp()
+            await setDoc(doc(db,'teachers',teacherId),{
+              teacherId, firstName: data.firstName||'', middleInitial: data.middleInitial||'', lastName: data.lastName||'', email: data.email||'', grade: data.advisoryGrade||'', section: data.advisorySection||'', verified:true, verifiedAt: serverTimestamp()
             });
-
-            // Mark request approved
-            await updateDoc(reqRef, { status: "approved", reviewedAt: serverTimestamp() });
-
-            alert("Teacher approved.");
-            await loadPendingRequests();
-            await loadApprovedTeachers();
-          } catch (err) {
-            console.error(err);
-            alert("Approve failed: " + (err.message||err));
-          }
-        };
+            await updateDoc(reqRef,{status:'approved', reviewedAt: serverTimestamp()});
+            await loadPendingRequests(); await loadApprovedTeachers();
+          }catch(err){console.error(err); alert('Approve failed: '+(err.message||err));}
+        }
       });
 
-      document.querySelectorAll(".deny-btn").forEach(btn => {
+      document.querySelectorAll('.btn-deny').forEach(btn=>{
         btn.onclick = async () => {
-          const reqId = btn.dataset.req;
-          if (!confirm("Deny this teacher request?")) return;
-          try {
-            await updateDoc(doc(db, "teacherVerificationRequests", reqId), { status: "rejected", reviewedAt: serverTimestamp() });
-            alert("Request denied.");
-            await loadPendingRequests();
-          } catch (err) {
-            console.error(err);
-            alert("Deny failed: " + (err.message||err));
-          }
-        };
+          const reqId = btn.dataset.req; if (!confirm('Deny this teacher request?')) return;
+          try{ await updateDoc(doc(db,'teacherVerificationRequests',reqId),{status:'rejected', reviewedAt: serverTimestamp()}); await loadPendingRequests(); }catch(err){console.error(err); alert('Deny failed: '+(err.message||err)); }
+        }
       });
     }
 
-    async function loadApprovedTeachers() {
+    async function loadApprovedTeachers(){
       approvedTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">Loading...</td></tr>`;
-      const q = query(collection(db, "teachers"), where("verified", "==", true));
+      const q = query(collection(db,'teachers'), where('verified','==', true));
       const snap = await getDocs(q);
-      if (snap.empty) {
-        approvedTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">No approved teachers yet.</td></tr>`;
-        return;
-      }
-      approvedTbody.innerHTML = "";
-      snap.forEach(s => {
+      if (snap.empty){ approvedTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">No approved teachers yet.</td></tr>`; return; }
+      approvedTbody.innerHTML = '';
+      snap.forEach(s=>{
         const d = s.data();
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${escapeHtml(d.firstName||"")} ${escapeHtml(d.middleInitial||"")} ${escapeHtml(d.lastName||"")}</td>
-          <td>${escapeHtml(d.email||"")}</td>
-          <td>${escapeHtml(d.grade||"")}</td>
-          <td>${escapeHtml(d.section||"")}</td>
-          <td>${escapeHtml(d.verified ? "Verified" : "—")}</td>
-        `;
-        approvedTbody.appendChild(tr);
+        const tr = document.createElement('tr'); tr.innerHTML = `
+          <td>${escapeHtml(d.firstName||'')} ${escapeHtml(d.middleInitial||'')} ${escapeHtml(d.lastName||'')}</td>
+          <td>${escapeHtml(d.email||'')}</td>
+          <td>${escapeHtml(d.grade||'')}</td>
+          <td>${escapeHtml(d.section||'')}</td>
+          <td>${escapeHtml(d.verified ? 'Verified' : '—')}</td>
+        `; approvedTbody.appendChild(tr);
       });
     }
 
-    searchInput.addEventListener("input", () => renderPending(pendingRequests));
-    logoutBtn.addEventListener("click", async () => { await signOut(auth); window.location.href = "index.html"; });
+    searchInput.addEventListener('input', ()=> renderPending(pendingRequests));
+    logoutBtn.addEventListener('click', async ()=>{ await signOut(auth); window.location.href='index.html'; });
+    approveAllBtn.addEventListener('click', async ()=>{
+      if (!confirm('Approve all visible pending requests?')) return; const rows = Array.from(document.querySelectorAll('#pendingTable tbody tr'));
+      for (const r of rows){ const btn = r.querySelector('.btn-approve'); if (!btn) continue; btn.click(); }
+    });
+    refreshBtn.addEventListener('click', async ()=>{ await loadPendingRequests(); await loadApprovedTeachers(); });
 
-    function escapeHtml(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"); }
+    function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
   </script>
 </body>
 </html>
