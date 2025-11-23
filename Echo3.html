@@ -207,76 +207,18 @@
                 grid-template-columns: 1fr;
             }
         }
-
-        /* Profile slide-out panel (Option A) */
-.profile-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
-.profile-avatar {
-width:80px; height:80px; border-radius:50%; overflow:hidden; flex:0 0 80px; border:4px solid rgba(0,0,0,0.06);
-display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#e6f6ec,#f0fff6);
-}
-.profile-avatar img { width:100%; height:100%; object-fit:cover; }
-.profile-name { font-size:18px; font-weight:700; color:var(--primary,#2d7d4a); }
-.profile-meta { font-size:13px; color:var(--text-secondary,#666); }
-.profile-row { margin:12px 0; }
-.upload-btn { display:block; width:100%; padding:10px; border-radius:8px; border:1px dashed #bdbdbd; background:transparent; cursor:pointer; text-align:center; }
-.small { font-size:12px; color:#666; }
-.divider { height:1px; background:var(--border,#eee); margin:12px 0; }
-.logout-btn { background:#e53935; color:#fff; border:none; padding:10px; width:100%; border-radius:8px; cursor:pointer; }
-.edit-photo { display:inline-block; margin-top:8px; font-size:13px; color:#00796b; cursor:pointer; }
-/* small responsive tweak when viewport small */
-@media (max-width:420px) {
-#profile-panel { width:100%; left:-100%; }
-#profile-panel.open { left:0; }
-}
-
-#profile-overlay {
-position: fixed;
-top: 0;
-left: 0;
-width: 100vw;
-height: 100vh;
-backdrop-filter: blur(6px);
-background: rgba(0,0,0,0.35);
-z-index: 1100;
-opacity: 0;
-pointer-events: none;
-transition: opacity 250ms ease;
-}
-#profile-overlay.visible {
-opacity: 1;
-pointer-events: auto;
-}
-
-
-/* Close button */
-#profileCloseBtn {
-position: absolute;
-right: 14px;
-top: 14px;
-background: rgba(0,0,0,0.07);
-border-radius: 50%;
-width: 32px;
-height: 32px;
-display:flex;
-align-items:center;
-justify-content:center;
-cursor:pointer;
-font-size:20px;
-user-select:none;
-}
     </style>
 </head>
 <body>
     <!-- Top Navigation -->
-<nav class="navbar" id="navbar">
-<div class="nav-container">
-<div class="nav-logo">
-<!-- changed anchor to button-like behavior so we can toggle profile drawer -->
-<a id="logoButton" href="javascript:void(0)" class="logo-link" aria-label="Open profile">
-<span class="logo-icon">🌱</span>
-<span class="logo-text" data-testid="app-title">ECOTrack</span>
-</a>
-</div>
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html" class="logo-link">
+                <span class="logo-icon">🌱</span>
+                <span class="logo-text" data-testid="app-title">ECOTrack</span>
+                </a>
+            </div>
             
             <ul class="nav-menu" id="nav-menu">
                 <li><a href="#" data-section="home" data-testid="nav-home">🏠<span class="nav-text">Home</span></a></li>
@@ -294,48 +236,6 @@ user-select:none;
                 <span></span>
             </button>
     </nav>
-
-    <!-- Profile Slide-out Panel -->
-<div id="profile-overlay"></div>
-<aside id="profile-panel" aria-hidden="true">
-<div id="profileCloseBtn">✕</div>
-<div class="profile-header">
-<div class="profile-avatar" id="profileAvatarPlaceholder">
-<img id="profileAvatarImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><rect width='100%' height='100%' fill='%23e6f6ec'/><text x='50%' y='55%' font-size='40' dominant-baseline='middle' text-anchor='middle' fill='%232d7d4a'>👤</text></svg>" alt="avatar">
-</div>
-<div>
-<div class="profile-name" id="profileName">Student Name</div>
-<div class="profile-meta" id="profileEmail">email@example.com</div>
-</div>
-</div>
-
-
-<div class="profile-row">
-<div><strong>Grade</strong></div>
-<div class="small" id="profileGrade">Grade -</div>
-</div>
-<div class="profile-row">
-<div><strong>Advisory</strong></div>
-<div class="small" id="profileSection">Section -</div>
-</div>
-<div class="profile-row">
-<div><strong>Age</strong></div>
-<div class="small" id="profileAge">-</div>
-</div>
-
-
-<div class="divider"></div>
-
-
-<label class="upload-btn" for="profileFileInput" id="uploadLabel">Click to select a new profile photo</label>
-<input id="profileFileInput" type="file" accept="image/*" style="display:none">
-<div class="small">Tip: choose a square photo for best results.</div>
-<button id="savePhotoBtn" class="upload-btn" style="margin-top:10px; display:none">Upload & Save</button>
-
-
-<div style="height:12px"></div>
-<button id="logoutBtn" class="logout-btn">Log out</button>
-</aside>
 
     <!-- Main Content -->
     <main class="main-content" id="main-content">
@@ -1016,141 +916,55 @@ user-select:none;
 <script src="complete-translations.js"></script>
 <script src="filipino-translations.js"></script>
 
-    <script type="module" defer>
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+<script type="module" defer>
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
-        authDomain: "registar-5f3fb.firebaseapp.com",
-        projectId: "registar-5f3fb",
-        storageBucket: "registar-5f3fb.firebasestorage.app",
-        messagingSenderId: "856198150739",
-        appId: "1:856198150739:web:801000f564b47f6333e4a6"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
+            authDomain: "registar-5f3fb.firebaseapp.com",
+            projectId: "registar-5f3fb",
+            storageBucket: "registar-5f3fb.firebasestorage.app",
+            messagingSenderId: "856198150739",
+            appId: "1:856198150739:web:801000f564b47f6333e4a6"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    // ==== PROFILE ELEMENTS ====
-    const profileName = document.getElementById("profileName");
-    const profileEmail = document.getElementById("profileEmail");
-    const profileGrade = document.getElementById("profileGrade");
-    const profileSection = document.getElementById("profileSection");
-    const profileAge = document.getElementById("profileAge");
-    const profileAvatarImg = document.getElementById("profileAvatarImg");
-    const profileFileInput = document.getElementById("profileFileInput");
-    const savePhotoBtn = document.getElementById("savePhotoBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-
-    let currentUser = null;
-    let selectedFile = null;
-
-    // 🔒 PROTECT PAGE — ONLY VERIFIED STUDENTS
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) {
+        // 🔒 Protect page: only verified students
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
             window.location.href = "index.html";
             return;
-        }
+            }
 
-        currentUser = user;
-
-        try {
-            const studentRef = doc(db, "students", user.uid);
-            const studentSnap = await getDoc(studentRef);
-
-            if (!studentSnap.exists()) {
+            try {
+            const studentDoc = await getDoc(doc(db, "students", user.uid));
+            if (!studentDoc.exists()) {
                 await signOut(auth);
                 window.location.href = "index.html";
                 return;
             }
 
-            const data = studentSnap.data();
-
-            if (!data.verified) {
-                alert("Your account has not been verified by a teacher yet.");
+            const studentData = studentDoc.data();
+            if (!studentData.verified) {
+                alert("Your account has not been verified by a teacher yet. Please wait for verification.");
                 await signOut(auth);
                 window.location.href = "index.html";
                 return;
             }
 
-            // 🎯 POPULATE PROFILE DRAWER
-            profileName.textContent = data.firstName || data.name || "Student";
-            profileEmail.textContent = user.email;
-            profileGrade.textContent = data.grade || "-";
-            profileSection.textContent = data.section || data.advisory || "-";
-            profileAge.textContent = data.age || data.ageRange || "-";
-
-            if (data.photoURL) {
-                profileAvatarImg.src = data.photoURL;
+            console.log("✅ Verified student access granted:", studentData.name);
+            } catch (err) {
+            console.error(err);
+            await signOut(auth);
+            window.location.href = "index.html";
             }
-
-            console.log("✅ Student verified and loaded");
-
-        } catch (error) {
-            console.error(error);
-            await signOut(auth);
-            window.location.href = "index.html";
-        }
-    });
-
-    // === SELECT PROFILE PHOTO ===
-    profileFileInput.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        if (!file.type.startsWith("image/")) {
-            alert("Please select an image file.");
-            return;
-        }
-
-        selectedFile = file;
-
-        // preview image
-        const reader = new FileReader();
-        reader.onload = (ev) => (profileAvatarImg.src = ev.target.result);
-        reader.readAsDataURL(file);
-
-        savePhotoBtn.style.display = "block";
-    });
-
-    // === UPLOAD PROFILE PHOTO ===
-    savePhotoBtn.addEventListener("click", async () => {
-        if (!selectedFile || !currentUser) return;
-
-        const uid = currentUser.uid;
-        const fileRef = storageRef(storage, `profilePictures/${uid}`);
-
-        try {
-            await uploadBytes(fileRef, selectedFile);
-            const url = await getDownloadURL(fileRef);
-
-            await setDoc(doc(db, "students", uid), { photoURL: url }, { merge: true });
-
-            alert("Profile photo updated!");
-            savePhotoBtn.style.display = "none";
-            selectedFile = null;
-
-        } catch (err) {
-            console.error(err);
-            alert("Upload failed.");
-        }
-    });
-
-    // === LOG OUT ===
-    logoutBtn.addEventListener("click", async () => {
-        try {
-            await signOut(auth);
-            window.location.href = "index.html";
-        } catch (err) {
-            console.error(err);
-        }
-    });
-</script>
+        });
+    </script>
 
 </body>
 </html>
