@@ -3,184 +3,374 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ECOTrack | Teacher Verification — EcoLux</title>
+  <title>ECOTrack | Student Verification — EcoLux</title>
+
   <style>
-    *{box-sizing:border-box;font-family:Inter, Poppins, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+    /* Reset & base */
+    *{box-sizing:border-box;margin:0;padding:0;font-family:Inter, Poppins, system-ui, -apple-system, 'Segoe UI', Roboto}
     :root{
-      --bg: linear-gradient(135deg,#05220f 0%, #0b3a23 40%, #052b14 100%);
-      --card: rgba(255,255,255,0.06);
-      --glass-blur:12px;
-      --accent-emerald:#00b37e; --accent-neon:#b9ff00; --accent-gold:#caa038;
-      --muted:rgba(255,255,255,0.88);
-      --radius:14px;
+      --bg-1: linear-gradient(135deg,#072b14 0%, #0b3a23 35%, #06332a 100%);
+      --glass-bg: rgba(255,255,255,0.06);
+      --panel-bg: rgba(255,255,255,0.08);
+      --accent-emerald:#00b37e;
+      --accent-neon:#b9ff00;
+      --accent-gold:#caa038;
+      --muted:rgba(255,255,255,0.85);
+      --card-radius:14px;
+      --glass-blur:10px;
+      --shadow:0 8px 30px rgba(2,12,6,0.55);
     }
-    body{min-height:100vh;margin:0;padding:28px;background:var(--bg);color:var(--muted);-webkit-font-smoothing:antialiased}
-    .container{max-width:1100px;margin:0 auto}
-    .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{width:56px;height:56px;border-radius:12px;display:grid;place-items:center;font-size:28px;background:linear-gradient(135deg,var(--accent-emerald),var(--accent-neon));color:#05220f}
-    h1{font-size:20px}
-    .controls{display:flex;gap:12px;align-items:center}
-    .teacherInfo{font-weight:700;color:rgba(255,255,255,0.95)}
-    .search input{padding:12px;border-radius:12px;border:none;background:rgba(255,255,255,0.06);color:var(--muted);min-width:220px}
 
-    .panel{background:var(--card);backdrop-filter:blur(var(--glass-blur));border-radius:var(--radius);padding:16px;box-shadow:0 12px 36px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.04)}
-    .student-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:16px}
+    html,body{height:100%;}
+    body{
+      min-height:100vh;
+      background:var(--bg-1);
+      color:var(--muted);
+      padding:28px;
+      display:flex;align-items:flex-start;justify-content:center;
+      -webkit-font-smoothing:antialiased;
+    }
 
-    .student-card{border-radius:12px;padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column;gap:8px}
-    .student-card.verified{background:linear-gradient(90deg, rgba(0,179,126,0.12), rgba(255,255,255,0.02));border:1px solid rgba(0,179,126,0.14)}
-    .student-name{font-weight:700}
-    .meta{font-size:13px;color:rgba(255,255,255,0.8)}
+    .wrap{width:100%;max-width:1200px}
 
-    .card-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .card-actions{display:flex;gap:8px}
-    .btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+    header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;
+      background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(6px)
+    }
+    .logo-circle{width:56px;height:56px;border-radius:12px;display:grid;place-items:center;
+      font-size:28px;background:linear-gradient(135deg,var(--accent-emerald),var(--accent-neon));
+      box-shadow:0 6px 18px rgba(0,0,0,0.4);color:#05220f
+    }
+    h1{font-size:20px;color:var(--muted)}
+    .subtitle{font-size:12px;color:rgba(255,255,255,0.7)}
+
+    /* Top controls */
+    .top-controls{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .search{flex:1;max-width:640px;display:flex;gap:8px}
+    .search input{flex:1;padding:12px 14px;border:none;border-radius:12px;background:rgba(255,255,255,0.06);color:var(--muted);outline:none}
+
+    .pill{padding:10px 14px;border-radius:999px;background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.05)
+    }
+
+    .panel{background:var(--panel-bg);border-radius:var(--card-radius);padding:18px;
+      box-shadow:var(--shadow);backdrop-filter:blur(var(--glass-blur));
+      border:1px solid rgba(255,255,255,0.06)
+    }
+    .grid{display:grid;grid-template-columns:1fr 380px;gap:18px}
+
+    table{width:100%;border-collapse:collapse;color:var(--muted)}
+    thead th{font-size:13px;padding:10px 12px;background:rgba(255,255,255,0.04);
+      border-bottom:1px solid rgba(255,255,255,0.03);text-align:left
+    }
+    tbody td{padding:12px;border-bottom:1px dashed rgba(255,255,255,0.03);font-size:14px}
+
+    .actions{display:flex;gap:8px}
+    .btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
     .btn-verify{background:linear-gradient(90deg,var(--accent-emerald),var(--accent-neon));color:#05220f}
-    .btn-reject{background:transparent;border:1px solid rgba(255,255,255,0.08);color:var(--muted)}
-
-    .hint{margin-top:12px;font-weight:600;color:rgba(255,255,255,0.85)}
-    .logout{margin-top:14px;padding:10px 14px;border-radius:10px;background:linear-gradient(90deg,#a63a2b,var(--accent-gold));border:none;color:#06160d;font-weight:800}
-
-    @media (max-width:720px){
-      .top{flex-direction:column;align-items:flex-start}
-      .search input{width:100%}
-      .student-list{grid-template-columns:1fr}
+    .btn-reject{background:transparent;border:1px solid rgba(255,255,255,0.08);color:#fff}
+    .btn-logout{background:linear-gradient(90deg,#a63a2b,var(--accent-gold));
+      padding:10px 14px;border-radius:10px;color:#06160d;font-weight:700
     }
+
+    .stats{display:flex;flex-direction:column;gap:12px}
+    .stat-item{padding:12px;border-radius:10px;background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.03)
+    }
+    .stat-item h4{margin-bottom:6px;font-size:13px;color:rgba(255,255,255,0.9)}
+    .stat-big{font-size:20px;font-weight:700;color:var(--accent-neon)}
+
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+    @media(max-width:520px){
+      body{padding:14px}
+      header{flex-direction:column;align-items:flex-start}
+      thead{display:none}
+      table,tbody,tr,td{display:block;width:100%}
+      tbody td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.04)}
+    }
+
+    .row:hover{transform:translateY(-4px);transition:.15s}
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="top">
-      <div class="brand">
-        <div class="logo">🌱</div>
-        <div>
-          <h1>Teacher Verification</h1>
-          <div class="subtitle">Approve students for your assigned grade & section</div>
-        </div>
-      </div>
 
-      <div class="controls">
-        <div id="teacherInfo" class="teacherInfo">Loading your grade & section…</div>
-        <div class="search"><input id="searchInput" type="text" placeholder="Search students by name or email (optional)" /></div>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo-circle">📘</div>
+      <div>
+        <h1>ECOTrack — Teacher Panel</h1>
+        <div class="subtitle">Student Approvals • Assigned Class Only</div>
       </div>
     </div>
+  </header>
 
-    <div class="panel">
-      <div id="studentList" class="student-list" aria-live="polite">Loading students…</div>
-
-      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
-        <button id="logoutBtn" class="logout">Log Out</button>
-      </div>
+  <div class="top-controls">
+    <div class="search">
+      <input id="searchInput" placeholder="Search students by name or email" />
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <div class="pill" id="assignedInfo">Loading…</div>
+      <button id="logoutBtn" class="btn btn-logout">Log Out</button>
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import {
-      getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  <div class="grid">
+    <div class="panel card">
+      <h3 style="margin-bottom:12px">Pending Students</h3>
 
-    const firebaseConfig = {
-  apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
-  authDomain: "registar-5f3fb.firebaseapp.com",
-  projectId: "registar-5f3fb",
-  storageBucket: "registar-5f3fb.firebasestorage.app",
-  messagingSenderId: "856198150739",
-  appId: "1:856198150739:web:801000f564b47f6333e4a6"
-};
+      <div style="overflow:auto;max-height:56vh">
+        <table id="pendingTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Grade</th>
+              <th>Section</th>
+              <th>Email</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody><tr><td colspan="5" style="text-align:center">Loading…</td></tr></tbody>
+        </table>
+      </div>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+      <h3 style="margin-top:18px">Approved Students</h3>
+      <div style="overflow:auto;max-height:28vh;margin-top:8px">
+        <table id="approvedTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Grade</th>
+              <th>Section</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody><tr><td colspan="5" style="text-align:center">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
 
-    const studentList = document.getElementById('studentList');
-    const searchInput = document.getElementById('searchInput');
-    const teacherInfo = document.getElementById('teacherInfo');
-    const logoutBtn = document.getElementById('logoutBtn');
+    <aside class="stats">
+      <div class="stat-item">
+        <h4>Pending Count</h4>
+        <div class="stat-big" id="totalPending">—</div>
+      </div>
 
-    let teacherGrade = ""; let teacherSection = ""; let pendingStudents = []; let currentUser = null;
+      <div class="stat-item">
+        <h4>Quick Tools</h4>
+        <button id="refreshBtn" class="btn" style="margin-top:8px;background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)">Refresh</button>
+      </div>
 
-    onAuthStateChanged(auth, async (user)=>{
-      if (!user){ window.location.href='index.html'; return; }
-      currentUser = user;
-      try{
-        const tdoc = await getDoc(doc(db,'teachers',user.uid));
-        if (!tdoc.exists()){ alert('Teacher account not found or not approved. Contact admin.'); await signOut(auth); window.location.href='index.html'; return; }
-        const t = tdoc.data(); if (!t.verified && t.verified !== true){ alert('Your account is not approved by admin yet.'); await signOut(auth); window.location.href='index.html'; return; }
-        teacherGrade = String(t.grade||'').trim(); teacherSection = String(t.section||'').trim(); teacherInfo.innerText = `Assigned: ${teacherGrade} • ${teacherSection}`;
-        await loadPendingStudents();
-      }catch(err){ console.error('Error loading teacher data:',err); alert('Error loading data — check console.'); await signOut(auth); window.location.href='index.html'; }
+      <div class="stat-item">
+        <h4>Note</h4>
+        <div style="font-size:13px;color:rgba(255,255,255,0.7)">You can only verify students assigned to your grade & section.</div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore, collection, query, where, getDocs, doc, getDoc,
+    setDoc, updateDoc, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
+    authDomain: "registar-5f3fb.firebaseapp.com",
+    projectId: "registar-5f3fb",
+    storageBucket: "registar-5f3fb.firebasestorage.app",
+    messagingSenderId: "856198150739",
+    appId: "1:856198150739:web:801000f564b47f6333e4a6"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const pendingTbody = document.querySelector("#pendingTable tbody");
+  const approvedTbody = document.querySelector("#approvedTable tbody");
+  const searchInput = document.getElementById("searchInput");
+  const assignedInfo = document.getElementById("assignedInfo");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const refreshBtn = document.getElementById("refreshBtn");
+  const totalPendingEl = document.getElementById("totalPending");
+
+  let teacherGrade = "";
+  let teacherSection = "";
+  let pendingList = [];
+
+  onAuthStateChanged(auth, async (user)=>{
+    if (!user) { window.location.href = "index.html"; return; }
+
+    const tdoc = await getDoc(doc(db,"teachers",user.uid));
+    if (!tdoc.exists() || !tdoc.data().verified){
+      alert("You are not an approved teacher.");
+      await signOut(auth);
+      window.location.href="index.html";
+      return;
+    }
+
+    const t = tdoc.data();
+    teacherGrade = String(t.grade||"").trim();
+    teacherSection = String(t.section||"").trim();
+    assignedInfo.innerText = `Grade ${teacherGrade} • ${teacherSection}`;
+
+    await loadPending();
+    await loadApproved();
+  });
+
+  async function loadPending(){
+    pendingTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">Loading…</td></tr>`;
+
+    const q = query(collection(db,"verificationRequests"), where("status","==","pending"));
+    const snap = await getDocs(q);
+
+    pendingList = [];
+    snap.forEach(s => pendingList.push({ id: s.id, ...s.data() }));
+
+    pendingList = pendingList.filter(s =>
+      (s.grade||"").toLowerCase() === teacherGrade.toLowerCase() &&
+      (s.section||"").toLowerCase().trim() === teacherSection.toLowerCase().trim()
+    );
+
+    renderPending(pendingList);
+  }
+
+  function renderPending(list){
+    const term = searchInput.value.toLowerCase().trim();
+
+    const filtered = list.filter(s=>{
+      const full = `${s.firstName||""} ${s.lastName||""}`.toLowerCase();
+      return full.includes(term) || (s.email||"").toLowerCase().includes(term);
     });
 
-    async function loadPendingStudents(){
-      studentList.innerHTML = `<p style="text-align:center">Loading…</p>`;
-      try{
-        const q = query(collection(db,'verificationRequests'), where('status','==','pending'));
-        const snap = await getDocs(q); pendingStudents = [];
-        snap.forEach(s=> pendingStudents.push({ id: s.id, ...s.data() }));
+    totalPendingEl.innerText = filtered.length;
 
-        const normalize = g=> String(g||'').toLowerCase().replace(/\s+/g,'');
-        const tg = normalize(teacherGrade); const ts = String(teacherSection||'').toLowerCase().trim();
-
-        pendingStudents = pendingStudents.filter(s=>{ const sg = normalize(s.grade); const ss = String(s.section||'').toLowerCase().trim(); return sg===tg && ss===ts; });
-        renderStudents(pendingStudents);
-      }catch(err){ console.error('Failed to load pending students:',err); studentList.innerHTML = `<p style="text-align:center">Failed to load students. Check console.</p>`; }
+    if (filtered.length===0){
+      pendingTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">No pending students.</td></tr>`;
+      return;
     }
 
-    function renderStudents(list){
-      const term = (searchInput.value||'').trim().toLowerCase();
-      const filtered = list.filter(s=>{ if (!term) return true; const name = (s.firstName||s.name||'') + ' ' + (s.lastName||''); return name.toLowerCase().includes(term) || (s.email||'').toLowerCase().includes(term); });
-      if (filtered.length===0){ studentList.innerHTML = `<p style="text-align:center">No pending requests for ${teacherGrade} • ${teacherSection}.</p>`; return; }
-      studentList.innerHTML = '';
-      filtered.forEach(s=>{
-        const div = document.createElement('div'); div.className = 'student-card';
-        div.innerHTML = `
-          <div>
-            <div class="student-name">${escapeHtml((s.firstName||s.name)||'Unnamed')} ${escapeHtml(s.middleInitial||'')} ${escapeHtml(s.lastName||'')}</div>
-            <div class="meta">Grade: ${escapeHtml(s.grade||'')} ${s.age? '• Age: '+escapeHtml(s.age): ''} • Section: ${escapeHtml(s.section||'')}</div>
-            <div class="meta">${escapeHtml(s.email||'')}</div>
+    pendingTbody.innerHTML = "";
+    filtered.forEach(s=>{
+      const tr = document.createElement("tr");
+      tr.className="row";
+      tr.innerHTML = `
+        <td>${escape(s.firstName||"")} ${escape(s.middleInitial||"")} ${escape(s.lastName||"")}</td>
+        <td>${escape(s.grade||"")}</td>
+        <td>${escape(s.section||"")}</td>
+        <td>${escape(s.email||"")}</td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-verify" data-id="${escape(s.studentId||s.id)}" data-req="${escape(s.id)}">Verify</button>
+            <button class="btn btn-reject" data-req="${escape(s.id)}">Reject</button>
           </div>
-          <div class="card-row">
-            <div class="card-actions">
-              <button class="btn btn-verify" data-req="${escapeHtml(s.id)}" data-id="${escapeHtml(s.studentId||s.id)}">Verify</button>
-              <button class="btn btn-reject" data-req="${escapeHtml(s.id)}">Reject</button>
-            </div>
-          </div>
-        `;
-        studentList.appendChild(div);
-      });
-      attachButtons();
+        </td>
+      `;
+      pendingTbody.appendChild(tr);
+    });
+
+    attachButtons();
+  }
+
+  function attachButtons(){
+    document.querySelectorAll(".btn-verify").forEach(btn=>{
+      btn.onclick = async ()=>{
+        const reqId = btn.dataset.req;
+        const studentId = btn.dataset.id;
+
+        const ref = doc(db,"verificationRequests",reqId);
+        const snap = await getDoc(ref);
+        if (!snap.exists()) return;
+
+        const d = snap.data();
+
+        await setDoc(doc(db,"students",studentId),{
+          studentId,
+          firstName:d.firstName||"",
+          middleInitial:d.middleInitial||"",
+          lastName:d.lastName||"",
+          email:d.email||"",
+          grade:d.grade||"",
+          section:d.section||"",
+          age:d.age||null,
+          verified:true,
+          verifiedAt:serverTimestamp()
+        });
+
+        await updateDoc(ref,{status:"approved", reviewedAt:serverTimestamp()});
+
+        await loadPending();
+        await loadApproved();
+      };
+    });
+
+    document.querySelectorAll(".btn-reject").forEach(btn=>{
+      btn.onclick = async ()=>{
+        const reqId = btn.dataset.req;
+        if (!confirm("Reject this student?")) return;
+
+        await updateDoc(doc(db,"verificationRequests",reqId),{
+          status:"rejected",
+          reviewedAt:serverTimestamp()
+        });
+
+        await loadPending();
+      };
+    });
+  }
+
+  async function loadApproved(){
+    approvedTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">Loading…</td></tr>`;
+
+    const q = query(collection(db,"students"), where("verified","==",true));
+    const snap = await getDocs(q);
+
+    let list = [];
+    snap.forEach(s => list.push(s.data()));
+
+    list = list.filter(s =>
+      (s.grade||"").toLowerCase() === teacherGrade.toLowerCase() &&
+      (s.section||"").toLowerCase().trim() === teacherSection.toLowerCase().trim()
+    );
+
+    if (list.length===0){
+      approvedTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">No verified students yet.</td></tr>`;
+      return;
     }
 
-    function attachButtons(){
-      document.querySelectorAll('.btn-verify').forEach(btn=>{
-        btn.onclick = async ()=>{
-          const reqId = btn.dataset.req; const studentId = btn.dataset.id; btn.disabled = true;
-          try{
-            const reqRef = doc(db,'verificationRequests',reqId); const reqSnap = await getDoc(reqRef); if (!reqSnap.exists()){ alert('Request missing.'); return; }
-            const data = reqSnap.data();
-            await setDoc(doc(db,'students',studentId),{
-              studentId, firstName: data.firstName||data.name||'', middleInitial: data.middleInitial||'', lastName: data.lastName||'', email: data.email||'', grade: data.grade||'', section: data.section||'', age: data.age||null, verified:true, verifiedBy: currentUser.uid, verifiedAt: serverTimestamp(), createdAt: data.requestedAt || serverTimestamp()
-            });
-            await updateDoc(reqRef,{status:'approved', reviewedAt: serverTimestamp(), reviewedBy: currentUser.uid});
-            await loadPendingStudents();
-          }catch(err){ console.error('Verify failed:',err); alert('Failed to verify: '+(err.message||err)); btn.disabled = false; }
-        }
-      });
+    approvedTbody.innerHTML = "";
+    list.forEach(d=>{
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${escape(d.firstName||"")} ${escape(d.middleInitial||"")} ${escape(d.lastName||"")}</td>
+        <td>${escape(d.email||"")}</td>
+        <td>${escape(d.grade||"")}</td>
+        <td>${escape(d.section||"")}</td>
+        <td>Verified</td>
+      `;
+      approvedTbody.appendChild(tr);
+    });
+  }
 
-      document.querySelectorAll('.btn-reject').forEach(btn=>{
-        btn.onclick = async ()=>{
-          const reqId = btn.dataset.req; if (!confirm('Reject this verification request?')) return;
-          try{ await updateDoc(doc(db,'verificationRequests',reqId),{status:'rejected', reviewedAt: serverTimestamp(), reviewedBy: currentUser.uid}); await loadPendingStudents(); }catch(err){ console.error('Reject failed:',err); alert('Failed to reject: '+(err.message||err)); }
-        }
-      });
-    }
+  searchInput.addEventListener("input", ()=>renderPending(pendingList));
+  refreshBtn.addEventListener("click", async ()=>{ await loadPending(); await loadApproved(); });
 
-    searchInput.addEventListener('input', ()=> renderStudents(pendingStudents));
-    logoutBtn.addEventListener('click', async ()=>{ await signOut(auth); window.location.href='index.html'; });
+  logoutBtn.addEventListener("click", async ()=>{
+    await signOut(auth);
+    window.location.href = "index.html";
+  });
 
-    function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
-  </script>
+  function escape(s){
+    return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+  }
+</script>
+
 </body>
 </html>
