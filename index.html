@@ -1,77 +1,537 @@
 <!DOCTYPE html>
-overflow:hidden;
-box-shadow:0 0 6px rgba(0,255,150,0.4);
-}
-.energy-fill {
-height:100%; width:0%;
-background:linear-gradient(90deg,#8ef5c0,#46ffb6,#00e38e);
-animation: energyLoad 3s infinite ease-in-out;
-}
-@keyframes energyLoad {
-0% { width:0%; }
-50% { width:100%; }
-100% { width:0%; }
-}
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECOTrack | Sign In & Sign Up</title>
 
+  <style>
+    * { box-sizing: border-box; font-family: "Poppins", sans-serif; }
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(145deg, #072e1c, #0f5132, #198754);
+      color: #fff;
+    }
 
-/* Responsive */
-@media(max-width:480px){
-.nav-btn { padding:8px 14px; font-size:13px; }
-.energy-bar { height:12px; }
-}
+    /* Card (mix of dark-eco + minimal professional) */
+    .container {
+      width: 380px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 25px;
+      padding: 35px;
+      box-shadow: 0 25px 45px rgba(0,0,0,0.45);
+      backdrop-filter: blur(12px);
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.25);
+      animation: fadeIn 0.7s ease;
+    }
 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-</style>
+    h1 {
+      color: #8ef5c0;
+      margin-bottom: 25px;
+      letter-spacing: 1px;
+      font-size: 34px;
+      font-weight: 700;
+      text-shadow: 0 0 10px rgba(0,255,180,0.4);
+    }
+
+    form { display: flex; flex-direction: column; gap: 12px; }
+
+    input, select {
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      font-size: 15px;
+      color: #eafff4;
+      transition: 0.3s;
+    }
+    input::placeholder, select { color: #d8f5e7; }
+
+    input:focus, select:focus {
+      border-color:#8ef5c0;
+      box-shadow:0 0 0 3px rgba(142,245,192,0.25);
+    }
+
+    button {
+      background: #198754;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.25s;
+      font-weight: 600;
+    }
+    button:hover { background:#13633e; }
+
+    .hidden { display: none; }
+
+    .role-btn {
+      background: rgba(255,255,255,0.15);
+      border:none;
+      border-radius:30px;
+      padding:10px 18px;
+      margin:0 4px; cursor:pointer;
+      font-size:14px;
+      transition:0.25s;
+      color:#e7fff5;
+      border:1px solid rgba(255,255,255,0.25);
+    }
+    .role-btn.active {
+      background:#8ef5c0;
+      color:#003b1f;
+      box-shadow: 0 0 10px rgba(142,245,192,0.45);
+    }
+    .role-btn:hover { transform: translateY(-2px); }
+
+    .switch { cursor:pointer; font-size:14px; color:#8ef5c0; margin-top:5px; }
+
+    small.note { color:#c8ffe3; display:block; margin-top:6px; font-size:12px; opacity:0.9; }
+  
+
+    /* Animated ECOTrack Logo */
+    .logo-container {
+      display:flex;
+      justify-content:center;
+      margin-bottom:15px;
+    }
+
+    .eco-logo {
+      width:60px;
+      height:60px;
+      border-radius:50%;
+      background: radial-gradient(circle, #8ef5c0 20%, #0f5132 80%);
+      position: relative;
+      box-shadow:0 0 20px rgba(142,245,192,0.6);
+      animation: pulse 2.5s infinite ease-in-out;
+    }
+
+    .eco-logo::before {
+      content:"";
+      position:absolute;
+      inset:12px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.35);
+      filter:blur(4px);
+    }
+
+    @keyframes pulse {
+      0%,100% { transform:scale(1); box-shadow:0 0 20px rgba(142,245,192,0.5); }
+      50% { transform:scale(1.12); box-shadow:0 0 30px rgba(142,245,192,0.9); }
+    }
+
+    /* Leaf Animation */
+    .eco-leaf {
+      position:absolute;
+      width:22px;
+      height:22px;
+      background:#8ef5c0;
+      border-radius:0 50% 0 50%;
+      top:-8px;
+      right:-6px;
+      transform-origin:bottom left;
+      animation: leaf-wiggle 2s ease-in-out infinite;
+      box-shadow:0 0 10px rgba(142,245,192,0.8);
+    }
+
+    @keyframes leaf-wiggle {
+      0%,100% { transform:rotate(0deg); }
+      50% { transform:rotate(14deg); }
+    }
+
+    /* Rotating Ring */
+    .eco-ring {
+      position:absolute;
+      width:80px;
+      height:80px;
+      border-radius:50%;
+      border:3px solid rgba(142,245,192,0.35);
+      top:-10px;
+      left:-10px;
+      animation: spin 6s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform:rotate(0deg); }
+      to { transform:rotate(360deg); }
+    }
+
+    /* Earth Animation */
+    .eco-earth {
+      position:absolute;
+      width:26px;
+      height:26px;
+      border-radius:50%;
+      background: radial-gradient(circle, #4fd4ff, #0a4660);
+      bottom:-6px;
+      left:-6px;
+      animation: orbit 4.5s linear infinite;
+      box-shadow:0 0 10px rgba(79,212,255,0.7);
+    }
+
+    @keyframes orbit {
+      0% { transform: translate(0,0); }
+      25% { transform: translate(40px,0); }
+      50% { transform: translate(40px,40px); }
+      75% { transform: translate(0,40px); }
+      100% { transform: translate(0,0); }
+    }
+    
+    /* --- Glowing ECOTrack Text Animation --- */
+    h1 {
+      animation: text-glow 3s ease-in-out infinite;
+    }
+    @keyframes text-glow {
+      0%,100% { text-shadow:0 0 10px #8ef5c0, 0 0 25px #46ffb6; }
+      50% { text-shadow:0 0 20px #9ffff0, 0 0 40px #7effd4; }
+    }
+
+    /* --- Rotating Leaf Particles --- */
+    .leaf-particles { position:relative; width:100%; height:0; }
+    .leaf {
+      width:14px; height:14px;
+      background:#8ef5c0;
+      border-radius:0 50% 0 50%;
+      position:absolute;
+      opacity:0.7;
+      animation: spin-leaf 6s linear infinite;
+    }
+    .p1 { top:-20px; left:20px; animation-duration:7s; }
+    .p2 { top:-25px; right:20px; animation-duration:5s; }
+    .p3 { top:-10px; left:50%; animation-duration:8s; }
+
+    @keyframes spin-leaf {
+      from { transform:rotate(0deg) translateX(20px) rotate(0deg); }
+      to { transform:rotate(360deg) translateX(20px) rotate(-360deg); }
+    }
+
+    /* --- Water Droplet Shine Animation --- */
+    .eco-logo::after {
+      content:"";
+      position:absolute;
+      width:18px; height:18px;
+      top:5px; left:5px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.6);
+      filter:blur(3px);
+      animation: droplet 2.8s infinite ease-in-out;
+    }
+    @keyframes droplet {
+      0% { transform:translate(0,0) scale(1); opacity:0.8; }
+      50% { transform:translate(20px,20px) scale(1.2); opacity:0.3; }
+      100% { transform:translate(0,0) scale(1); opacity:0.8; }
+    }
+
+    /* --- Neon Eco Outline --- */
+    .container {
+      box-shadow:0 0 25px rgba(0,255,150,0.4), 0 0 45px rgba(0,255,150,0.2);
+      border:2px solid rgba(142,245,192,0.6);
+    }
+
+    /* --- Loading Animation Version of the Logo --- */
+    .eco-logo.loading {
+      animation: pulse 1.2s infinite alternate, spin-load 1.5s linear infinite;
+    }
+    @keyframes spin-load {
+      from { transform:rotate(0deg); }
+      to { transform:rotate(360deg); }
+    }
+
+  
+
+    /* --- Sparkling Particles --- */
+    .spark-container {
+      position: absolute;
+      width: 100%; height: 100px;
+      top: -10px; left: 0;
+      pointer-events: none;
+    }
+    .spark {
+      width: 6px; height: 6px;
+      background: #d0ffe6;
+      border-radius: 50%;
+      position: absolute;
+      filter: blur(1px);
+      animation: sparkle 3s infinite ease-in-out;
+      opacity: 0.8;
+    }
+    .s1 { left: 40px; animation-duration: 2.8s; }
+    .s2 { left: 120px; animation-duration: 3.5s; }
+    .s3 { right: 40px; animation-duration: 2.5s; }
+    .s4 { right: 110px; animation-duration: 4s; }
+    .s5 { left: 50%; animation-duration: 3.2s; }
+
+    @keyframes sparkle {
+      0%,100% { opacity: .3; transform: translateY(0) scale(1); }
+      50% { opacity: 1; transform: translateY(-12px) scale(1.4); }
+    }
+
+    /* --- Animated Vines Wrapping Card --- */
+    .container::before,
+    .container::after {
+      content: "";
+      position: absolute;
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      border: 3px solid rgba(142,245,192,0.5);
+      pointer-events: none;
+      animation: vine-wrap 6s infinite ease-in-out;
+      filter: blur(1px);
+    }
+
+    .container::before {
+      top: -40px; left: -40px;
+      animation-delay: 0s;
+    }
+
+    .container::after {
+      bottom: -40px; right: -40px;
+      animation-delay: 3s;
+    }
+
+    @keyframes vine-wrap {
+      0%,100% { transform: rotate(0deg) scale(1); opacity: .4; }
+      50% { transform: rotate(20deg) scale(1.1); opacity: .8; }
+    }
+
+    /* --- Soft Mist Behind Logo --- */
+    .eco-logo::before {
+      content: "";
+      position: absolute;
+      width: 110px; height: 110px;
+      top: -25px; left: -25px;
+      background: radial-gradient(circle, rgba(200,255,230,0.25), rgba(0,0,0,0) 70%);
+      filter: blur(20px);
+      animation: mist-float 5s ease-in-out infinite;
+    }
+
+    @keyframes mist-float {
+      0%,100% { transform: translateY(0); opacity:.7; }
+      50% { transform: translateY(-10px); opacity:1; }
+    }
+
+  
+
+    /* --- Firefly-like Eco Particles --- */
+    .firefly {
+      position:absolute;
+      width:8px; height:8px;
+      background:#b8ffd9;
+      border-radius:50%;
+      filter:blur(2px);
+      opacity:.8;
+      animation: firefly-move 6s infinite ease-in-out;
+    }
+    @keyframes firefly-move {
+      0% { transform:translate(0,0); opacity:.4; }
+      25% { transform:translate(20px,-15px); opacity:1; }
+      50% { transform:translate(-10px,10px); opacity:.6; }
+      75% { transform:translate(15px,5px); opacity:1; }
+      100% { transform:translate(0,0); opacity:.4; }
+    }
+
+    /* --- Growing Vine Tendrils (corners) --- */
+    .vine-tendril {
+      position:absolute;
+      width:0; height:3px;
+      background:#8ef5c0;
+      animation: grow-vine 4s infinite alternate ease-in-out;
+      border-radius:3px;
+      box-shadow:0 0 10px #8ef5c0;
+    }
+    .vine-top-left { top:0; left:0; animation-delay:0s; }
+    .vine-top-right { top:0; right:0; animation-delay:1s; }
+    .vine-bottom-left { bottom:0; left:0; animation-delay:2s; }
+    .vine-bottom-right { bottom:0; right:0; animation-delay:3s; }
+
+    @keyframes grow-vine {
+      0% { width:0; opacity:.3; }
+      100% { width:80px; opacity:1; }
+    }
+
+    /* --- Motion Responsive Mist --- */
+    .mist-layer {
+      position:absolute;
+      width:200px; height:200px;
+      top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      background:radial-gradient(circle, rgba(200,255,230,0.25), transparent 70%);
+      filter:blur(35px);
+      pointer-events:none;
+      transition: transform .3s ease-out;
+    }
+
+    /* --- Particle Burst On Logo Click --- */
+    .burst-particle {
+      position:absolute;
+      width:6px; height:6px;
+      background:#8ef5c0;
+      border-radius:50%;
+      pointer-events:none;
+      animation: burst 0.8s forwards ease-out;
+    }
+    @keyframes burst {
+      from { opacity:1; transform:scale(1); }
+      to { opacity:0; transform:scale(3) translateY(-20px); }
+    }
+
+    /* --- ECOTrack Intro Animation Screen --- */
+    #intro-screen {
+      position:fixed;
+      inset:0;
+      background:linear-gradient(145deg,#0b3f29,#0f684a,#198754);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      z-index:9999;
+      animation: intro-fade 3s forwards;
+    }
+    #intro-logo {
+      width:90px; height:90px;
+      border-radius:50%;
+      background:radial-gradient(circle,#8ef5c0 20%,#0f5132 80%);
+      animation: intro-pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes intro-fade {
+      0% { opacity:1; }
+      80% { opacity:1; }
+      100% { opacity:0; visibility:hidden; }
+    }
+    @keyframes intro-pulse {
+      0%,100% { transform:scale(1); box-shadow:0 0 20px rgba(142,245,192,0.5); }
+      50% { transform:scale(1.15); box-shadow:0 0 30px rgba(142,245,192,0.9); }
+    }
+
+    /* Responsive adjustments */
+    @media(max-width:480px) {
+      .container { width:90%; padding:25px; }
+      h1 { font-size:26px; }
+      .eco-logo { width:50px; height:50px; }
+    }
+
+  
+
+    /* --- Smooth Page Transitions --- */
+    .fade-page {
+      animation: fadePage 0.6s ease forwards;
+    }
+    @keyframes fadePage {
+      from { opacity:0; transform:translateY(10px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    /* --- Animated Navigation Buttons --- */
+    .nav-btn {
+      display:inline-block;
+      padding:10px 18px;
+      background:#198754;
+      color:white;
+      border-radius:10px;
+      margin:8px;
+      cursor:pointer;
+      font-size:14px;
+      transition:0.3s;
+      box-shadow:0 0 10px rgba(0,255,150,0.4);
+    }
+    .nav-btn:hover {
+      transform:translateY(-4px) scale(1.05);
+      box-shadow:0 0 15px rgba(0,255,150,0.7);
+    }
+
+    /* --- Seasonal Themes (Spring, Rainforest, Night-Glow) --- */
+    body.spring {
+      background:linear-gradient(135deg,#bbffcf,#6fff99);
+    }
+    body.rainforest {
+      background:linear-gradient(135deg,#034d2c,#007c4f,#00a86b);
+    }
+    body.nightglow {
+      background:linear-gradient(135deg,#020e07,#00331f,#00996a);
+      box-shadow:inset 0 0 80px rgba(0,255,150,0.25);
+    }
+
+    /* --- Eco-Energy Meter Loading Bar --- */
+    .energy-bar {
+      width:100%; height:14px;
+      background:rgba(255,255,255,0.2);
+      border-radius:20px;
+      margin-top:20px;
+      overflow:hidden;
+      box-shadow:0 0 6px rgba(0,255,150,0.4);
+    }
+    .energy-fill {
+      height:100%; width:0%;
+      background:linear-gradient(90deg,#8ef5c0,#46ffb6,#00e38e);
+      animation: energyLoad 3s infinite ease-in-out;
+    }
+    @keyframes energyLoad {
+      0% { width:0%; }
+      50% { width:100%; }
+      100% { width:0%; }
+    }
+
+    /* Responsive */
+    @media(max-width:480px){
+      .nav-btn { padding:8px 14px; font-size:13px; }
+      .energy-bar { height:12px; }
+    }
+
+  </style>
 </head>
 <body>
 
-
 <div class="container">
-<div class="logo-container">
-<div class="eco-logo">
-<div class="eco-leaf"></div>
-<div class="eco-ring"></div>
-<div class="eco-earth"></div>
-</div>
-</div>
-<h1>ECOTrack</h1>
+  <div class="logo-container">
+    <div class="eco-logo">
+      <div class="eco-leaf"></div>
+      <div class="eco-ring"></div>
+      <div class="eco-earth"></div>
+    </div>
+  </div>
+  <h1>ECOTrack</h1>
 
+  <!-- Sparkling Particles -->
+  <div class="spark-container">
+    <div class="spark s1"></div>
+    <div class="spark s2"></div>
+    <div class="spark s3"></div>
+    <div class="spark s4"></div>
+    <div class="spark s5"></div>
+  </div>
 
-<!-- Sparkling Particles -->
-<div class="spark-container">
-<div class="spark s1"></div>
-<div class="spark s2"></div>
-<div class="spark s3"></div>
-<div class="spark s4"></div>
-<div class="spark s5"></div>
-</div>
+  <!-- Rotating Leaf Particles (already present) -->
+  <div class="leaf-particles">
+    <div class="leaf p1"></div>
+    <div class="leaf p2"></div>
+    <div class="leaf p3"></div>
+  </div>
 
+  <!-- Rotating Leaf Particles -->
+  <div class="leaf-particles">
+    <div class="leaf p1"></div>
+    <div class="leaf p2"></div>
+    <div class="leaf p3"></div>
+  </div>
 
-<!-- Rotating Leaf Particles (already present) -->
-<div class="leaf-particles">
-<div class="leaf p1"></div>
-<div class="leaf p2"></div>
-<div class="leaf p3"></div>
-</div>
+  <div>
+    <button id="studentBtn" class="role-btn active">Student</button>
+    <button id="teacherBtn" class="role-btn">Teacher</button>
+    <button id="adminBtn" class="role-btn">Admin</button>
+  </div>
 
-
-<!-- Rotating Leaf Particles -->
-<div class="leaf-particles">
-<div class="leaf p1"></div>
-<div class="leaf p2"></div>
-<div class="leaf p3"></div>
-</div>
-
-
-<div>
-<button id="studentBtn" class="role-btn active">Student</button>
-<button id="teacherBtn" class="role-btn">Teacher</button>
-<button id="adminBtn" class="role-btn">Admin</button>
-</div>
-
-
-<!-- Original forms remain—this is only a visual update container! -->
-
+  <!-- Original forms remain—this is only a visual update container! -->
 
 </div>
 
@@ -411,7 +871,6 @@ adminSignin.addEventListener("submit", async (e) => {
 });
 
 </script>
-
 
 </body>
 </html>
