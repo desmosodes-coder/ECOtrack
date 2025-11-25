@@ -336,66 +336,6 @@
     .center { text-align:center; }
     .input-file { display:none; }
 
-    .navbar {
-    width: 100%;
-    background: var(--surface);
-    padding: 10px 20px;
-    position: sticky;
-    top: 0;
-    z-index: 9999;
-}
-
-.nav-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Make hamburger align right */
-.hamburger {
-    display: none;
-    flex-direction: column;
-    gap: 4px;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.hamburger span {
-    width: 25px;
-    height: 3px;
-    background: var(--text);
-    border-radius: 3px;
-}
-
-/* Show hamburger on mobile */
-@media (max-width: 768px) {
-    .hamburger {
-        display: flex;
-    }
-
-    .nav-menu {
-        position: absolute;
-        top: 65px;
-        right: 10px;
-        background: var(--surface);
-        flex-direction: column;
-        width: 200px;
-        padding: 10px;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        display: none;
-    }
-
-    .nav-menu.show {
-        display: flex;
-    }
-
-    .nav-menu li {
-        margin: 10px 0;
-    }
-}
-
     </style>
 </head>
 <body>
@@ -1510,15 +1450,6 @@
       if (e.key === 'Escape') hidePanel();
     });
 
-    </script>
-
-    <script>
-        const hamburger = document.getElementById("hamburger-menu");
-        const navMenu = document.getElementById("nav-menu");
-
-        hamburger.addEventListener("click", () => {
-        navMenu.classList.toggle("show");
-    });
     </script>
 
 </body>
