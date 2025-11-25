@@ -1,64 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ECOTrack | Sign In & Sign Up</title>
+overflow:hidden;
+box-shadow:0 0 6px rgba(0,255,150,0.4);
+}
+.energy-fill {
+height:100%; width:0%;
+background:linear-gradient(90deg,#8ef5c0,#46ffb6,#00e38e);
+animation: energyLoad 3s infinite ease-in-out;
+}
+@keyframes energyLoad {
+0% { width:0%; }
+50% { width:100%; }
+100% { width:0%; }
+}
 
-  <style>
-    * { box-sizing: border-box; font-family: "Poppins", sans-serif; }
-    body {
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: linear-gradient(135deg, #9be15d, #00e3ae);
-    }
-    .container {
-      width: 360px;
-      background: #fff;
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-      text-align: center;
-    }
-    h1 { color: #2e7d32; margin-bottom: 20px; }
-    form { display: flex; flex-direction: column; gap: 10px; }
-    input, select {
-      padding: 10px; border-radius: 8px;
-      border: 1px solid #ccc; font-size: 14px;
-    }
-    button {
-      background: #2e7d32; color: #fff;
-      border: none; padding: 10px;
-      border-radius: 8px; cursor: pointer;
-    }
-    button:hover { background:#1b5e20; }
-    .hidden { display: none; }
-    .role-btn {
-      background:#81c784; border:none;
-      border-radius:20px; padding:8px 16px;
-      margin:0 5px; cursor:pointer;
-    }
-    .role-btn.active { background:#2e7d32; color:white; }
-    .switch { cursor:pointer; font-size:14px; color:#00796b; margin-top:5px; }
-    small.note { color:#666; display:block; margin-top:6px; }
-  </style>
+
+/* Responsive */
+@media(max-width:480px){
+.nav-btn { padding:8px 14px; font-size:13px; }
+.energy-bar { height:12px; }
+}
+
+
+</style>
 </head>
 <body>
 
+
 <div class="container">
-  <h1>ECOTrack</h1>
+<div class="logo-container">
+<div class="eco-logo">
+<div class="eco-leaf"></div>
+<div class="eco-ring"></div>
+<div class="eco-earth"></div>
+</div>
+</div>
+<h1>ECOTrack</h1>
 
-  <!-- ROLE SWITCH -->
-  <div>
-    <button id="studentBtn" class="role-btn active">Student</button>
-    <button id="teacherBtn" class="role-btn">Teacher</button>
-    <button id="adminBtn" class="role-btn">Admin</button>
-  </div>
 
-  <!-- STUDENT SIGN IN -->
+<!-- Sparkling Particles -->
+<div class="spark-container">
+<div class="spark s1"></div>
+<div class="spark s2"></div>
+<div class="spark s3"></div>
+<div class="spark s4"></div>
+<div class="spark s5"></div>
+</div>
+
+
+<!-- Rotating Leaf Particles (already present) -->
+<div class="leaf-particles">
+<div class="leaf p1"></div>
+<div class="leaf p2"></div>
+<div class="leaf p3"></div>
+</div>
+
+
+<!-- Rotating Leaf Particles -->
+<div class="leaf-particles">
+<div class="leaf p1"></div>
+<div class="leaf p2"></div>
+<div class="leaf p3"></div>
+</div>
+
+
+<div>
+<button id="studentBtn" class="role-btn active">Student</button>
+<button id="teacherBtn" class="role-btn">Teacher</button>
+<button id="adminBtn" class="role-btn">Admin</button>
+</div>
+
+
+<!-- Original forms remain—this is only a visual update container! -->
+
+
+</div>
+
+<!-- STUDENT SIGN IN -->
   <form id="student-signin-form">
     <input id="signin-email" type="email" placeholder="Email" maxlength="30" required>
     <input id="signin-password" type="password" placeholder="Password" maxlength="22" required>
@@ -394,6 +411,7 @@ adminSignin.addEventListener("submit", async (e) => {
 });
 
 </script>
+
 
 </body>
 </html>
