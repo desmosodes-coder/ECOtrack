@@ -207,6 +207,135 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ===== Profile Slide-up Panel Styles ===== */
+    .profile-panel {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: -100%;
+      max-height: 92vh;
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,255,245,0.96));
+      color: #042a18;
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+      box-shadow: 0 -20px 40px rgba(3,60,37,0.25);
+      transition: bottom 360ms cubic-bezier(.2,.9,.2,1);
+      z-index: 99999;
+      padding: 18px;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .profile-panel.open { bottom: 0; }
+
+    /* header */
+    .profile-header {
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom: 12px;
+    }
+    .profile-left {
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+
+    .profile-avatar {
+      width:72px;
+      height:72px;
+      border-radius:50%;
+      background: linear-gradient(135deg,#e6fff3,#c8fbe6);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      border:3px solid rgba(6,62,37,0.06);
+      box-shadow:0 6px 18px rgba(6,62,37,0.08);
+    }
+    .profile-avatar img { width:100%; height:100%; object-fit:cover; }
+
+    .profile-name { font-weight:700; font-size:18px; color:#05321f; }
+    .profile-email { font-size:13px; color:#2f6a50; opacity:0.9; }
+
+    .profile-actions { display:flex; gap:8px; align-items:center; }
+
+    .btn-small {
+      padding:8px 12px;
+      border-radius:10px;
+      border: none;
+      cursor:pointer;
+      font-weight:600;
+      background:#198754;
+      color:white;
+      box-shadow: 0 6px 14px rgba(0,140,80,0.08);
+    }
+    .btn-ghost {
+      background:transparent;
+      border:1px solid rgba(6,62,37,0.08);
+      color:#05321f;
+    }
+
+    /* profile content grid */
+    .profile-grid {
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top:10px;
+    }
+
+    .profile-card {
+      background: white;
+      border-radius:12px;
+      padding:12px;
+      box-shadow: 0 6px 14px rgba(5,50,34,0.04);
+      border:1px solid rgba(6,62,37,0.03);
+    }
+    .profile-card h4 { margin:0 0 8px 0; color:#065033; font-size:14px; }
+    .profile-field { width:100%; padding:8px; border-radius:8px; border:1px solid rgba(6,62,37,0.06); font-size:14px; }
+
+    .profile-footer {
+      margin-top:12px;
+      display:flex;
+      gap:8px;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .toggle {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      cursor:pointer;
+    }
+    .toggle input { width: 18px; height:18px; }
+
+    /* small screens adjustments */
+    @media (max-width:720px) {
+      .profile-grid { grid-template-columns: 1fr; }
+      .profile-avatar { width:64px; height:64px; }
+      .profile-panel { padding:12px; }
+      .btn-small { padding:8px 10px; font-size:14px; }
+    }
+
+    /* overlay behind panel */
+    .profile-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.36);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity 240ms ease;
+      z-index: 99998;
+    }
+    .profile-overlay.show { opacity:1; pointer-events:all; }
+
+    /* small helper styles */
+    .muted { color:#476b59; font-size:13px; }
+    .center { text-align:center; }
+    .input-file { display:none; }
+
     </style>
 </head>
 <body>
@@ -214,7 +343,7 @@
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <a href="index.html" class="logo-link">
+                <a href="#" class="logo-link" id="logoTrigger">
                 <span class="logo-icon">🌱</span>
                 <span class="logo-text" data-testid="app-title">ECOTrack</span>
                 </a>
@@ -826,6 +955,82 @@
 
     </main>
 
+     <!-- Profile Overlay and Panel -->
+  <div id="profileOverlay" class="profile-overlay" aria-hidden="true"></div>
+
+  <aside id="profilePanel" class="profile-panel" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="profile-header">
+      <div class="profile-left">
+        <label for="profileImageInput" title="Change profile picture" style="cursor:pointer;">
+          <div class="profile-avatar" id="profileAvatar" aria-hidden="true">
+            <!-- image injected by JS -->
+            <img src="" alt="Profile picture" id="profileAvatarImg" style="display:none;">
+            <div id="profileInitials" style="font-weight:700;color:#0b3f25;font-size:22px;">ET</div>
+          </div>
+        </label>
+        <input type="file" id="profileImageInput" accept="image/*" class="input-file">
+
+        <div>
+          <div class="profile-name" id="profileFullName">Loading...</div>
+          <div class="profile-email" id="profileEmail">—</div>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <button id="editProfileBtn" class="btn-small btn-ghost">Edit</button>
+        <button id="logoutBtn" class="btn-small">Logout</button>
+        <button id="closeProfile" class="btn-small btn-ghost">Close</button>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+      <div class="profile-card">
+        <h4>Personal Details</h4>
+        <input id="fieldFullName" class="profile-field" placeholder="Full name" />
+        <input id="fieldEmail" class="profile-field" placeholder="Email" disabled />
+        <input id="fieldAge" class="profile-field" type="number" placeholder="Age" min="1" />
+      </div>
+
+      <div class="profile-card">
+        <h4>School Info</h4>
+        <select id="fieldGrade" class="profile-field">
+          <option value="">Select Grade</option>
+          <option>Grade 11</option>
+          <option>Grade 12</option>
+        </select>
+        <input id="fieldSection" class="profile-field" placeholder="Section / Advisory" />
+        <input id="fieldPoints" class="profile-field" placeholder="Points" readonly />
+        <div style="margin-top:8px;">
+          <div class="muted">Verification status: <strong id="fieldVerified">—</strong></div>
+        </div>
+      </div>
+
+      <div class="profile-card" style="grid-column:1 / -1;">
+        <h4>Account & Security</h4>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="saveProfileBtn" class="btn-small">Save Changes</button>
+          <button id="sendResetBtn" class="btn-small btn-ghost">Send Password Reset Email</button>
+          <button id="deleteAccountBtn" class="btn-small btn-ghost" style="background:#ffecec;color:#7a1b1b;border:1px solid rgba(255,0,0,0.06)">Delete Account</button>
+        </div>
+        <div style="margin-top:8px;" class="muted">Delete account will remove user authentication (requires admin action in Firestore cleanup). Use carefully.</div>
+      </div>
+    </div>
+
+    <div class="profile-footer">
+      <div>
+        <div class="toggle" id="themeToggle">
+          <input type="checkbox" id="themeCheckbox" />
+          <label for="themeCheckbox" class="muted">Dark Mode</label>
+        </div>
+      </div>
+
+      <div class="center">
+        <small class="muted">Last synced: <span id="lastSynced">—</span></small>
+      </div>
+    </div>
+
+  </aside>
+
     <!-- Notification -->
     <div class="notification" id="notification"></div>
 
@@ -917,53 +1122,333 @@
 <script src="filipino-translations.js"></script>
 
 <script type="module" defer>
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getStorage, ref as sRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
-            authDomain: "registar-5f3fb.firebaseapp.com",
-            projectId: "registar-5f3fb",
-            storageBucket: "registar-5f3fb.firebasestorage.app",
-            messagingSenderId: "856198150739",
-            appId: "1:856198150739:web:801000f564b47f6333e4a6"
+    // --- Use same config as your index.html ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
+      authDomain: "registar-5f3fb.firebaseapp.com",
+      projectId: "registar-5f3fb",
+      storageBucket: "registar-5f3fb.firebasestorage.app",
+      messagingSenderId: "856198150739",
+      appId: "1:856198150739:web:801000f564b47f6333e4a6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // UI refs
+    const logoTrigger = document.getElementById('logoTrigger');
+    const profilePanel = document.getElementById('profilePanel');
+    const profileOverlay = document.getElementById('profileOverlay');
+    const closeProfile = document.getElementById('closeProfile');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    const saveProfileBtn = document.getElementById('saveProfileBtn');
+    const sendResetBtn = document.getElementById('sendResetBtn');
+    const profileNotice = document.getElementById('profileNotice');
+    const profileAvatarImg = document.getElementById('profileAvatarImg');
+    const profileInitials = document.getElementById('profileInitials');
+    const profileImageInput = document.getElementById('profileImageInput');
+    const profileFullName = document.getElementById('profileFullName');
+    const profileEmail = document.getElementById('profileEmail');
+    const fieldFullName = document.getElementById('fieldFullName');
+    const fieldEmail = document.getElementById('fieldEmail');
+    const fieldAge = document.getElementById('fieldAge');
+    const fieldGrade = document.getElementById('fieldGrade');
+    const fieldSection = document.getElementById('fieldSection');
+    const fieldPoints = document.getElementById('fieldPoints');
+    const fieldVerified = document.getElementById('fieldVerified');
+    const lastSynced = document.getElementById('lastSynced');
+    const themeCheckbox = document.getElementById('themeCheckbox');
+    const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+
+    let currentUid = null;
+    let currentProfileDocPath = null; // 'students' or 'verificationRequests'
+    let currentProfileData = null;
+    let currentPhotoStorageRef = null;
+    let uploadedPhotoFile = null;
+
+    // show / hide helpers
+    function showPanel() {
+      profilePanel.classList.add('open');
+      profileOverlay.classList.add('show');
+      profilePanel.setAttribute('aria-hidden', 'false');
+      profileOverlay.setAttribute('aria-hidden', 'false');
+    }
+    function hidePanel() {
+      profilePanel.classList.remove('open');
+      profileOverlay.classList.remove('show');
+      profilePanel.setAttribute('aria-hidden', 'true');
+      profileOverlay.setAttribute('aria-hidden', 'true');
+    }
+    logoTrigger.addEventListener('click', (e) => { e.preventDefault(); showPanel(); loadProfile(); });
+
+    closeProfile.addEventListener('click', hidePanel);
+    profileOverlay.addEventListener('click', hidePanel);
+
+    // small notification
+    function showNotice(msg, ms = 2200) {
+      profileNotice.textContent = msg;
+      profileNotice.style.display = 'block';
+      setTimeout(()=> profileNotice.style.display = 'none', ms);
+    }
+
+    // safe set field values
+    function setVal(el, v) { if(!el) return; el.value = v ?? ''; }
+    function setText(el, v) { if(!el) return; el.textContent = v ?? '—'; }
+
+    // load profile: check students/{uid} then fallback to verificationRequests/{uid}
+    async function loadProfile() {
+      const user = auth.currentUser;
+      if (!user) {
+        // not signed in -> redirect to sign-in page
+        console.warn('No user signed in; redirecting to sign in...');
+        window.location.href = 'index.html';
+        return;
+      }
+      currentUid = user.uid;
+      // try students collection first
+      const studentsRef = doc(db, 'students', currentUid);
+      const studentSnap = await getDoc(studentsRef);
+      if (studentSnap.exists()) {
+        currentProfileDocPath = 'students';
+        currentProfileData = studentSnap.data();
+      } else {
+        // fallback to verificationRequests
+        const vrRef = doc(db, 'verificationRequests', currentUid);
+        const vrSnap = await getDoc(vrRef);
+        if (vrSnap.exists()) {
+          currentProfileDocPath = 'verificationRequests';
+          currentProfileData = vrSnap.data();
+        } else {
+          // still not found - create a minimal students doc using auth info
+          currentProfileDocPath = 'students';
+          currentProfileData = {
+            firstName: user.displayName || (user.email ? user.email.split('@')[0] : 'Student'),
+            lastName: '',
+            email: user.email,
+            age: null,
+            grade: '',
+            section: '',
+            verified: false,
+            points: 0,
+            photoURL: null
+          };
+          // don't auto-write until user saves; show the info
+        }
+      }
+
+      // fill UI
+      const fullName = (currentProfileData.firstName ?? '') + (currentProfileData.lastName ? ' ' + currentProfileData.lastName : '');
+      setText(profileFullName, fullName || (user.displayName || 'Student'));
+      setText(profileEmail, currentProfileData.email ?? user.email ?? '—');
+      setVal(fieldFullName, fullName);
+      setVal(fieldEmail, currentProfileData.email ?? user.email ?? '');
+      setVal(fieldAge, currentProfileData.age ?? '');
+      setVal(fieldGrade, currentProfileData.grade ?? '');
+      setVal(fieldSection, currentProfileData.section ?? '');
+      setVal(fieldPoints, String(currentProfileData.points ?? 0));
+      setText(fieldVerified, currentProfileData.verified ? 'Verified' : (currentProfileData.status ?? (currentProfileData.verified === false ? 'Not verified' : 'Pending')));
+      setText(lastSynced, new Date().toLocaleString());
+
+      // profile picture
+      const photoURL = currentProfileData.photoURL ?? null;
+      if (photoURL) {
+        profileAvatarImg.src = photoURL;
+        profileAvatarImg.style.display = '';
+        profileInitials.style.display = 'none';
+      } else {
+        // try storage lookup: expected location profiles/{uid}/profile.jpg
+        try {
+          const storageRef = sRef(storage, `profiles/${currentUid}/profile.jpg`);
+          const url = await getDownloadURL(storageRef);
+          profileAvatarImg.src = url;
+          profileAvatarImg.style.display = '';
+          profileInitials.style.display = 'none';
+        } catch (e) {
+          // no picture found; show initials
+          profileAvatarImg.style.display = 'none';
+          profileInitials.style.display = '';
+          const initials = (currentProfileData.firstName?.[0] ?? 'E') + (currentProfileData.lastName?.[0] ?? 'T');
+          profileInitials.textContent = initials.toUpperCase();
+        }
+      }
+
+      // disable edit by default
+      setEditable(false);
+    }
+
+    function setEditable(flag) {
+      const editableFields = [fieldFullName, fieldAge, fieldGrade, fieldSection];
+      editableFields.forEach(f => f.disabled = !flag);
+      if (flag) {
+        editProfileBtn.textContent = 'Cancel';
+        saveProfileBtn.style.display = '';
+      } else {
+        editProfileBtn.textContent = 'Edit';
+        // keep Save visible but if not editing maybe hide
+        // but we keep it visible to allow explicit saving
+      }
+    }
+
+    editProfileBtn.addEventListener('click', () => {
+      const editing = editProfileBtn.textContent === 'Edit';
+      setEditable(editing);
+    });
+
+    // image upload
+    profileImageInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      // small client-side validation
+      if (!file.type.startsWith('image/')) return alert('Please select an image file.');
+      uploadedPhotoFile = file;
+      // show preview immediately
+      const url = URL.createObjectURL(file);
+      profileAvatarImg.src = url;
+      profileAvatarImg.style.display = '';
+      profileInitials.style.display = 'none';
+    });
+
+    // save profile: upload image if present, then write to students/{uid}
+    saveProfileBtn.addEventListener('click', async () => {
+      if (!currentUid) return alert('User not loaded.');
+      try {
+        showNotice('Saving...');
+        // prepare data
+        const full = (fieldFullName.value || '').trim();
+        // try splitting first/last
+        let first = full, last = '';
+        const parts = full.split(' ').filter(Boolean);
+        if (parts.length >= 2) { first = parts.slice(0, -1).join(' '); last = parts.slice(-1).join(' '); }
+
+        const docRef = doc(db, 'students', currentUid);
+        const payload = {
+          firstName: first,
+          lastName: last,
+          email: fieldEmail.value || currentProfileData.email || auth.currentUser.email,
+          age: fieldAge.value ? Number(fieldAge.value) : null,
+          grade: fieldGrade.value || '',
+          section: fieldSection.value || '',
+          verified: currentProfileData.verified ?? false,
+          points: Number(fieldPoints.value || (currentProfileData.points ?? 0)),
+          updatedAt: serverTimestamp()
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        // if user uploaded a new picture, upload to storage first
+        if (uploadedPhotoFile) {
+          const pRef = sRef(storage, `profiles/${currentUid}/profile.jpg`);
+          await uploadBytes(pRef, uploadedPhotoFile);
+          const photoURL = await getDownloadURL(pRef);
+          payload.photoURL = photoURL;
+          // update avatar display to the new persistent URL
+          profileAvatarImg.src = photoURL;
+          uploadedPhotoFile = null;
+        }
 
-        // 🔒 Protect page: only verified students
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-            window.location.href = "index.html";
-            return;
-            }
+        // write or merge to students collection
+        await setDoc(docRef, payload, { merge: true });
 
-            try {
-            const studentDoc = await getDoc(doc(db, "students", user.uid));
-            if (!studentDoc.exists()) {
-                await signOut(auth);
-                window.location.href = "index.html";
-                return;
-            }
+        // also update the verificationRequests doc if exists (keep info in sync)
+        const vrRef = doc(db, 'verificationRequests', currentUid);
+        const vrSnap = await getDoc(vrRef);
+        if (vrSnap.exists()) {
+          await updateDoc(vrRef, {
+            firstName: payload.firstName,
+            lastName: payload.lastName,
+            email: payload.email,
+            requestedAt: vrSnap.data().requestedAt ?? serverTimestamp()
+          }).catch(()=>{/* ignore if failed */});
+        }
 
-            const studentData = studentDoc.data();
-            if (!studentData.verified) {
-                alert("Your account has not been verified by a teacher yet. Please wait for verification.");
-                await signOut(auth);
-                window.location.href = "index.html";
-                return;
-            }
+        // reload profile data
+        currentProfileData = { ...currentProfileData, ...payload };
+        setText(profileFullName, payload.firstName + (payload.lastName ? ' ' + payload.lastName : ''));
+        setText(profileEmail, payload.email);
+        setText(fieldVerified, payload.verified ? 'Verified' : 'Not verified');
+        setVal(fieldPoints, String(payload.points));
+        setText(lastSynced, new Date().toLocaleString());
+        setEditable(false);
+        showNotice('Saved ✓', 1600);
+      } catch (err) {
+        console.error(err);
+        alert('Failed to save profile: ' + (err.message || err));
+      }
+    });
 
-            console.log("✅ Verified student access granted:", studentData.name);
-            } catch (err) {
-            console.error(err);
-            await signOut(auth);
-            window.location.href = "index.html";
-            }
-        });
+    // logout
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        // redirect to index after sign out
+        window.location.href = 'index.html';
+      } catch (e) {
+        alert('Logout failed: ' + (e.message || e));
+      }
+    });
+
+    // send password reset email
+    sendResetBtn.addEventListener('click', async () => {
+      try {
+        const email = fieldEmail.value || (auth.currentUser && auth.currentUser.email);
+        if (!email) return alert('No email available to send reset.');
+        await sendPasswordResetEmail(auth, email);
+        showNotice('Password reset email sent', 2200);
+      } catch (e) {
+        console.error(e);
+        alert('Could not send reset email: ' + (e.message || e));
+      }
+    });
+
+    // delete account (auth delete requires reauth and admin; here we sign user out and hint)
+    deleteAccountBtn.addEventListener('click', () => {
+      const ok = confirm('Deleting account from frontend will only remove the Auth session. Full removal requires admin action. Continue and sign out?');
+      if (!ok) return;
+      signOut(auth).then(()=> window.location.href='index.html');
+    });
+
+    // theme toggle: simple data-theme toggle saved to localStorage
+    function applyTheme(name) {
+      document.documentElement.setAttribute('data-theme', name);
+      localStorage.setItem('ecotrack_theme', name);
+      // if you want to persist to user doc
+    }
+    themeCheckbox.addEventListener('change', () => {
+      applyTheme(themeCheckbox.checked ? 'dark' : 'light');
+    });
+    // initialize theme from localStorage
+    const savedTheme = localStorage.getItem('ecotrack_theme') || document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(savedTheme);
+    themeCheckbox.checked = savedTheme === 'dark';
+
+    // onAuthStateChanged ensure user is signed in before profile
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        // no user: redirect to login
+        // do not redirect if you want to allow demo browsing
+        // window.location.href = 'index.html';
+        console.log('No user session');
+        return;
+      } else {
+        // preload profile quietly
+        // don't force open panel, just make sure data is ready
+        currentUid = user.uid;
+        // optionally call loadProfile() so it's ready when they click logo
+        // but avoid unnecessary reads on page load; we will load when user opens panel
+      }
+    });
+
+    // accessibility: close with Esc
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') hidePanel();
+    });
+
     </script>
 
 </body>
