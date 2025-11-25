@@ -98,14 +98,14 @@
         <div class="logo-circle">🌿</div>
         <div>
           <h1>ECOTrack — Admin</h1>
-          <div class="subtitle">Student Approvals • Eco-Lux Glass</div>
+          <div class="subtitle">Teacher Approvals • Eco-Lux Glass</div>
         </div>
       </div>
     </header>
 
     <div class="top-controls">
       <div class="search">
-        <input id="searchInput" class="searchInput" placeholder="Search pending students by name or email" aria-label="Search pending students" />
+        <input id="searchInput" class="searchInput" placeholder="Search pending teachers by name or email" aria-label="Search pending teachers" />
       </div>
       <div style="display:flex;gap:10px;align-items:center">
         <div class="pill">Admins only</div>
@@ -125,7 +125,7 @@
           </table>
         </div>
 
-        <h3 style="margin-top:14px;color:var(--muted)">Approved Students</h3>
+        <h3 style="margin-top:14px;color:var(--muted)">Approved Teachers</h3>
         <div style="overflow:auto;max-height:28vh;margin-top:8px">
           <table id="approvedTable">
             <thead><tr><th>Name</th><th>Email</th><th>Grade</th><th>Section</th><th>Status</th></tr></thead>
@@ -138,7 +138,7 @@
         <div class="stat-item">
           <h4>Overview</h4>
           <div class="stat-big" id="totalPending">—</div>
-          <div style="font-size:13px;margin-top:6px;color:rgba(255,255,255,0.7)">Pending student verifications</div>
+          <div style="font-size:13px;margin-top:6px;color:rgba(255,255,255,0.7)">Pending teacher verifications</div>
         </div>
 
         <div class="stat-item">
@@ -194,12 +194,12 @@
       const adm = await getDoc(doc(db, "admins", user.uid));
       if (!adm.exists()) { alert("Admin access denied."); await signOut(auth); window.location.href = "index.html"; return; }
       await loadPendingRequests();
-      await loadApprovedStudents();
+      await loadApprovedTeachers();
     });
 
     async function loadPendingRequests(){
       pendingTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">Loading...</td></tr>`;
-      const q = query(collection(db, "studentVerificationRequests"), where("status","==","pending"));
+      const q = query(collection(db, "teacherVerificationRequests"), where("status","==","pending"));
       const snap = await getDocs(q);
       pendingRequests = [];
       snap.forEach(s => pendingRequests.push({ id: s.id, ...s.data() }));
@@ -215,7 +215,7 @@
 
       totalPendingEl.innerText = filtered.length;
 
-      if (filtered.length===0){ pendingTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">No pending student requests.</td></tr>`; return; }
+      if (filtered.length===0){ pendingTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">No pending teacher requests.</td></tr>`; return; }
       pendingTbody.innerHTML = "";
       filtered.forEach(r => {
         const tr = document.createElement('tr'); tr.className='row';
@@ -226,7 +226,7 @@
           <td>${escapeHtml(r.email||"")}</td>
           <td>
             <div class="actions">
-              <button class="btn btn-approve" data-id="${escapeHtml(r.studentId)}" data-req="${escapeHtml(r.id)}">Approve</button>
+              <button class="btn btn-approve" data-id="${escapeHtml(r.teacherId)}" data-req="${escapeHtml(r.id)}">Approve</button>
               <button class="btn btn-deny" data-req="${escapeHtml(r.id)}">Deny</button>
             </div>
           </td>
@@ -239,34 +239,34 @@
     function attachPendingButtons(){
       document.querySelectorAll('.btn-approve').forEach(btn=>{
         btn.onclick = async () => {
-          const studentId = btn.dataset.id; const reqId = btn.dataset.req;
+          const teacherId = btn.dataset.id; const reqId = btn.dataset.req;
           try{
-            const reqRef = doc(db,"studentVerificationRequests",reqId);
+            const reqRef = doc(db,"teacherVerificationRequests",reqId);
             const reqSnap = await getDoc(reqRef);
             if (!reqSnap.exists()){ alert('Request not found'); return; }
             const data = reqSnap.data();
-            await setDoc(doc(db,'students',studentId),{
-              studentId, firstName: data.firstName||'', middleInitial: data.middleInitial||'', lastName: data.lastName||'', email: data.email||'', grade: data.advisoryGrade||'', section: data.advisorySection||'', verified:true, verifiedAt: serverTimestamp()
+            await setDoc(doc(db,'teachers',teacherId),{
+              teacherId, firstName: data.firstName||'', middleInitial: data.middleInitial||'', lastName: data.lastName||'', email: data.email||'', grade: data.advisoryGrade||'', section: data.advisorySection||'', verified:true, verifiedAt: serverTimestamp()
             });
             await updateDoc(reqRef,{status:'approved', reviewedAt: serverTimestamp()});
-            await loadPendingRequests(); await loadApprovedStudents();
+            await loadPendingRequests(); await loadApprovedTeachers();
           }catch(err){console.error(err); alert('Approve failed: '+(err.message||err));}
         }
       });
 
       document.querySelectorAll('.btn-deny').forEach(btn=>{
         btn.onclick = async () => {
-          const reqId = btn.dataset.req; if (!confirm('Deny this student request?')) return;
-          try{ await updateDoc(doc(db,'studentVerificationRequests',reqId),{status:'rejected', reviewedAt: serverTimestamp()}); await loadPendingRequests(); }catch(err){console.error(err); alert('Deny failed: '+(err.message||err)); }
+          const reqId = btn.dataset.req; if (!confirm('Deny this teacher request?')) return;
+          try{ await updateDoc(doc(db,'teacherVerificationRequests',reqId),{status:'rejected', reviewedAt: serverTimestamp()}); await loadPendingRequests(); }catch(err){console.error(err); alert('Deny failed: '+(err.message||err)); }
         }
       });
     }
 
-    async function loadApprovedStudents(){
+    async function loadApprovedTeachers(){
       approvedTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">Loading...</td></tr>`;
-      const q = query(collection(db,'students'), where('verified','==', true));
+      const q = query(collection(db,'teachers'), where('verified','==', true));
       const snap = await getDocs(q);
-      if (snap.empty){ approvedTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">No approved students yet.</td></tr>`; return; }
+      if (snap.empty){ approvedTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">No approved teachers yet.</td></tr>`; return; }
       approvedTbody.innerHTML = '';
       snap.forEach(s=>{
         const d = s.data();
@@ -286,7 +286,7 @@
       if (!confirm('Approve all visible pending requests?')) return; const rows = Array.from(document.querySelectorAll('#pendingTable tbody tr'));
       for (const r of rows){ const btn = r.querySelector('.btn-approve'); if (!btn) continue; btn.click(); }
     });
-    refreshBtn.addEventListener('click', async ()=>{ await loadPendingRequests(); await loadApprovedStudents(); });
+    refreshBtn.addEventListener('click', async ()=>{ await loadPendingRequests(); await loadApprovedTeachers(); });
 
     function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
   </script>
