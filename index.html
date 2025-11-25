@@ -665,18 +665,21 @@ adminSignin.addEventListener("submit", async (e) => {
   const email = $("admin-email").value.trim();
   const password = $("admin-password").value;
 
+  if (email.length > 30) return alert("Email must be at most 30 characters.");
+  if (password.length > 22) return alert("Password must be at most 22 characters.");
+
   try {
     const userCred = await signInWithEmailAndPassword(auth, email, password);
     const uid = userCred.user.uid;
-
     const adminSnap = await getDoc(doc(db, "admins", uid));
+
     if (!adminSnap.exists()) {
       await signOut(auth);
       return alert("Admin access denied.");
     }
 
+    // success
     window.location.href = "admin.html";
-
   } catch (err) {
     alert(err.message || "Admin sign in failed.");
   }
