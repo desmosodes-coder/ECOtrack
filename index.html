@@ -1,12 +1,11 @@
-<!-- Updated index.html with Teacher removed and Admin verifying Students -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ECOTrack | Sign In & Sign Up</title>
-  <!-- STYLE REMAINS SAME -->
-   <style>
+
+  <style>
     * { box-sizing: border-box; font-family: "Poppins", sans-serif; }
     body {
       margin: 0;
@@ -503,90 +502,181 @@
   </div>
   <h1>ECOTrack</h1>
 
+  <!-- Sparkling Particles -->
+  <div class="spark-container">
+    <div class="spark s1"></div>
+    <div class="spark s2"></div>
+    <div class="spark s3"></div>
+    <div class="spark s4"></div>
+    <div class="spark s5"></div>
+  </div>
+
+  <!-- Rotating Leaf Particles (already present) -->
+  <div class="leaf-particles">
+    <div class="leaf p1"></div>
+    <div class="leaf p2"></div>
+    <div class="leaf p3"></div>
+  </div>
+
+  <!-- Rotating Leaf Particles -->
+  <div class="leaf-particles">
+    <div class="leaf p1"></div>
+    <div class="leaf p2"></div>
+    <div class="leaf p3"></div>
+  </div>
+
   <div>
     <button id="studentBtn" class="role-btn active">Student</button>
+    <button id="teacherBtn" class="role-btn">Teacher</button>
     <button id="adminBtn" class="role-btn">Admin</button>
   </div>
+
+  <!-- Original forms remain—this is only a visual update container! -->
+
 </div>
 
 <!-- STUDENT SIGN IN -->
-<form id="student-signin-form">
-  <input id="signin-email" type="email" placeholder="Email" maxlength="30" required>
-  <input id="signin-password" type="password" placeholder="Password" maxlength="22" required>
-  <button type="submit">Sign In</button>
-  <div class="switch" id="toStudentSignup">Don’t have an account? Sign Up</div>
-  <small class="note">Students need admin verification before signing in.</small>
-</form>
+  <form id="student-signin-form">
+    <input id="signin-email" type="email" placeholder="Email" maxlength="30" required>
+    <input id="signin-password" type="password" placeholder="Password" maxlength="22" required>
+    <button type="submit">Sign In</button>
+    <div class="switch" id="toStudentSignup">Don’t have an account? Sign Up</div>
+    <small class="note">Students need teacher verification before signing in.</small>
+  </form>
 
-<!-- STUDENT SIGN UP -->
-<form id="student-signup-form" class="hidden">
-  <input id="signup-name" placeholder="Full Name" maxlength="80" required>
-  <select id="signup-grade" required>
-    <option value="">Grade Level</option>
-    <option value="Grade 11">Grade 11</option>
-    <option value="Grade 12">Grade 12</option>
-  </select>
-  <input id="signup-section" placeholder="Section / Advisory" maxlength="18" required>
-  <input id="signup-age" type="number" placeholder="Age" min="3" max="120" required>
-  <input id="signup-email" type="email" placeholder="Email" maxlength="30" required>
-  <input id="signup-password" type="password" placeholder="Password" maxlength="22" required>
-  <input id="signup-confirm" type="password" placeholder="Confirm Password" maxlength="22" required>
-  <button type="submit">Sign Up</button>
-  <div class="switch" id="toStudentSignin">Already have an account? Sign In</div>
-</form>
+  <!-- STUDENT SIGN UP -->
+  <form id="student-signup-form" class="hidden">
+    <input id="signup-name" placeholder="Full Name" maxlength="80" required>
 
-<!-- ADMIN SIGN IN -->
-<form id="admin-signin-form" class="hidden">
-  <input id="admin-email" type="email" placeholder="Admin Email" maxlength="30" required>
-  <input id="admin-password" type="password" placeholder="Password" maxlength="22" required>
-  <button type="submit">Sign In</button>
-  <small class="note">Admin sign-in only — no signup here.</small>
-</form>
+    <select id="signup-grade" required>
+      <option value="">Grade Level</option>
+      <option value="Grade 11">Grade 11</option>
+      <option value="Grade 12">Grade 12</option>
+    </select>
+
+    <input id="signup-section" placeholder="Section / Advisory" maxlength="18" required>
+    <input id="signup-age" type="number" placeholder="Age" required min="3" max="120">
+    <input id="signup-email" type="email" placeholder="Email" maxlength="30" required>
+    <input id="signup-password" type="password" placeholder="Password" maxlength="22" required>
+    <input id="signup-confirm" type="password" placeholder="Confirm Password" maxlength="22" required>
+    <button type="submit">Sign Up</button>
+    <div class="switch" id="toStudentSignin">Already have an account? Sign In</div>
+  </form>
+
+  <!-- TEACHER SIGN IN -->
+  <form id="teacher-signin-form" class="hidden">
+    <input id="teacher-email" type="email" placeholder="Teacher Email" maxlength="30" required>
+    <input id="teacher-password" type="password" placeholder="Password" maxlength="22" required>
+    <button type="submit">Sign In</button>
+    <div class="switch" id="toTeacherSignup">Create Teacher Account</div>
+    <small class="note">Teachers need admin approval before signing in.</small>
+  </form>
+
+  <!-- TEACHER SIGN UP -->
+  <form id="teacher-signup-form" class="hidden">
+    <input id="t-name" placeholder="Full Name" maxlength="80" required>
+
+    <select id="t-grade" required>
+      <option value="">Grade Level</option>
+      <option value="Grade 11">Grade 11</option>
+      <option value="Grade 12">Grade 12</option>
+    </select>
+
+    <input id="t-section" placeholder="Section / Advisory" maxlength="18" required>
+    <input id="t-email" type="email" placeholder="Email" maxlength="30" required>
+    <input id="t-password" type="password" placeholder="Password" maxlength="22" required>
+    <input id="t-confirm" type="password" placeholder="Confirm Password" maxlength="22" required>
+    <button type="submit">Sign Up</button>
+    <div class="switch" id="toTeacherSignin">Already have an account? Sign In</div>
+  </form>
+
+  <!-- ADMIN SIGN IN -->
+  <form id="admin-signin-form" class="hidden">
+    <input id="admin-email" type="email" placeholder="Admin Email" maxlength="30" required>
+    <input id="admin-password" type="password" placeholder="Password" maxlength="22" required>
+    <button type="submit">Sign In</button>
+    <small class="note">Admin sign-in only — no signup here.</small>
+  </form>
+
+</div>
 
 <script type="module">
-/* FIREBASE IMPORTS AND CONFIG REMAIN SAME */
+/* ——— FIREBASE IMPORTS ——— */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+/* ——— FIREBASE CONFIG ——— */
+const firebaseConfig = {
+  apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
+  authDomain: "registar-5f3fb.firebaseapp.com",
+  projectId: "registar-5f3fb",
+  storageBucket: "registar-5f3fb.firebasestorage.app",
+  messagingSenderId: "856198150739",
+  appId: "1:856198150739:web:801000f564b47f6333e4a6"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* ——— ELEMENTS ——— */
 const studentBtn = document.getElementById("studentBtn");
+const teacherBtn = document.getElementById("teacherBtn");
 const adminBtn = document.getElementById("adminBtn");
 
 const studentSignin = document.getElementById("student-signin-form");
 const studentSignup = document.getElementById("student-signup-form");
+const teacherSignin = document.getElementById("teacher-signin-form");
+const teacherSignup = document.getElementById("teacher-signup-form");
 const adminSignin = document.getElementById("admin-signin-form");
 
 const toStudentSignup = document.getElementById("toStudentSignup");
 const toStudentSignin = document.getElementById("toStudentSignin");
+const toTeacherSignup = document.getElementById("toTeacherSignup");
+const toTeacherSignin = document.getElementById("toTeacherSignin");
 
+/* ——— SIMPLE UI SWITCHING ——— */
 function hideAll() {
   studentSignin.classList.add("hidden");
   studentSignup.classList.add("hidden");
+  teacherSignin.classList.add("hidden");
+  teacherSignup.classList.add("hidden");
   adminSignin.classList.add("hidden");
 }
 
-studentBtn.onclick = () => {
-  hideAll();
-  studentSignin.classList.remove("hidden");
-  studentBtn.classList.add("active");
-  adminBtn.classList.remove("active");
-};
+studentBtn.onclick = () => { hideAll(); studentSignin.classList.remove("hidden"); studentBtn.classList.add("active"); teacherBtn.classList.remove("active"); adminBtn.classList.remove("active"); };
+teacherBtn.onclick = () => { hideAll(); teacherSignin.classList.remove("hidden"); teacherBtn.classList.add("active"); studentBtn.classList.remove("active"); adminBtn.classList.remove("active"); };
+adminBtn.onclick = () => { hideAll(); adminSignin.classList.remove("hidden"); adminBtn.classList.add("active"); studentBtn.classList.remove("active"); teacherBtn.classList.remove("active"); };
 
-adminBtn.onclick = () => {
-  hideAll();
-  adminSignin.classList.remove("hidden");
-  adminBtn.classList.add("active");
-  studentBtn.classList.remove("active");
-};
+toStudentSignup.onclick = () => { studentSignin.classList.add("hidden"); studentSignup.classList.remove("hidden"); };
+toStudentSignin.onclick = () => { studentSignup.classList.add("hidden"); studentSignin.classList.remove("hidden"); };
 
-toStudentSignup.onclick = () => {
-  studentSignin.classList.add("hidden");
-  studentSignup.classList.remove("hidden");
-};
+toTeacherSignup.onclick = () => { teacherSignin.classList.add("hidden"); teacherSignup.classList.remove("hidden"); };
+toTeacherSignin.onclick = () => { teacherSignup.classList.add("hidden"); teacherSignin.classList.remove("hidden"); };
 
-toStudentSignin.onclick = () => {
-  studentSignup.classList.add("hidden");
-  studentSignin.classList.remove("hidden");
-};
+/* ————————————————————————————————————————————
+   Helper to get value safely
+   — use document.getElementById for every input so hyphen IDs work correctly
+————————————————————————————————————————————————*/
+const $ = id => document.getElementById(id);
 
-// STUDENT SIGN UP — Admin verifies students
+/* ————————————————————————————————————————————
+   STUDENT SIGN UP -> create verification request (pending)
+   stored in collection: verificationRequests/{uid}
+   Fields: studentId, firstName, lastName, age, email, grade, section, status, requestedAt
+———————————————————————————————————————————— */
 studentSignup.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -598,26 +688,39 @@ studentSignup.addEventListener("submit", async (e) => {
   const password = $("signup-password").value;
   const confirm = $("signup-confirm").value;
 
-  if (!name || !grade || !section || !email || !password)
-    return alert("Please fill all fields.");
+  if (!name || !grade || !section || !email || !password) return alert("Please fill all fields.");
+  if (email.length > 30) return alert("Email must be at most 30 characters.");
+  if (password.length > 22) return alert("Password must be at most 22 characters.");
   if (password !== confirm) return alert("Passwords do not match.");
+  if (section.length > 18) return alert("Section/advisory must be at most 18 characters.");
 
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     const uid = cred.user.uid;
 
+    // create a verification request for teachers to approve
     await setDoc(doc(db, "verificationRequests", uid), {
       studentId: uid,
-      name,
+      firstName: name,
+      lastName: "",            // you can split name later if you prefer
+      middleInitial: "",
+      email,
+      age: isFinite(age) ? age : null,
       grade,
       section,
-      age,
-      email,
       status: "pending",
       requestedAt: serverTimestamp()
     });
 
-    alert("Sign-up successful. Wait for admin verification.");
+    alert("Sign-up successful. Wait for your teacher to verify your account.");
+    // reset form
+    $("signup-name").value = "";
+    $("signup-grade").value = "";
+    $("signup-section").value = "";
+    $("signup-age").value = "";
+    $("signup-email").value = "";
+    $("signup-password").value = "";
+    $("signup-confirm").value = "";
     hideAll();
     studentSignin.classList.remove("hidden");
 
@@ -626,39 +729,121 @@ studentSignup.addEventListener("submit", async (e) => {
   }
 });
 
-// STUDENT SIGN IN — Requires admin verification
+/* ————————————————————————————————————————————
+   STUDENT SIGN IN -> only allowed if students/{uid}.verified === true
+———————————————————————————————————————————— */
 studentSignin.addEventListener("submit", async (e) => {
   e.preventDefault();
-
   const email = $("signin-email").value.trim();
   const password = $("signin-password").value;
+
+  if (email.length > 30) return alert("Email must be at most 30 characters.");
+  if (password.length > 22) return alert("Password must be at most 22 characters.");
 
   try {
     const userCred = await signInWithEmailAndPassword(auth, email, password);
     const uid = userCred.user.uid;
-
     const snap = await getDoc(doc(db, "students", uid));
-    if (!snap.exists()) {
-      alert("Your profile is not verified yet.");
-      await signOut(auth);
-      return;
-    }
-
+    if (!snap.exists()) return alert("Student profile not found. Are you verified?");
     const data = snap.data();
-    if (!data.verified) {
-      alert("Admin has not approved your account yet.");
-      await signOut(auth);
-      return;
-    }
-
+    if (!data.verified) return alert("Your account is not yet verified by your teacher.");
+    // success -> go to student area
     window.location.href = "Echo3.html";
-
   } catch (err) {
     alert(err.message || "Sign in failed.");
   }
 });
 
-// ADMIN SIGN IN — Checks if user is admin
+/* ————————————————————————————————————————————
+   TEACHER SIGN UP -> create teacher verification request (pending)
+   stored in teacherVerificationRequests/{uid}
+———————————————————————————————————————————— */
+teacherSignup.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const name = $("t-name").value.trim();
+  const grade = $("t-grade").value;
+  const section = $("t-section").value.trim();
+  const email = $("t-email").value.trim();
+  const password = $("t-password").value;
+  const confirm = $("t-confirm").value;
+
+  if (!name || !grade || !section || !email || !password) return alert("Please fill all fields.");
+  if (email.length > 30) return alert("Email must be at most 30 characters.");
+  if (password.length > 22) return alert("Password must be at most 22 characters.");
+  if (password !== confirm) return alert("Passwords do not match.");
+  if (section.length > 18) return alert("Section/advisory must be at most 18 characters.");
+
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    const uid = cred.user.uid;
+
+    await setDoc(doc(db, "teacherVerificationRequests", uid), {
+      teacherId: uid,
+      firstName: name,
+      lastName: "",
+      middleInitial: "",
+      email,
+      advisoryGrade: grade,
+      advisorySection: section,
+      status: "pending",
+      requestedAt: serverTimestamp()
+    });
+
+    alert("Teacher account created. Wait for admin approval.");
+    // reset
+    $("t-name").value = "";
+    $("t-grade").value = "";
+    $("t-section").value = "";
+    $("t-email").value = "";
+    $("t-password").value = "";
+    $("t-confirm").value = "";
+    hideAll();
+    teacherSignin.classList.remove("hidden");
+  } catch (err) {
+    alert(err.message || "Teacher sign up failed.");
+  }
+});
+
+/* ————————————————————————————————————————————
+   TEACHER SIGN IN -> only allowed if teachers/{uid}.verified === true
+———————————————————————————————————————————— */
+teacherSignin.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const email = $("teacher-email").value.trim();
+  const password = $("teacher-password").value;
+
+  if (email.length > 30) return alert("Email must be at most 30 characters.");
+  if (password.length > 22) return alert("Password must be at most 22 characters.");
+
+  try {
+    const userCred = await signInWithEmailAndPassword(auth, email, password);
+    const uid = userCred.user.uid;
+
+    const snap = await getDoc(doc(db, "teachers", uid));
+    if (!snap.exists()) {
+      alert("Teacher account not approved yet or profile missing.");
+      // sign out immediately to prevent session confusion
+      await signOut(auth);
+      return;
+    }
+    const data = snap.data();
+    if (!data.verified) {
+      await signOut(auth);
+      return alert("Admin has not approved your account yet.");
+    }
+
+    // success -> teacher goes to verify page
+    window.location.href = "verify.html";
+  } catch (err) {
+    alert(err.message || "Teacher sign in failed.");
+  }
+});
+
+/* ————————————————————————————————————————————
+   ADMIN SIGN IN -> allowed only if admins/{uid} exists
+———————————————————————————————————————————— */
 adminSignin.addEventListener("submit", async (e) => {
   e.preventDefault();
 
