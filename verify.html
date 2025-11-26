@@ -6,7 +6,7 @@
   <title>ECOTrack | Student Verification — EcoLux</title>
 
   <style>
-    /* Reset & base */
+    /* --- your existing styles kept --- */
     *{box-sizing:border-box;margin:0;padding:0;font-family:Inter, Poppins, system-ui, -apple-system, 'Segoe UI', Roboto}
     :root{
       --bg-1: linear-gradient(135deg,#072b14 0%, #0b3a23 35%, #06332a 100%);
@@ -20,7 +20,6 @@
       --glass-blur:10px;
       --shadow:0 8px 30px rgba(2,12,6,0.55);
     }
-
     html,body{height:100%;}
     body{
       min-height:100vh;
@@ -30,9 +29,7 @@
       display:flex;align-items:flex-start;justify-content:center;
       -webkit-font-smoothing:antialiased;
     }
-
     .wrap{width:100%;max-width:1200px}
-
     header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
     .brand{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;
       background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02));
@@ -44,28 +41,18 @@
     }
     h1{font-size:20px;color:var(--muted)}
     .subtitle{font-size:12px;color:rgba(255,255,255,0.7)}
-
-    /* Top controls */
     .top-controls{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
     .search{flex:1;max-width:640px;display:flex;gap:8px}
     .search input{flex:1;padding:12px 14px;border:none;border-radius:12px;background:rgba(255,255,255,0.06);color:var(--muted);outline:none}
-
     .pill{padding:10px 14px;border-radius:999px;background:rgba(255,255,255,0.04);
       border:1px solid rgba(255,255,255,0.05)
     }
-
-    .panel{background:var(--panel-bg);border-radius:var(--card-radius);padding:18px;
-      box-shadow:var(--shadow);backdrop-filter:blur(var(--glass-blur));
-      border:1px solid rgba(255,255,255,0.06)
-    }
-    .grid{display:grid;grid-template-columns:1fr 380px;gap:18px}
-
+    .panel{background:var(--panel-bg);border-radius:var(--card-radius);padding:18px;}
     table{width:100%;border-collapse:collapse;color:var(--muted)}
     thead th{font-size:13px;padding:10px 12px;background:rgba(255,255,255,0.04);
       border-bottom:1px solid rgba(255,255,255,0.03);text-align:left
     }
     tbody td{padding:12px;border-bottom:1px dashed rgba(255,255,255,0.03);font-size:14px}
-
     .actions{display:flex;gap:8px}
     .btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
     .btn-verify{background:linear-gradient(90deg,var(--accent-emerald),var(--accent-neon));color:#05220f}
@@ -73,14 +60,12 @@
     .btn-logout{background:linear-gradient(90deg,#a63a2b,var(--accent-gold));
       padding:10px 14px;border-radius:10px;color:#06160d;font-weight:700
     }
-
     .stats{display:flex;flex-direction:column;gap:12px}
     .stat-item{padding:12px;border-radius:10px;background:rgba(255,255,255,0.03);
       border:1px solid rgba(255,255,255,0.03)
     }
     .stat-item h4{margin-bottom:6px;font-size:13px;color:rgba(255,255,255,0.9)}
     .stat-big{font-size:20px;font-weight:700;color:var(--accent-neon)}
-
     @media(max-width:980px){.grid{grid-template-columns:1fr}}
     @media(max-width:520px){
       body{padding:14px}
@@ -91,6 +76,37 @@
     }
 
     .row:hover{transform:translateY(-4px);transition:.15s}
+
+    /* ---- Image modal styles ---- */
+    .image-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 6000;
+    }
+    .image-modal {
+      width: min(980px, 96%);
+      max-height: 86vh;
+      overflow: auto;
+      background: #071e15;
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+      color: var(--muted);
+    }
+    .image-modal header { display:flex;justify-content:space-between;align-items:center;margin-bottom:10px }
+    .image-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:10px; }
+    .image-card { background: rgba(255,255,255,0.02); padding:8px; border-radius:8px; display:flex;flex-direction:column; gap:8px; align-items:center;}
+    .image-card img { width:100%; height:110px; object-fit:cover; border-radius:6px; }
+    .image-card .meta { font-size:12px; width:100%; text-align:left; word-break:break-all; color:rgba(255,255,255,0.8) }
+    .image-card .controls { display:flex; gap:8px; margin-top:6px }
+    .modal-close { background:transparent;border:1px solid rgba(255,255,255,0.06); padding:6px 10px;border-radius:8px; color:var(--muted) }
+    @media(max-width:520px){
+      .image-card img { height:90px }
+    }
   </style>
 </head>
 <body>
@@ -116,7 +132,7 @@
     </div>
   </div>
 
-  <div class="grid">
+  <div class="grid" style="grid-template-columns:1fr 380px;gap:18px">
     <div class="panel card">
       <h3 style="margin-bottom:12px">Pending Students</h3>
 
@@ -171,14 +187,37 @@
   </div>
 </div>
 
+<!-- Image modal (hidden by default) -->
+<div id="imageModalBackdrop" class="image-modal-backdrop" role="dialog" aria-hidden="true">
+  <div class="image-modal" role="document" id="imageModal">
+    <header>
+      <div>
+        <strong id="modalTitle">Student Images</strong>
+        <div style="font-size:13px;color:rgba(255,255,255,0.7)" id="modalSubtitle">Loading…</div>
+      </div>
+      <div>
+        <button id="closeImagesBtn" class="modal-close">Close</button>
+      </div>
+    </header>
+
+    <section id="imageList">
+      <div style="text-align:center;color:rgba(255,255,255,0.6)">Loading images…</div>
+    </section>
+  </div>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   import {
     getFirestore, collection, query, where, getDocs, doc, getDoc,
-    setDoc, updateDoc, serverTimestamp
+    setDoc, updateDoc, serverTimestamp, deleteDoc
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import {
+    getStorage, ref as sRef, listAll, getDownloadURL, deleteObject
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
+  // --- your firebase config (same as before) ---
   const firebaseConfig = {
     apiKey: "AIzaSyAvblGiAIZ26bIbtw6cSv9kfgzSiYyq_10",
     authDomain: "registar-5f3fb.firebaseapp.com",
@@ -191,6 +230,7 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  const storage = getStorage(app);
 
   const pendingTbody = document.querySelector("#pendingTable tbody");
   const approvedTbody = document.querySelector("#approvedTable tbody");
@@ -199,6 +239,13 @@
   const logoutBtn = document.getElementById("logoutBtn");
   const refreshBtn = document.getElementById("refreshBtn");
   const totalPendingEl = document.getElementById("totalPending");
+
+  // modal refs
+  const imageModalBackdrop = document.getElementById("imageModalBackdrop");
+  const imageList = document.getElementById("imageList");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalSubtitle = document.getElementById("modalSubtitle");
+  const closeImagesBtn = document.getElementById("closeImagesBtn");
 
   let teacherGrade = "";
   let teacherSection = "";
@@ -224,6 +271,9 @@
     await loadApproved();
   });
 
+  /* ------------------------
+     Load pending verification requests
+     ------------------------ */
   async function loadPending(){
     pendingTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">Loading…</td></tr>`;
 
@@ -231,11 +281,16 @@
     const snap = await getDocs(q);
 
     pendingList = [];
-    snap.forEach(s => pendingList.push({ id: s.id, ...s.data() }));
+    snap.forEach(s => {
+      // build object with id and fields
+      const d = s.data();
+      pendingList.push({ id: s.id, ...d });
+    });
 
+    // filter to teacher's class
     pendingList = pendingList.filter(s =>
-      (s.grade||"").toLowerCase() === teacherGrade.toLowerCase() &&
-      (s.section||"").toLowerCase().trim() === teacherSection.toLowerCase().trim()
+      (String(s.grade||"").toLowerCase() === teacherGrade.toLowerCase()) &&
+      (String(s.section||"").toLowerCase().trim() === teacherSection.toLowerCase().trim())
     );
 
     renderPending(pendingList);
@@ -259,72 +314,30 @@
     pendingTbody.innerHTML = "";
     filtered.forEach(s=>{
       const tr = document.createElement("tr");
-      tr.className="row";
+
+      // create actions: view images / verify / reject
+      const actions = `
+        <div class="actions">
+          <button class="btn btn-verify" data-uid="${escapeHtml(s.uid||s.id)}" data-name="${escapeHtml((s.firstName||"")+" "+(s.lastName||""))}" onclick="viewImagesHandler(event)">View Images</button>
+          <button class="btn btn-verify" data-req="${escapeHtml(s.id)}" onclick="verifyHandler(event)">Verify</button>
+          <button class="btn btn-reject" data-req="${escapeHtml(s.id)}" onclick="rejectHandler(event)">Reject</button>
+        </div>
+      `;
+
       tr.innerHTML = `
-        <td>${escape(s.firstName||"")} ${escape(s.middleInitial||"")} ${escape(s.lastName||"")}</td>
-        <td>${escape(s.grade||"")}</td>
-        <td>${escape(s.section||"")}</td>
-        <td>${escape(s.email||"")}</td>
-        <td>
-          <div class="actions">
-            <button class="btn btn-verify" data-id="${escape(s.studentId||s.id)}" data-req="${escape(s.id)}">Verify</button>
-            <button class="btn btn-reject" data-req="${escape(s.id)}">Reject</button>
-          </div>
-        </td>
+        <td>${escapeHtml(s.firstName||"")} ${escapeHtml(s.lastName||"")}</td>
+        <td>${escapeHtml(s.grade||"")}</td>
+        <td>${escapeHtml(s.section||"")}</td>
+        <td>${escapeHtml(s.email||"")}</td>
+        <td>${actions}</td>
       `;
       pendingTbody.appendChild(tr);
     });
-
-    attachButtons();
   }
 
-  function attachButtons(){
-    document.querySelectorAll(".btn-verify").forEach(btn=>{
-      btn.onclick = async ()=>{
-        const reqId = btn.dataset.req;
-        const studentId = btn.dataset.id;
-
-        const ref = doc(db,"verificationRequests",reqId);
-        const snap = await getDoc(ref);
-        if (!snap.exists()) return;
-
-        const d = snap.data();
-
-        await setDoc(doc(db,"students",studentId),{
-          studentId,
-          firstName:d.firstName||"",
-          middleInitial:d.middleInitial||"",
-          lastName:d.lastName||"",
-          email:d.email||"",
-          grade:d.grade||"",
-          section:d.section||"",
-          age:d.age||null,
-          verified:true,
-          verifiedAt:serverTimestamp()
-        });
-
-        await updateDoc(ref,{status:"approved", reviewedAt:serverTimestamp()});
-
-        await loadPending();
-        await loadApproved();
-      };
-    });
-
-    document.querySelectorAll(".btn-reject").forEach(btn=>{
-      btn.onclick = async ()=>{
-        const reqId = btn.dataset.req;
-        if (!confirm("Reject this student?")) return;
-
-        await updateDoc(doc(db,"verificationRequests",reqId),{
-          status:"rejected",
-          reviewedAt:serverTimestamp()
-        });
-
-        await loadPending();
-      };
-    });
-  }
-
+  /* ------------------------
+     Load approved students
+     ------------------------ */
   async function loadApproved(){
     approvedTbody.innerHTML = `<tr><td colspan="5" style="text-align:center">Loading…</td></tr>`;
 
@@ -332,11 +345,11 @@
     const snap = await getDocs(q);
 
     let list = [];
-    snap.forEach(s => list.push(s.data()));
+    snap.forEach(s => list.push({ id: s.id, ...s.data() }));
 
     list = list.filter(s =>
-      (s.grade||"").toLowerCase() === teacherGrade.toLowerCase() &&
-      (s.section||"").toLowerCase().trim() === teacherSection.toLowerCase().trim()
+      (String(s.grade||"").toLowerCase() === teacherGrade.toLowerCase()) &&
+      (String(s.section||"").toLowerCase().trim() === teacherSection.toLowerCase().trim())
     );
 
     if (list.length===0){
@@ -347,17 +360,27 @@
     approvedTbody.innerHTML = "";
     list.forEach(d=>{
       const tr = document.createElement("tr");
+
+      // add view images button to approved students
+      const actions = `<div class="actions">
+          <button class="btn" data-uid="${escapeHtml(d.id)}" data-name="${escapeHtml((d.firstName||"")+" "+(d.lastName||""))}" onclick="viewImagesHandler(event)">View Images</button>
+        </div>`;
+
       tr.innerHTML = `
-        <td>${escape(d.firstName||"")} ${escape(d.middleInitial||"")} ${escape(d.lastName||"")}</td>
-        <td>${escape(d.email||"")}</td>
-        <td>${escape(d.grade||"")}</td>
-        <td>${escape(d.section||"")}</td>
-        <td>Verified</td>
+        <td>${escapeHtml(d.firstName||"")} ${escapeHtml(d.middleInitial||"")} ${escapeHtml(d.lastName||"")}</td>
+        <td>${escapeHtml(d.email||"")}</td>
+        <td>${escapeHtml(d.grade||"")}</td>
+        <td>${escapeHtml(d.section||"")}</td>
+        <td>${actions}</td>
       `;
       approvedTbody.appendChild(tr);
     });
   }
 
+  // simple HTML escape for safety
+  function escapeHtml(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"); }
+
+  // wire up search + refresh
   searchInput.addEventListener("input", ()=>renderPending(pendingList));
   refreshBtn.addEventListener("click", async ()=>{ await loadPending(); await loadApproved(); });
 
@@ -366,10 +389,150 @@
     window.location.href = "index.html";
   });
 
-  function escape(s){
-    return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;")
-      .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+  // verify / reject handlers (reuse your existing patterns)
+  window.verifyHandler = async function(e){
+    const btn = e.currentTarget;
+    const reqId = btn.dataset.req;
+    if (!reqId) return;
+    if (!confirm("Verify this student?")) return;
+    await updateDoc(doc(db,"verificationRequests",reqId),{ status:"approved", reviewedAt: serverTimestamp() });
+    // optionally move to students collection — keep your flow
+    await loadPending();
+    await loadApproved();
+  };
+
+  window.rejectHandler = async function(e){
+    const btn = e.currentTarget;
+    const reqId = btn.dataset.req;
+    if (!reqId) return;
+    if (!confirm("Reject this student?")) return;
+    await updateDoc(doc(db,"verificationRequests",reqId),{ status:"rejected", reviewedAt: serverTimestamp() });
+    await loadPending();
+  };
+
+  /* ------------------------
+     Image viewing / deletion
+     ------------------------ */
+
+  // global handler bound to buttons we injected (viewImagesHandler)
+  window.viewImagesHandler = function(e){
+    const btn = e.currentTarget;
+    const uid = btn.dataset.uid;
+    const name = btn.dataset.name || "Student";
+    if (!uid) {
+      alert("No student UID available for this row.");
+      return;
+    }
+    openImageModalFor(uid, name);
+  };
+
+  // open the modal and populate images
+  async function openImageModalFor(studentUid, studentName){
+    modalTitle.textContent = `Images — ${studentName}`;
+    modalSubtitle.textContent = `Student UID: ${studentUid}`;
+    imageList.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.6)">Loading images from wasteHistory/${studentUid}/ …</div>`;
+    imageModalBackdrop.style.display = "flex";
+    imageModalBackdrop.setAttribute("aria-hidden","false");
+
+    try {
+      const folderRef = sRef(storage, `wasteHistory/${studentUid}/`);
+      const l = await listAll(folderRef);
+      if (!l.items || l.items.length === 0) {
+        imageList.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.6)">No images found.</div>`;
+        return;
+      }
+
+      // build grid
+      const grid = document.createElement("div");
+      grid.className = "image-grid";
+
+      // fetch URLs in parallel
+      const items = l.items;
+      const promises = items.map(async itemRef => {
+        const url = await getDownloadURL(itemRef);
+        return { itemRef, url };
+      });
+
+      const results = await Promise.all(promises);
+
+      results.forEach(r=>{
+        const c = document.createElement("div");
+        c.className = "image-card";
+        const filename = r.itemRef.name;
+        // inner
+        c.innerHTML = `
+          <img src="${r.url}" alt="${escapeHtml(filename)}" />
+          <div class="meta">${escapeHtml(filename)}</div>
+          <div class="controls">
+            <a class="btn" href="${r.url}" target="_blank" rel="noopener">Open</a>
+            <button class="btn btn-reject" data-path="${escapeHtml(r.itemRef.fullPath)}" onclick="deleteImageHandler(event, '${escapeHtml(studentUid)}')">Delete</button>
+          </div>
+        `;
+        grid.appendChild(c);
+      });
+
+      imageList.innerHTML = "";
+      imageList.appendChild(grid);
+    } catch (err) {
+      console.error("Failed to load images:", err);
+      imageList.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.6)">Failed to load images — ${escapeHtml(err.message||err)}</div>`;
+    }
   }
+
+  // close modal
+  closeImagesBtn.addEventListener("click", closeImageModal);
+  imageModalBackdrop.addEventListener("click", (e)=>{
+    if (e.target === imageModalBackdrop) closeImageModal();
+  });
+  function closeImageModal(){
+    imageModalBackdrop.style.display = "none";
+    imageModalBackdrop.setAttribute("aria-hidden","true");
+    imageList.innerHTML = "";
+  }
+
+  // delete handler (removes storage file and attempts to remove matching Firestore docs in collection 'wasteHistory')
+  window.deleteImageHandler = async function(ev, studentUid){
+    ev.stopPropagation();
+    const btn = ev.currentTarget;
+    const storagePath = btn.dataset.path;
+    if (!storagePath) return alert("No storage path found for this image.");
+
+    if (!confirm("Delete this image permanently?")) return;
+
+    try {
+      const objRef = sRef(storage, storagePath);
+      await deleteObject(objRef);
+
+      // attempt to delete doc(s) in collection 'wasteHistory' that reference this storage path
+      try {
+        const whCol = collection(db, "wasteHistory");
+        const q = query(whCol, where("studentUid","==", studentUid), where("storagePath","==", storagePath));
+        const snap = await getDocs(q);
+        const deletes = [];
+        snap.forEach(d=>{
+          deletes.push(deleteDoc(doc(db, "wasteHistory", d.id)));
+        });
+        await Promise.all(deletes);
+      } catch (innerErr) {
+        // not fatal — maybe no such collection or fields differ
+        console.warn("Could not delete matching Firestore docs (maybe schema differs):", innerErr);
+      }
+
+      // remove the image card from modal UI
+      btn.closest(".image-card")?.remove();
+
+      // if no images left, show message
+      if (!imageList.querySelector(".image-card")) {
+        imageList.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.6)">No images found.</div>`;
+      }
+
+      alert("Image deleted.");
+    } catch (err) {
+      console.error("Failed to delete image:", err);
+      alert("Failed to delete image: " + (err.message || err));
+    }
+  };
+
 </script>
 
 </body>
